@@ -1,0 +1,33 @@
+name: Question for the central authority
+description: Ask a technical question. It is translated into EN / CS / PL and published with the official answer in the read-only channel on the website.
+title: "[Q] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Only the central authority answers.** This issue is locked automatically, so users cannot reply to each other.
+        Your question is public: do not include personal data. You can write in English, Czech or Polish.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What do you want to know?
+    validations:
+      required: true
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic
+      options:
+        - Assembly / wiring
+        - Firmware / flashing
+        - Solar / power
+        - Network / connecting
+        - Accessibility add-ons
+        - Group purchase
+        - Other
+  - type: input
+    id: language
+    attributes:
+      label: Language

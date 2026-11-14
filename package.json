@@ -1,0 +1,22 @@
+{
+  "name": "meshtastic-esp32s3-eink",
+  "version": "1.0.0",
+  "description": "Open-hardware solar Meshtastic E-Ink node: website, signing and channel tools",
+  "scripts": {
+    "serve": "npx --yes http-server@14.1.1 site -p 8080 -c-1",
+    "keygen": "node tools/sign.mjs keygen",
+    "sign": "node tools/sign.mjs sign",
+    "vendor": "esbuild tools/vendor-entry.mjs --bundle --format=esm --minify --outfile=site/vendor/noble.js"
+  },
+  "license": "GPL-3.0-only",
+  "type": "module",
+  "devDependencies": {
+    "@noble/curves": "^1.9.7",
+    "@noble/post-quantum": "^0.5.2",
+    "esbuild": "^0.25.10"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0"
+  },
+  "private": true
+}

@@ -1,0 +1,64 @@
+name: Question channel
+# Central-authority Q&A: lock each question so users cannot talk to each other,
+# translate it into EN / CS / PL and publish it to the read-only channel
+# (site/channel.json). A comment by a maintainer is the official answer.
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: channel
+  cancel-in-progress: false
+
+jobs:
+  question:
+    if: github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'question')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lock conversation (only the central authority can reply)
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh issue lock ${{ github.event.issue.number }} --repo ${{ github.repository }} --reason resolved || true
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: node tools/channel.mjs question
+        env: { ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}" }
+      - name: Publish
+        run: |
+          git config user.name "channel-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/channel.json
+          git commit -m "channel: question #${{ github.event.issue.number }}" || exit 0
+          git pull --rebase && git push
+
+  answer:
+    # Only maintainers (owner / members / collaborators) can answer.
+    if: >-
+      github.event_name == 'issue_comment' && !github.event.issue.pull_request &&
+      contains(github.event.issue.labels.*.name, 'question') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: node tools/channel.mjs answer
+        env: { ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}" }
+      - name: Publish and close
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          git config user.name "channel-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/channel.json
+          git commit -m "channel: answer #${{ github.event.issue.number }}" || exit 0
+          git pull --rebase && git push
+          gh issue edit ${{ github.event.issue.number }} --repo ${{ github.repository }} --add-label answered || true
+          gh issue close ${{ github.event.issue.number }} --repo ${{ github.repository }} || true

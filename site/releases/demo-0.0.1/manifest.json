@@ -1,0 +1,19 @@
+{
+  "name": "meshtastic-esp32s3-eink",
+  "version": "0.0.1-demo",
+  "board": "heltec-wireless-paper",
+  "upstream_commit": "DEMO-not-a-real-build",
+  "built_at": "2026-11-14T14:14:51.952Z",
+  "signature_algs": [
+    "ML-DSA-65",
+    "Ed25519"
+  ],
+  "files": [
+    {
+      "name": "firmware.bin",
+      "size": 4096,
+      "sha256": "f2e4bb5ecd498b26931440cca9d2ce58fd350fc3297754fb3b48de7025db9ebd"
+    }
+  ],
+  "note": "DEMO release: random bytes, NOT real firmware. Use it only to try the verifier."
+}
