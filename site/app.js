@@ -1,9 +1,9 @@
-import { CONFIG } from './config.js';
-import { PINS, BOM, BOM_ADDONS, COMPUTE } from './pins.js';
-import { mountDemo } from './demo.js';
-import en from './content/en.js';
-import cs from './content/cs.js';
-import pl from './content/pl.js';
+import { CONFIG } from './config.js?v=2';
+import { PINS, BOM, BOM_ADDONS, COMPUTE } from './pins.js?v=2';
+import { mountDemo } from './demo.js?v=2';
+import en from './content/en.js?v=2';
+import cs from './content/cs.js?v=2';
+import pl from './content/pl.js?v=2';
 
 const LANGS = { en, cs, pl };
 const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'openhw', 'access', 'faq', 'verify', 'security', 'releases'];
