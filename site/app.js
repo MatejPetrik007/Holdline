@@ -1,11 +1,12 @@
 import { CONFIG } from './config.js';
-import { PINS } from './pins.js';
+import { PINS, BOM, BOM_ADDONS, COMPUTE } from './pins.js';
+import { mountDemo } from './demo.js';
 import en from './content/en.js';
 import cs from './content/cs.js';
 import pl from './content/pl.js';
 
 const LANGS = { en, cs, pl };
-const ROUTES = ['home', 'hardware', 'build', 'solar', 'openhw', 'access', 'faq', 'verify', 'security', 'releases'];
+const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'openhw', 'access', 'faq', 'verify', 'security', 'releases'];
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -60,6 +61,104 @@ function pinTable(rows) {
     .map(([part, sig, gpio, fn]) => `<tr><td>${esc(part)}</td><td><code>${esc(sig)}</code></td><td><span class="gpio">${typeof gpio === 'number' ? 'GPIO' + gpio : esc(gpio)}</span></td><td>${esc(fn[lang])}</td></tr>`)
     .join('')}</tbody></table></div>`;
 }
+const tr = (x) => (x && typeof x === 'object' ? x[lang] : x);
+const buyLinks = (buy) => `<span class="buy">${buy.map(([l, u]) => `<a href="${esc(u)}" rel="noopener nofollow" target="_blank">${esc(l)}</a>`).join('')}</span>`;
+function bomTable(rows) {
+  const c = T.ui.bomCols;
+  return `<div class="tbl-wrap"><table class="tbl"><thead><tr>${c.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows
+    .map((r) => `<tr><td><b>${esc(tr(r.part))}</b></td><td>${esc(r.ex)}</td><td>${esc(tr(r.note))}</td><td>${buyLinks(r.buy)}</td></tr>`)
+    .join('')}</tbody></table></div><p class="small">${T.ui.shopNote}</p>`;
+}
+function computeTable() {
+  const c = T.ui.computeCols;
+  return `<div class="tbl-wrap"><table class="tbl"><thead><tr>${c.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${COMPUTE
+    .map((r) => `<tr><td><b>${esc(tr(r.tier))}</b></td><td>${esc(tr(r.hw))}</td><td>${esc(tr(r.gpu))}</td><td>${esc(tr(r.does))}</td><td style="white-space:nowrap">${esc(r.power)}</td></tr>`)
+    .join('')}</tbody></table></div>`;
+}
+
+// ---------- ESP32-S3-DevKitC-1 pin diagram ----------
+const GROUP_COLOR = { epaper: '#2f7de1', radio: '#dd7a1f', power: '#d23f31', gnd: '#7b8088', battery: '#8e44ad', addon: '#0d9b6c', ui: '#a08a2c' };
+function pinGroups() {
+  const m = {};
+  const add = (gpio, group, label) => (m[gpio] ||= []).push({ group, label });
+  for (const [part, sig, gpio] of PINS.diy) {
+    if (typeof gpio !== 'number') continue;
+    const group = part === 'E-paper' ? 'epaper' : part === 'SX1262' ? 'radio' : part === 'Battery' ? 'battery' : 'ui';
+    add(gpio, group, `${part === 'Battery' ? 'VBAT sense' : part === 'Button' ? 'BOOT' : part + ' ' + sig}`);
+  }
+  for (const [part, sig, gpio] of PINS.addons) add(gpio, 'addon', `${part.replace(' (basic)', '').replace('Braille keyboard', 'Braille')} ${sig.split(' ')[0]}`);
+  return m;
+}
+function boardSvg() {
+  const B = T.ui.board;
+  const pg = pinGroups();
+  const top = 192, step = 23, bx = 230, bw = 160;
+  const rows = PINS.header.J1.length;
+  const h = top + rows * step + 50;
+  let pins = '';
+  const side = (list, isLeft) => list.forEach((p, i) => {
+    const y = top + i * step;
+    const x = isLeft ? bx + 10 : bx + bw - 26;
+    const name = typeof p === 'number' ? String(p) : p;
+    let tags = typeof p === 'number' ? pg[p] || [] : [];
+    if (p === '3V3' && i === 0) tags = [{ group: 'power', label: B.v33 }];
+    if (p === 'GND' && ((isLeft && i === rows - 1) || (!isLeft && i === 0))) tags = [{ group: 'gnd', label: B.gnd }];
+    const used = tags.length > 0;
+    const groups = [...new Set(tags.map((t) => t.group))].join(' ');
+    const col = used ? GROUP_COLOR[tags[0].group] : '';
+    const tagW = 150, tx = isLeft ? 8 : bx + bw + 52;
+    pins += `<g class="pin${used ? ' used' : ''}" data-groups="${groups}" data-gpio="${esc(name)}">`;
+    if (used) {
+      const lx1 = isLeft ? tx + tagW : x + 16, lx2 = isLeft ? x : tx;
+      pins += `<path class="wire" d="M${lx1} ${y + 8}H${lx2}" stroke="${col}"/>`;
+      pins += `<rect x="${tx}" y="${y - 1}" width="${tagW}" height="18" rx="9" fill="${col}" style="fill:${col};stroke:none"/><text x="${tx + tagW / 2}" y="${y + 12}" text-anchor="middle" style="fill:#fff;font-weight:700;font-size:10.5px">${esc(tags.map((t) => t.label).join(' · '))}</text>`;
+    }
+    pins += `<rect x="${x}" y="${y}" width="16" height="16" rx="3" ${used ? `style="stroke:${col}"` : ''}/>`;
+    pins += `<text x="${isLeft ? x + 22 : x - 6}" y="${y + 12}" text-anchor="${isLeft ? 'start' : 'end'}">${typeof p === 'number' ? 'IO' + p : esc(p)}</text></g>`;
+  });
+  side(PINS.header.J1, true);
+  side(PINS.header.J3, false);
+  const svg = `<svg class="board" viewBox="0 0 620 ${h}" role="img" aria-label="${esc(B.aria)}">
+    <text x="310" y="26" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--ink)">ESP32-S3-DevKitC-1</text>
+    <text x="310" y="44" text-anchor="middle" style="font-size:10.5px;fill:var(--muted)">${esc(B.sub)}</text>
+    <rect x="${bx}" y="${top - 132}" width="${bw}" height="${rows * step + 152}" rx="10" style="fill:#13324a;stroke:var(--ink);stroke-width:1.5"/>
+    <rect x="${bx + 22}" y="${top - 122}" width="${bw - 44}" height="96" rx="4" style="fill:#c9ccd1;stroke:#8a8f97"/>
+    <rect x="${bx + 36}" y="${top - 108}" width="${bw - 72}" height="68" rx="3" style="fill:#2b2f36"/>
+    <text x="${bx + bw / 2}" y="${top - 78}" text-anchor="middle" style="fill:#d7dbe0;font-size:10px">ESP32-S3</text>
+    <text x="${bx + bw / 2}" y="${top - 64}" text-anchor="middle" style="fill:#d7dbe0;font-size:8.5px">WROOM-1</text>
+    <rect x="${bx + 30}" y="${top + rows * step + 4}" width="34" height="18" rx="3" style="fill:#c9ccd1"/><rect x="${bx + bw - 64}" y="${top + rows * step + 4}" width="34" height="18" rx="3" style="fill:#c9ccd1"/>
+    <text x="${bx + 47}" y="${top + rows * step + 34}" text-anchor="middle" style="font-size:8px;fill:var(--muted)">USB-UART</text><text x="${bx + bw - 47}" y="${top + rows * step + 34}" text-anchor="middle" style="font-size:8px;fill:var(--muted)">USB</text>
+    <text x="${bx + 18}" y="${top - 12}" style="font-size:9px;fill:#9fb3c8">J1</text><text x="${bx + bw - 18}" y="${top - 12}" text-anchor="end" style="font-size:9px;fill:#9fb3c8">J3</text>
+    ${pins}</svg>`;
+  const legend = `<ul class="legend-list">${Object.entries(B.groups).map(([g, [name, desc]]) => `<li data-group="${g}" tabindex="0"><i style="background:${GROUP_COLOR[g]}"></i><b>${name}</b><span class="small">${desc}</span></li>`).join('')}</ul>`;
+  return `<div class="board-wrap">${svg}<div>${legend}<p class="small">${B.note}</p></div></div>`;
+}
+function wireBoard() {
+  $$('.board-wrap').forEach((wrap) => {
+    const pins = $$('.pin', wrap);
+    const items = $$('.legend-list li', wrap);
+    const set = (g) => {
+      pins.forEach((p) => {
+        const on = g && p.dataset.groups.split(' ').includes(g);
+        p.classList.toggle('hl', !!on);
+        $('.wire', p)?.classList.toggle('dim', !!g && !on);
+      });
+      items.forEach((i) => i.classList.toggle('hl', i.dataset.group === g));
+    };
+    items.forEach((i) => {
+      i.addEventListener('mouseenter', () => set(i.dataset.group));
+      i.addEventListener('focus', () => set(i.dataset.group));
+      i.addEventListener('mouseleave', () => set(null));
+      i.addEventListener('blur', () => set(null));
+    });
+    pins.forEach((p) => {
+      if (!p.dataset.groups) return;
+      p.addEventListener('mouseenter', () => set(p.dataset.groups.split(' ')[0]));
+      p.addEventListener('mouseleave', () => set(null));
+    });
+  });
+}
+
 function powerTable() {
   return `<ol class="chain">${PINS.power.map(([n, what, how]) => `<li><b>${esc(what[lang])}</b><span>${esc(how[lang])}</span></li>`).join('')}</ol>`;
 }
@@ -88,13 +187,20 @@ function fill(html) {
     .replaceAll('{{UP}}', `<span class="up">${T.ui.up}</span>`)
     .replaceAll('{{PINS_HELTEC}}', pinTable(PINS.heltec))
     .replaceAll('{{PINS_DIY}}', pinTable(PINS.diy))
+    .replaceAll('{{PINS_ADDONS}}', () => pinTable(PINS.addons))
+    .replaceAll('{{BOARD}}', boardSvg)
+    .replaceAll('{{BOM}}', () => bomTable(BOM))
+    .replaceAll('{{BOM_ADDONS}}', () => bomTable(BOM_ADDONS))
+    .replaceAll('{{COMPUTE}}', computeTable)
     .replaceAll('{{POWER_CHAIN}}', powerTable())
     .replaceAll('{{REPO}}', `https://github.com/${CONFIG.repo}`);
 }
 
 // ---------- render ----------
+let unmount = null;
 function render(fromHash) {
   const { page, anchor } = route();
+  if (unmount) { unmount(); unmount = null; }
   document.documentElement.lang = lang;
   $$('#langs button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.lang === lang));
   $('#nav').innerHTML = ROUTES.map((r) => `<a href="#/${r}" ${r === page ? 'aria-current="page"' : ''}>${T.ui.nav[r]}</a>`).join('');
@@ -103,6 +209,8 @@ function render(fromHash) {
   $('#main').innerHTML = fill(T.pages[page]);
   document.body.classList.remove('nav-open');
   wireCopy();
+  wireBoard();
+  if (page === 'demo') unmount = mountDemo($('#sim'), T.ui.demo);
   ({ verify: initVerify, releases: initReleases, faq: initFaq, access: initForms, openhw: initForms }[page] || (() => {}))();
   if (anchor) document.getElementById(anchor)?.scrollIntoView();
   else if (fromHash) window.scrollTo(0, 0);

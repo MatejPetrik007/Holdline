@@ -4,9 +4,11 @@
 
 An open-hardware, solar-powered [Meshtastic](https://meshtastic.org) LoRa node for ESP32-S3 boards with E-Ink displays:
 
-- **Build it at home** with a parts list, a pin-by-pin wiring guide and a DIY firmware variant ([`hardware/`](hardware/), [`variants/diy_s3_eink/`](variants/diy_s3_eink/)).
+- **Delivered fully assembled** to every household: plug in the solar panel and mount it. Soldering is optional.
+- **Blackout demo**: an interactive simulation of an alert failing over the cell network and reaching every node through the mesh (Cieszyn / Český Těšín).
+- **Or build it at home** with a parts list (with shop links), an interactive pin diagram, a pin-by-pin wiring guide and a DIY firmware variant ([`hardware/`](hardware/), [`variants/diy_s3_eink/`](variants/diy_s3_eink/)).
 - **Runs off-grid on solar**: a 2–6 W panel plus one 18650 cell.
-- **Accessibility add-ons** for deaf, blind and deafblind people: a Braille keyboard and a haptic skin band, both open hardware ([`hardware/addons/`](hardware/addons/)). There is a registration form for supplied units and one for self-build kits and the group purchase.
+- **Accessibility add-ons** for deaf, blind and deafblind people: a Braille keyboard and the state-supplied haptic band Pro (with sound recognition and an optional speech-to-text hub), both open hardware; deafblind people get an in-person handover ([`hardware/addons/`](hardware/addons/)). There is a registration form for supplied units and a self-build form for people who opt out of the assembled delivery.
 - **Central-authority Q&A**: people ask only the central authority, never each other. Questions are auto-translated into EN / CS / PL and published with the official answer in a read-only channel.
 - **Verifiable firmware**: SHA-256 manifests signed with ML-DSA-65 (FIPS 204) + Ed25519, verified entirely in the browser.
 
@@ -28,6 +30,7 @@ Ed25519    0d8d88541b61d4e0d73e3e4e622e90f44f4c3267b48928b846296d24d40d03e6
 | `site/` | Static website (no build step, deployed to GitHub Pages). Content in `site/content/{en,cs,pl}.js`, pin maps in `site/pins.js`, settings in `site/config.js` |
 | `site/channel.json` | Read-only Q&A channel data (written by the workflow) |
 | `site/releases.json`, `site/releases/` | Signed releases (currently one **demo** release of random bytes) |
+| `site/demo.js` | Blackout simulation (cell network vs. Meshtastic managed flooding) |
 | `site/vendor/noble.js` | Bundled ML-DSA + Ed25519 verifier (`npm run vendor`) |
 | `tools/sign.mjs` | Key generation and release signing |
 | `tools/channel.mjs` | Translates questions and answers with Claude and updates the channel |

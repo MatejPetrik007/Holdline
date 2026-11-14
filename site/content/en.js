@@ -3,10 +3,64 @@ const DISCLAIMER = `<p><b>Disclaimer:</b> this is an unofficial community build 
 export default {
   ui: {
     brand: 'Meshtastic E-Ink Node',
-    nav: { home: 'Home', hardware: 'Hardware', build: 'Build', solar: 'Solar', openhw: 'Open hardware', access: 'Accessibility', faq: 'Q&A', verify: 'Verify', security: 'Security', releases: 'Releases' },
+    nav: { home: 'Home', demo: 'Blackout demo', hardware: 'Hardware', build: 'Build', solar: 'Solar', openhw: 'Open hardware', access: 'Accessibility', faq: 'Q&A', verify: 'Verify', security: 'Security', releases: 'Releases' },
     up: 'check upstream',
     copy: 'COPY', copied: 'COPIED',
     pinCols: ['Part', 'Signal', 'ESP32-S3 pin', 'What it does'],
+    bomCols: ["Part", "Example", "Notes", "Where to buy"],
+    shopNote: "Shop links are example search pages, not endorsements. Check stock, price and the 868 MHz version before ordering.",
+    computeCols: ["Setup", "Hardware", "GPU / accelerator", "What it does", "Power"],
+    board: {
+      aria: "ESP32-S3-DevKitC-1 pin diagram with the GPIOs used by the e-paper display, the SX1262 radio, battery sensing and add-ons",
+      sub: "DIY wiring · hover a group or a pin",
+      v33: "3V3 → radio, e-paper",
+      gnd: "GND (common)",
+      groups: {
+        epaper: ["E-paper display", "SPI + DC, RST, BUSY · GPIO2–7"],
+        radio: ["SX1262 LoRa radio", "SPI + NRST, BUSY, DIO1 · GPIO8–14"],
+        power: ["3.3 V supply", "from the LDO, never 5 V"],
+        gnd: ["Ground", "shared by every module"],
+        battery: ["Battery sense", "100k/100k divider · GPIO1"],
+        addon: ["Accessibility add-ons", "I²C 17/18 · haptic 21 · band serial 15/16"],
+        ui: ["BOOT button", "already on the board · GPIO0"],
+      },
+      note: "Pin order follows ESP32-S3-DevKitC-1 v1.1. Check the silkscreen of your board before soldering. Assembled nodes are already wired; this is for people who build or repair their own.",
+    },
+    demo: {
+      who: "Crisis centre · Cieszyn", outgoing: "Outgoing alert", fits: "{n} B · fits in one packet",
+      channelLine: "Channel OLZA · AES-256 · EU868", preset: "Preset LongFast · hop limit",
+      routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
+      mapLabel: "Map of Cieszyn and Český Těšín with mesh radio nodes on both sides of the Olza river",
+      riverLabel: "Olza · border",
+      legend: ["mesh node · got alert", "mesh node · not yet", "rooftop router", "cell tower"],
+      replay: "Replay story", resend: "Resend via mesh", hopLimit: "Hop limit", speed: "Speed", speeds: ["Slow", "Normal", "Fast"],
+      restore: "Restore all nodes", hint: "Click a node to knock it out, then resend.", base: "base station",
+      statsLabel: "Delivery summary", stats: ["Cell network", "Mesh reached", "Max hops", "Transmissions", "Time to deliver"],
+      nodes: { hq: "Crisis centre", hospital: "Hospital", roof: "Těšín roof" },
+      tipHq: "Crisis centre base station (Cieszyn)", tipNode: "{name} ({c}) · {role} · click to switch off / on",
+      router: "rooftop router", household: "household node",
+      pills: { waiting: "waiting", sending: "sending", failed: "failed", delivered: "{r}/{t} delivered" },
+      phases: { normal: "GRID NORMAL", blackout: "BLACKOUT · BOTH BANKS", drained: "TOWER BATTERIES DRAINED", cell: "ALERT VIA CELL NETWORK", mesh: "MESHTASTIC · MANAGED FLOODING", done: "ALERT DELIVERED OVER MESH" },
+      log: {
+        grid: "Grid normal · 3 cell sites on mains power",
+        meshReady: "Mesh: {n} nodes on battery/solar, channel OLZA",
+        lost: "Grid power lost in Cieszyn and Český Těšín",
+        battery: "Cell sites switched to backup batteries",
+        depleted: "{t}: battery depleted, site offline",
+        sms: "SMS / cell broadcast → operator gateways",
+        noCell: "No cell site reachable · 0 residents notified",
+        switching: "Switching to the Meshtastic base station…",
+        resend: "──── resend via mesh ────",
+        tx: "TX alert id=0x4F1A · {b} B · hop_limit={h} · ch OLZA",
+        ack: "implicit ACK · heard {from} relay our packet",
+        quiet: "{n}: heard {from} relay it first, stays quiet",
+        rx: "{n} ({c}) rx hop {hop} · SNR {snr} dB · relay in {ms} ms",
+        rxLimit: "{n} ({c}) rx hop {hop} · SNR {snr} dB · hop limit 0, not relayed",
+        all: "Delivered to all {t} nodes · {tx} transmissions · {q} stayed quiet",
+        missed: "Not reached: {list}", offCount: " ({n} switched off)",
+        tip: "Tip: raise the hop limit or restore a router, then resend.",
+      },
+    },
     verify: {
       waiting: 'waiting for files: {n}/3',
       hash: 'SHA-256 of firmware matches manifest', sig: 'Signature', sigOk: 'valid for publisher key', sigBad: 'INVALID or missing',
@@ -31,9 +85,10 @@ export default {
   <div>
     <p class="eyebrow">open hardware · off-grid · ESP32-S3 + E-Ink</p>
     <h1>A solar-powered mesh node you can build at home.</h1>
-    <p class="lede">An open-hardware LoRa node running <a href="https://meshtastic.org" rel="noopener">Meshtastic</a> with an E-Ink screen. Build it yourself and join the network, receive a ready-made one from the state, or register for accessibility add-ons such as a Braille keyboard or a haptic skin band. Every firmware release can be verified in your browser before you flash it.</p>
+    <p class="lede">An open-hardware LoRa node running <a href="https://meshtastic.org" rel="noopener">Meshtastic</a> with an E-Ink screen. Every household receives one <b>fully assembled</b> from the state, so soldering is optional: the schematics are open for anyone who wants to build their own. You can also register for accessibility add-ons such as a Braille keyboard or a haptic skin band. Every firmware release can be verified in your browser before you flash it.</p>
     <div class="cta">
-      <a class="btn primary" href="#/openhw">Build it yourself →</a>
+      <a class="btn primary" href="#/demo">See it work in a blackout →</a>
+      <a class="btn" href="#/openhw">Build it yourself</a>
       <a class="btn" href="#/faq">Q&amp;A and pinout</a>
       <a class="btn" href="#/access">Accessibility registration</a>
     </div>
@@ -46,7 +101,7 @@ export default {
   <div class="card"><div class="feature-icon">▤</div><span class="num">02</span><h3>Low-power E-Ink display</h3><p>E-Ink keeps the last screen visible with zero power draw, so a battery node can show messages and node info for weeks. Pin configs are defined upstream in the <a href="https://github.com/meshtastic/firmware" rel="noopener">firmware repository</a>.</p></div>
   <div class="card"><div class="feature-icon">✓</div><span class="num">03</span><h3>Verifiable firmware</h3><p>Every release ships a manifest with SHA-256 hashes, signed with post-quantum <b>ML-DSA-65 (FIPS 204)</b> plus Ed25519. A valid signature proves the release is authentic from its publisher; it is not an endorsement by any authority.</p></div>
   <a class="card" href="#/solar"><div class="feature-icon">☀</div><span class="num">04</span><h3>Runs on sunlight</h3><p>Today's small solar panels easily power a node off-grid. A 2–6 W panel and one 18650 cell keep it running through nights and cloudy days. →</p></a>
-  <a class="card" href="#/openhw"><div class="feature-icon">⚒</div><span class="num">05</span><h3>Open hardware, built at home</h3><p>Schematics, pinout and parts list are open. Anyone can build a node at home and connect to the network. Join the group purchase for cheaper parts. →</p></a>
+  <a class="card" href="#/openhw"><div class="feature-icon">⚒</div><span class="num">05</span><h3>Delivered assembled, open to build</h3><p>Your node arrives ready to use: plug in the solar panel and mount it. Schematics, pinout and parts list are open if you'd rather build your own. →</p></a>
   <a class="card" href="#/access"><div class="feature-icon">⠿</div><span class="num">06</span><h3>Accessible for deaf and blind people</h3><p>Register for add-ons such as a Braille keyboard or a haptic skin band. They are open source too, so you can also build them yourself. →</p></a>
 </div>
 
@@ -65,6 +120,41 @@ export default {
   </div>
 </div>`,
 
+
+    demo: `
+<p class="eyebrow">simulation · Cieszyn (PL) / Český Těšín (CZ)</p>
+<h1>Blackout on the Olza</h1>
+<p class="lede">The power is out on both banks of the river. Cell towers last a few hours on battery, then go silent. A crisis centre in Cieszyn needs to tell residents in both countries where to find water and charging. Watch the same alert fail over the phone network, then reach every household node through a Meshtastic mesh, hop by hop.</p>
+<div id="sim"></div>
+
+<div class="two">
+  <div class="card"><h2>Why the phones go quiet</h2>
+    <p>A cell tower needs grid power and a working backhaul link to the core network. Most sites carry batteries sized for a few hours. In a long regional blackout they drain one by one, and SMS or cell-broadcast alerts have nothing left to travel on.</p>
+    <p>The border adds a second gap. Each country runs warnings over its own operators, so a resident of Český Těšín on a Czech SIM may never see an alert issued by a Polish authority a few hundred metres away, across the bridge.</p></div>
+  <div class="card"><h2>Why the mesh keeps working</h2>
+    <p>Meshtastic nodes are small LoRa radios that sip power: one 18650 cell and a palm-sized <a href="#/solar">solar panel</a> keep one running for days. They need no tower, no SIM and no operator. The E-Ink screen shows the alert even with no phone at all.</p>
+    <p>Poland and Czechia share the same licence-free EU868 band, so nodes on both banks join one channel. The river is a border for networks, not for radio.</p></div>
+</div>
+
+<h2>How a message propagates</h2>
+<ol class="steps">
+  <li><h3>The centre transmits once</h3><p>Its rooftop node broadcasts the encrypted packet with a hop limit, 3 by default. Every node in radio range, typically 1–5 km in town and much further from a hill, receives it.</p></li>
+  <li><h3>Each node relays it once</h3><p>This is <i>managed flooding</i>. A node that receives a new packet waits a short moment and then rebroadcasts it with the hop limit lowered by one. At zero, it stops.</p></li>
+  <li><h3>Far nodes go first</h3><p>The wait depends on signal strength: a weak signal means the node is far from the sender, so it waits less. That pushes the message outward fastest.</p></li>
+  <li><h3>Duplicates are ignored</h3><p>Every packet has an ID. A node that has already seen it drops copies. A regular node that hears a neighbour relay the packet before its own turn stays quiet, which saves airtime. Routers on high points, like Góra Zamkowa here, always relay.</p></li>
+  <li><h3>The sender knows it got out</h3><p>When the centre hears its own packet relayed, it counts that as an implicit acknowledgement.</p></li>
+  <li><h3>Lose a node, keep the network</h3><p>Knock out the Góra Zamkowa router on the map and resend: the Bulwary node by the river, which normally stays quiet, now carries the alert across to Český Těšín.</p></li>
+</ol>
+
+<h2>Cell network vs mesh during a blackout</h2>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Cell network</th><th>Meshtastic mesh</th></tr></thead><tbody>
+<tr><td>Needs grid power</td><td>Yes, batteries last hours</td><td><b>No</b>, battery and solar for days</td></tr>
+<tr><td>Central point of failure</td><td>Towers, backhaul, core network</td><td><b>None</b>, every node is a relay</td></tr>
+<tr><td>Across the PL–CZ border</td><td>Separate operators and alert systems</td><td><b>One shared channel</b> on both banks</td></tr>
+<tr><td>Capacity</td><td>Voice, data, video</td><td>Short text only, about 200 bytes per message, shared airtime</td></tr>
+<tr><td>Preparation</td><td>Already in every pocket</td><td>Nodes must be placed, charged and on the channel before the blackout: that is why every household gets one <a href="#/openhw">delivered assembled</a></td></tr>
+</tbody></table></div>
+<p class="small">The mesh does not replace sirens, radio broadcasts or door-to-door teams. It adds a channel that survives when the others are down. Deaf and deafblind residents receive the same alert as vibration through the <a href="#/access">haptic band</a>. This simulation simplifies radio range and timing and ignores packet collisions; node locations are illustrative.</p>`,
     hardware: `
 <p class="eyebrow">hardware</p>
 <h1>ESP32-S3 boards with E-Ink displays</h1>
@@ -145,42 +235,56 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 
     openhw: `
 <p class="eyebrow">open hardware</p>
-<h1>Open hardware: anyone can build one at home</h1>
-<p class="lede">Firmware, schematics, pinout, parts list and accessibility add-ons are all open. Build a node at home, flash verified firmware and connect to the network. If you don't want to build one, the state supplies a ready-made node automatically.</p>
-<div class="toc"><a href="#/openhw#paths">Three ways to get a node</a><a href="#/openhw#bom">Parts list</a><a href="#/openhw#connect">Connect to the network</a><a href="#/openhw#selfhost">Self-build add-ons and group purchase</a></div>
+<h1>Delivered assembled. Open, so you can build it yourself.</h1>
+<p class="lede">Every household receives a node <b>fully assembled, flashed and tested</b> by the state. You don't need to solder anything. The schematics, pinout and parts list are open so that anyone who wants to can build, repair or improve one at home.</p>
+<div class="toc"><a href="#/openhw#box">What arrives</a><a href="#/openhw#paths">Three ways to get a node</a><a href="#/openhw#pins">Which pin goes where</a><a href="#/openhw#bom">Parts and where to buy</a><a href="#/openhw#connect">Connect a self-built node</a><a href="#/openhw#selfhost">Build it yourself: tell us</a></div>
+
+<h2 id="box">What arrives in the box</h2>
+<div class="two">
+  <div>
+    <ul>
+      <li><b>The node, assembled</b> in a weatherproof IP65 case: board, LoRa radio, E-Ink screen, battery, charger and regulator, all wired, soldered, flashed with <a href="#/verify">verified firmware</a> and already set to region <code>EU_868</code> and the network channel.</li>
+      <li><b>Antenna</b> (screw-on SMA).</li>
+      <li><b>Solar panel</b> with a keyed plug-in lead that can't be connected the wrong way round.</li>
+      <li><b>Mounting bracket</b> and a printed quick guide (Braille or large print on request).</li>
+    </ul>
+  </div>
+  <ol class="steps">
+    <li><h3>Screw on the antenna</h3><p>Before anything else.</p></li>
+    <li><h3>Plug in the solar panel</h3><p>The only connection you make yourself. No tools.</p></li>
+    <li><h3>Mount it high, panel facing south</h3><p>Window sill, balcony or roof. Height matters more than anything.</p></li>
+    <li><h3>Press the button</h3><p>The screen shows <code>MESH · n nodes</code>. Done.</p></li>
+  </ol>
+</div>
 
 <h2 id="paths">Three ways to get a node</h2>
 <div class="grid">
-  <div class="card"><span class="num">A</span><h3>Build it yourself</h3><p>Follow the parts list and <a href="#/faq#wiring">wiring guide</a>, flash firmware, join the mesh. Open hardware means you may copy, modify and share the design.</p></div>
-  <div class="card"><span class="num">B</span><h3>Supplied by the state</h3><p>Everyone else gets a standard, pre-flashed solar node supplied automatically by the state. Details about delivery are published by the central authority in the <a href="#/faq#channel">read-only channel</a>.</p></div>
-  <a class="card" href="#/access"><span class="num">C</span><h3>Deaf, blind or deafblind</h3><p>Register to receive accessibility add-ons such as a Braille keyboard or a haptic skin band with your node. →</p></a>
+  <div class="card"><span class="num">A · DEFAULT</span><h3>Delivered assembled</h3><p>You don't need to do anything: every registered address receives an assembled node automatically. Soldering is never required. Delivery dates are published in the <a href="#/faq#channel">read-only channel</a>.</p></div>
+  <a class="card" href="#/openhw#selfhost"><span class="num">B · OPTIONAL</span><h3>Build it yourself</h3><p>Want to solder your own? Tell us with the form below, so the state doesn't send you one. Parts kits are available through the group purchase. →</p></a>
+  <a class="card" href="#/access"><span class="num">C</span><h3>Deaf, blind or deafblind</h3><p>Delivered assembled with the add-ons that fit you. Deafblind people get an in-person handover and set-up. →</p></a>
 </div>
 
-<h2 id="bom">Parts list (DIY reference build)</h2>
-<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Part</th><th>Example</th><th>Notes</th></tr></thead><tbody>
-<tr><td>MCU board</td><td>ESP32-S3-DevKitC-1 (N8R8 or N16R8)</td><td>PSRAM recommended</td></tr>
-<tr><td>LoRa radio</td><td>SX1262 module with TCXO, e.g. Waveshare Core1262 or Ebyte E22</td><td>Pick the band for your region (EU: 868 MHz). E22 needs RXEN/TXEN wiring, see datasheet</td></tr>
-<tr><td>Display</td><td>2.13″ or 2.9″ SPI e-paper module (black/white)</td><td>Must match the display driver set in the variant {{UP}}</td></tr>
-<tr><td>Antenna</td><td>Tuned 868 MHz antenna, u.FL→SMA pigtail</td><td>Never power the radio without it</td></tr>
-<tr><td>Solar panel</td><td>6 V, 2–6 W</td><td>See <a href="#/solar">Solar</a></td></tr>
-<tr><td>Charger</td><td>CN3791 (MPPT) or TP4056 with protection</td><td>1S Li-ion, 4.2 V</td></tr>
-<tr><td>Battery</td><td>1–2 × 18650 protected, or LiFePO4</td><td>LiFePO4 needs a 3.6 V charger</td></tr>
-<tr><td>Regulator</td><td>3.3 V LDO, low quiescent (ME6211, HT7333)</td><td>Feeds the 3V3 pin</td></tr>
-<tr><td>Misc.</td><td>2 × 100 kΩ resistors, IP65 box, cable glands</td><td>Battery voltage divider on GPIO1</td></tr>
-</tbody></table></div>
-<p>Design files live in the repo under <code>hardware/</code> and <code>variants/diy_s3_eink/</code>: <a href="{{REPO}}">{{REPO}}</a>. Hardware licence CERN-OHL-S-2.0, firmware GPL-3.0 (as upstream).</p>
+<h2 id="pins">Which pin goes where</h2>
+<p>Only needed if you build or repair a node yourself. Assembled nodes are already wired exactly like this.</p>
+{{BOARD}}
+<p>Full tables: <a href="#/faq#wiring">Q&amp;A → wiring</a> · Heltec Wireless Paper (the board inside the delivered node): <a href="#/hardware#pins">Hardware → pins</a>.</p>
 
-<h2 id="connect">Connect to the network</h2>
+<h2 id="bom">Parts and where to buy</h2>
+{{BOM}}
+<p>Design files: <code>hardware/</code> and <code>variants/diy_s3_eink/</code> in <a href="{{REPO}}">the repository</a>. Hardware licence CERN-OHL-S-2.0, firmware GPL-3.0 (as upstream). Accessibility add-on parts: <a href="#/access#build">Accessibility → build it yourself</a>.</p>
+
+<h2 id="connect">Connect a self-built node</h2>
+<p class="small">Delivered nodes are already configured. These steps are only for nodes you built yourself.</p>
 <ol class="steps">
   <li><h3>Set the region</h3><p>In the Meshtastic app or CLI set LoRa region <code>EU_868</code> for Czechia and Poland (other countries: check upstream).</p><pre><code>meshtastic --set lora.region EU_868</code></pre></li>
-  <li><h3>Add the network channel</h3><p>The central authority publishes the channel URL / QR code in the <a href="#/faq#channel">read-only channel</a>. Open it in the app or apply it with the CLI.</p><pre><code>meshtastic --seturl "&lt;channel URL from the read-only channel&gt;"</code></pre></li>
+  <li><h3>Add the network channel</h3><p>The central authority publishes the channel URL / QR code in the <a href="#/faq#channel">read-only channel</a>.</p><pre><code>meshtastic --seturl "&lt;channel URL from the read-only channel&gt;"</code></pre></li>
   <li><h3>Check you're in</h3><p>Within minutes your node list should show neighbours. No neighbours? Raise the antenna, check the region, and read the <a href="#/faq">Q&amp;A</a>.</p></li>
 </ol>
 
-<h2 id="selfhost">Self-build add-ons and group purchase</h2>
-<p>The Braille keyboard and haptic skin band are open source and open hardware, so you can build and run (self-host) them yourself instead of waiting for a supplied unit. Join the <b>group purchase</b> to get parts kits at bulk prices. Registrations are sent privately to the central authority, never published.</p>
+<h2 id="selfhost">Build it yourself: tell us</h2>
+<p>Only fill this in if you want to build your own. Everyone else receives an assembled node automatically and needs to do nothing. Your data goes privately to the central authority and is never published.</p>
 <div class="card">
-<form class="f reg" data-kind="self-build / group purchase">
+<form class="f reg" data-kind="self-build / opt-out of assembled delivery">
   <div class="row2">
     <label><span class="lbl">Name</span><input type="text" name="name" required autocomplete="name"></label>
     <label><span class="lbl">E-mail</span><input type="email" name="email" required autocomplete="email"></label>
@@ -189,18 +293,21 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
     <label><span class="lbl">Country</span><select name="country"><option>Czechia</option><option>Poland</option><option>Slovakia</option><option>Other</option></select></label>
     <label><span class="lbl">City / region</span><input type="text" name="region"></label>
   </div>
-  <fieldset><legend>What do you want to build?</legend>
-    <label class="check"><input type="checkbox" name="node"> Mesh node (ESP32-S3 + E-Ink + solar)</label>
+  <label><span class="lbl">Household address (so we can match your delivery)</span><textarea name="address" rows="2" autocomplete="street-address" required></textarea></label>
+  <label><span class="lbl">Assembled node from the state</span><select name="delivery"><option>Don't deliver one: I'll build my own</option><option>Deliver it anyway: I'm building an extra node</option></select></label>
+  <fieldset><legend>What will you build?</legend>
+    <label class="check"><input type="checkbox" name="node" checked> Mesh node (ESP32-S3 + E-Ink + solar)</label>
     <label class="check"><input type="checkbox" name="braille"> Braille keyboard add-on</label>
-    <label class="check"><input type="checkbox" name="haptic"> Haptic skin band add-on</label>
+    <label class="check"><input type="checkbox" name="haptic"> Haptic band Pro</label>
+    <label class="check"><input type="checkbox" name="hub"> Listening hub (speech-to-text)</label>
   </fieldset>
   <div class="row2">
-    <label><span class="lbl">Join the group purchase?</span><select name="groupbuy"><option value="yes">Yes, reserve kits for me</option><option value="no">No, I'll source parts myself</option></select></label>
+    <label><span class="lbl">Join the group purchase?</span><select name="groupbuy"><option value="yes">Yes, reserve parts kits for me</option><option value="no">No, I'll buy the parts myself</option></select></label>
     <label><span class="lbl">Number of kits</span><input type="number" name="qty" min="1" max="50" value="1"></label>
   </div>
   <label><span class="lbl">Experience</span><select name="experience"><option>First electronics project</option><option>I can solder and flash boards</option><option>Experienced maker</option></select></label>
-  <label class="check"><input type="checkbox" name="consent" required> I agree that the central authority processes this data to organise the group purchase.</label>
-  <button class="btn primary" type="submit">Send registration</button>
+  <label class="check"><input type="checkbox" name="consent" required> I agree that the central authority processes this data to cancel or adjust my delivery and organise the group purchase.</label>
+  <button class="btn primary" type="submit">Send</button>
   <div class="form-msg" aria-live="polite"></div>
 </form>
 </div>`,
@@ -208,15 +315,62 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
     access: `
 <p class="eyebrow">accessibility</p>
 <h1>Mesh messaging for deaf, blind and deafblind people</h1>
-<p class="lede">Off-grid communication must work for everyone. If you are deaf, hard of hearing, blind, partially sighted or deafblind, register below to receive your node with accessibility add-ons supplied by the state.</p>
+<p class="lede">Every node arrives assembled. If you are deaf, blind or deafblind, the state supplies it with the add-ons that fit you, set up and tested. Deafblind people receive theirs <b>in person</b>, from an instructor who communicates the way they do.</p>
+<div class="toc"><a href="#/access#who">Who gets what</a><a href="#/access#deafblind">How it works for deafblind people</a><a href="#/access#build">Haptic band Pro: build it yourself</a><a href="#/access#compute">Which computer or GPU</a><a href="#/access#register">Registration</a></div>
 
+<h2 id="who">Who gets what</h2>
 <div class="grid">
-  <div class="card"><div class="feature-icon">⠿</div><h3>Braille keyboard</h3><p>A 6- or 8-dot Braille input that types messages straight into the node. Paired with screen-reader-friendly status output from the companion app. For blind and deafblind users.</p></div>
-  <div class="card"><div class="feature-icon">≋</div><h3>Haptic skin band</h3><p>A wearable band that turns incoming messages and alerts into vibration patterns on the skin, so nothing depends on sound or sight. For deaf and deafblind users.</p></div>
-  <div class="card"><div class="feature-icon">▤</div><h3>High-contrast E-Ink</h3><p>The E-Ink screen is readable in direct sunlight and shows alerts visually, with no sound needed. Large-font layouts are planned.</p></div>
+  <div class="card"><div class="feature-icon">⠿</div><h3>Blind or partially sighted</h3>
+    <ul><li><b>Braille keyboard</b> (6- or 8-dot, chorded) that types straight into the node.</li><li>Messages read aloud by your phone's screen reader through the Meshtastic app {{UP}}.</li><li>Tactile markings on the case and buttons; quick guide in Braille and as audio.</li></ul>
+    <p class="small">Delivery: courier, plus a phone walkthrough if you want one.</p></div>
+  <div class="card"><div class="feature-icon">≋</div><h3>Deaf or hard of hearing</h3>
+    <ul><li><b>Haptic band Pro</b>, supplied by the state: 8 motors around the wrist.</li><li>Recognises important sounds on the band itself (siren, smoke alarm, doorbell, knock, your name) and gives each its own vibration pattern.</li><li>Mesh messages vibrate and appear on the E-Ink screen.</li><li>Optional <b>listening hub</b>: live captions of speech in the room on the E-Ink and your phone.</li></ul>
+    <p class="small">Delivery: courier, with a set-up video in Czech or Polish sign language and as text.</p></div>
+  <div class="card"><div class="feature-icon">✋</div><h3>Deafblind</h3>
+    <ul><li><b>Haptic band Pro in Braille layout</b>: 6 motors on the forearm form one Braille cell, 2 more signal space and alerts. Messages are felt letter by letter.</li><li><b>Braille keyboard</b> to reply; every key is confirmed by vibration.</li><li>Nothing depends on sight or sound.</li></ul>
+    <p class="small">Delivery: <b>in person</b>, see below.</p></div>
 </div>
 
-<div class="callout"><p><b>Open source, so you can also self-host.</b> Both add-ons are open hardware. If you or someone helping you prefers to build them, use the <a href="#/openhw#selfhost">self-build and group purchase form</a>.</p></div>
+<h2 id="deafblind">How it works for deafblind people</h2>
+<div class="two">
+  <div>
+    <h3>Delivery and set-up</h3>
+    <ul>
+      <li>No letters or calls to arrange it: we contact you through the channel you name in the form, usually a carer, an interpreter or your organisation.</li>
+      <li>A trained instructor visits and communicates the way you prefer: tactile sign language, Lorm, print-on-palm or Braille.</li>
+      <li>Together you set vibration strength and reading speed, practise the patterns, and mount the node. The case has tactile markings and a keyed solar plug.</li>
+      <li>A trusted contact can be paired to receive your SOS. A follow-up visit after a few weeks.</li>
+    </ul>
+  </div>
+  <ol class="steps">
+    <li><h3>A message arrives</h3><p>The node passes it to the band. All motors give two long pulses: attention.</p></li>
+    <li><h3>You start reading</h3><p>Tap the band. Letters play as Braille cells on the 2 × 3 motors, 1–4 per second as you set. Tap to pause, double-tap to repeat.</p></li>
+    <li><h3>You reply</h3><p>Type on the Braille keyboard; each character is echoed as vibration. Enter sends it over the mesh.</p></li>
+    <li><h3>Alerts can't be missed</h3><p>Warnings from the central authority use a strong repeating pattern that keeps going until you hold a key to confirm.</p></li>
+    <li><h3>SOS</h3><p>Hold two keys for 3 seconds: an SOS goes to your trusted contacts and the central authority.</p></li>
+  </ol>
+</div>
+
+<h2 id="build">Haptic band Pro: what it is, so you can build it yourself</h2>
+<p>The state supplies the band, but it is open hardware like everything else. It is an ESP32-S3 with a microphone driving 8 linear resonant actuators (LRA) through haptic driver chips. It works with <b>standard Meshtastic</b>: received messages reach the band through the Serial module in <code>TEXTMSG</code> mode, and a simple single-motor band can use the External Notification module instead {{UP}}. No firmware fork needed.</p>
+<div class="two">
+  <div><h3>Wiring</h3><ul>
+    <li>XIAO <code>D4/SDA</code>, <code>D5/SCL</code> → TCA9548A I²C mux → 8 × DRV2605L (one per mux channel) → 8 × LRA.</li>
+    <li>XIAO <code>D6/TX</code> → node GPIO16, XIAO <code>D7/RX</code> ← node GPIO15, common GND. Or wireless over BLE.</li>
+    <li>Wrist layout (deaf): 8 motors in a ring, so a sound can also show its direction. Braille layout (deafblind): 2 × 3 cell on the forearm + 2 control motors.</li>
+    <li>1S LiPo 500–1000 mAh on the XIAO battery pads.</li>
+  </ul></div>
+  <div><h3>Node pins for add-ons</h3>{{PINS_ADDONS}}</div>
+</div>
+{{BOM_ADDONS}}
+<div class="callout warn"><p><b>Status: reference design.</b> The band firmware and enclosure files will be published in <code>hardware/addons/</code> in the repository. Motors draw current spikes: power them from the battery through the drivers, never from a GPIO. Rounded, insulated housing; no continuous vibration longer than a few seconds.</p></div>
+
+<h2 id="compute">Which computer or GPU runs it</h2>
+<p>Sound recognition runs on the band itself, without a GPU, so it keeps working in a blackout. Turning speech into text needs more compute: that's the optional listening hub. The state-supplied hub is a Jetson Orin Nano; the table shows what else is enough if you build your own.</p>
+{{COMPUTE}}
+<p class="small">Rough planning values. Speech-to-text: <a href="https://github.com/ggml-org/whisper.cpp" rel="noopener">whisper.cpp</a> or <a href="https://github.com/SYSTRAN/faster-whisper" rel="noopener">faster-whisper</a>, both open source and running fully offline. The hub needs mains power or a large battery; during a blackout the band alone still delivers mesh messages and sound alerts.</p>
+
+<div class="callout"><p><b>Prefer to build it yourself?</b> Use the <a href="#/openhw#selfhost">self-build form</a>; parts kits are in the group purchase.</p></div>
 
 <h2 id="register">Registration form</h2>
 <p>Your data goes privately to the central authority only. It is never published and never shown to other users.</p>
@@ -230,7 +384,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
     <label><span class="lbl">E-mail</span><input type="email" name="email" autocomplete="email"></label>
     <label><span class="lbl">Phone (for SMS)</span><input type="tel" name="phone" autocomplete="tel"></label>
   </div>
-  <label><span class="lbl">How should we contact you?</span><select name="contact"><option>E-mail</option><option>SMS / text message</option><option>Through a carer or assistant</option><option>Letter in Braille</option></select></label>
+  <label><span class="lbl">How should we contact you?</span><select name="contact"><option>E-mail</option><option>SMS / text message</option><option>Through a carer, interpreter or assistant</option><option>Through my organisation for deaf, blind or deafblind people</option><option>Letter in Braille</option></select></label>
   <fieldset><legend>I am</legend>
     <label class="check"><input type="checkbox" name="deaf"> Deaf or hard of hearing</label>
     <label class="check"><input type="checkbox" name="blind"> Blind or partially sighted</label>
@@ -238,10 +392,16 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
   </fieldset>
   <fieldset><legend>Add-ons I need</legend>
     <label class="check"><input type="checkbox" name="braille"> Braille keyboard</label>
-    <label class="check"><input type="checkbox" name="haptic"> Haptic skin band (vibration)</label>
+    <label class="check"><input type="checkbox" name="haptic"> Haptic band Pro</label>
+    <label class="check"><input type="checkbox" name="hub"> Listening hub (live captions)</label>
   </fieldset>
-  <label><span class="lbl">Braille layout (if relevant)</span><select name="braille_layout"><option>6-dot</option><option>8-dot</option><option>Not sure</option></select></label>
+  <div class="row2">
+    <label><span class="lbl">Band layout</span><select name="band_layout"><option>Wrist ring (deaf)</option><option>Braille cell on the forearm (deafblind)</option><option>Not sure, decide at set-up</option></select></label>
+    <label><span class="lbl">Braille layout</span><select name="braille_layout"><option>6-dot</option><option>8-dot</option><option>Not sure</option></select></label>
+  </div>
+  <label><span class="lbl">Deafblind: how should the instructor communicate with you?</span><select name="tactile"><option>Not applicable</option><option>Tactile sign language</option><option>Lorm</option><option>Print-on-palm</option><option>Braille</option><option>Through my interpreter or carer</option></select></label>
   <label><span class="lbl">Delivery address</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
+  <label><span class="lbl">Carer, interpreter or trusted contact (optional)</span><input type="text" name="trusted"></label>
   <label><span class="lbl">Anything else we should know?</span><textarea name="notes" rows="3"></textarea></label>
   <label class="check"><input type="checkbox" name="consent" required> I agree that the central authority processes this data to supply my device and add-ons.</label>
   <button class="btn primary" type="submit">Send registration</button>
@@ -255,28 +415,39 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 <p class="lede">How to put it together, which pin is for what, and how to get on the network. Can't find your answer? <a href="#/faq#ask">Ask the central authority</a>; the answer is published in all three languages in the read-only channel.</p>
 <div class="toc"><a href="#/faq#assembly">Assembly</a><a href="#/faq#wiring">Which pin goes where</a><a href="#/faq#ask">Ask a question</a><a href="#/faq#channel">Read-only channel</a></div>
 
-<h2 id="assembly">Putting it together</h2>
-<details class="qa" open><summary>How do I assemble the node, step by step?</summary><div>
+<h2 id="assembly">When your node arrives</h2>
+<details class="qa" open><summary>What do I have to do when the node arrives?</summary><div>
+<p>Almost nothing. It arrives <b>assembled, soldered, flashed and configured</b>.</p>
+<ol>
+  <li>Screw on the antenna. Always before the node gets power.</li>
+  <li>Plug in the solar panel (keyed connector, can't go in the wrong way).</li>
+  <li>Mount it as high as you can, panel facing south.</li>
+  <li>Press the button. The screen shows <code>MESH · n nodes</code>.</li>
+</ol></div></details>
+<details class="qa"><summary>Do I need to solder?</summary><div><p><b>No.</b> Every node is delivered fully assembled. Soldering is only for people who choose to build their own; that's why the schematics and pinout are published. If you want to, tell us with the <a href="#/openhw#selfhost">self-build form</a> so the state doesn't send you one.</p></div></details>
+<details class="qa"><summary>I want to build my own. How do I assemble it, step by step?</summary><div>
 <ol>
   <li><b>Test on the bench first.</b> Plug the DevKitC into USB, flash the firmware (see <a href="#/build">Build</a>) and confirm the board boots before wiring anything else.</li>
   <li><b>Antenna on the radio module.</b> Always connect the antenna before the radio gets power. Transmitting without one can destroy the SX1262.</li>
-  <li><b>Wire the radio</b> (SPI + BUSY, DIO1, RESET) using the table below. Keep wires short, under 10 cm.</li>
+  <li><b>Wire the radio</b> (SPI + BUSY, DIO1, RESET) using the <a href="#/faq#wiring">diagram below</a>. Keep wires short, under 10 cm.</li>
   <li><b>Wire the e-paper module</b> (SPI + DC, RST, BUSY). It shares 3V3 and GND.</li>
   <li><b>Flash the DIY variant</b> and check the screen draws and the radio initialises (serial log at 115200 baud).</li>
   <li><b>Add power:</b> panel → charger → battery → 3.3 V regulator → 3V3 pin. Add the 100k/100k battery divider to GPIO1.</li>
   <li><b>Box it:</b> IP65 enclosure, cable gland for the panel lead, antenna outside, mounted as high as possible.</li>
-</ol></div></details>
-<details class="qa"><summary>Do I need to solder?</summary><div><p>With a Heltec Wireless Paper, no: it is one board. You only plug in the antenna and battery. The DIY build needs basic soldering of header pins and the power chain, or jumper wires on a breadboard for a first test.</p></div></details>
+</ol>
+<p>Parts and where to buy them: <a href="#/openhw#bom">Open hardware → parts</a>.</p></div></details>
 <details class="qa"><summary>Can I use an SX1276 / RFM95 radio instead of the SX1262?</summary><div><p>Meshtastic supports several radios, but the pin set differs (DIO0 instead of BUSY/DIO1) and the variant file must be changed. SX1262 is recommended for lower power and better sensitivity. Check radio support upstream {{UP}}.</p></div></details>
-<details class="qa"><summary>Which frequency do I use in Czechia and Poland?</summary><div><p>The EU 868 MHz band, region <code>EU_868</code> in Meshtastic. Buy the 868 MHz version of the radio and antenna. Other countries: check your local rules and the upstream region list {{UP}}.</p></div></details>
-<details class="qa"><summary>The screen stays blank. What now?</summary><div><p>Check BUSY and RST wiring, make sure the display model in the variant matches your panel (2.13″ and 2.9″ use different drivers), and verify 3.3 V on the module. On Heltec boards the display is powered through Vext (GPIO45, LOW = on).</p></div></details>
-<details class="qa"><summary>How do I connect my node to the network?</summary><div><p>Set the region, then apply the channel URL published by the central authority in the read-only channel. Step by step: <a href="#/openhw#connect">Open hardware → Connect</a>.</p></div></details>
+<details class="qa"><summary>Which frequency do I use in Czechia and Poland?</summary><div><p>The EU 868 MHz band, region <code>EU_868</code> in Meshtastic. Delivered nodes are already set. If you build your own, buy the 868 MHz version of the radio and antenna. Other countries: check your local rules and the upstream region list {{UP}}.</p></div></details>
+<details class="qa"><summary>The screen stays blank. What now?</summary><div><p>Delivered node: check the solar plug and that the battery has charged in daylight for a few hours, then ask in the <a href="#/faq#ask">Q&amp;A</a>. Self-built: check BUSY and RST wiring, make sure the display model in the variant matches your panel (2.13″ and 2.9″ use different drivers), and verify 3.3 V on the module. On Heltec boards the display is powered through Vext (GPIO45, LOW = on).</p></div></details>
+<details class="qa"><summary>How do I connect my node to the network?</summary><div><p>Delivered nodes are already connected. Self-built: set the region, then apply the channel URL published in the read-only channel. Step by step: <a href="#/openhw#connect">Open hardware → Connect</a>.</p></div></details>
 <details class="qa"><summary>How do I know the firmware is genuine?</summary><div><p>Use the <a href="#/verify">Verify page</a>: it checks the SHA-256 hash and the ML-DSA-65 + Ed25519 signatures in your browser, then compare the key fingerprint with the one in the GitHub README.</p></div></details>
-<details class="qa"><summary>Can I connect a Braille keyboard or a haptic band myself?</summary><div><p>Yes. Both add-ons are open hardware. They connect to free GPIOs or via I²C; pin assignments are in <code>hardware/addons/</code> in the repo. See <a href="#/access">Accessibility</a> and the <a href="#/openhw#selfhost">self-build form</a>.</p></div></details>
+<details class="qa"><summary>Can I connect a Braille keyboard or a haptic band myself?</summary><div><p>Yes. Both add-ons are open hardware: the keyboard uses I²C on GPIO17/18, the haptic band Pro uses the serial module on GPIO15/16. See <a href="#/access#build">Accessibility → build it yourself</a>.</p></div></details>
+<details class="qa"><summary>What does the mesh do in a blackout?</summary><div><p>It keeps delivering messages when cell towers go silent. See it in the <a href="#/demo">blackout demo</a>.</p></div></details>
 <details class="qa"><summary>Can I chat with other users here?</summary><div><p>No. On this site you can only ask the central authority. Questions and official answers appear in the read-only channel; there are no replies or comments between users.</p></div></details>
 
 <h2 id="wiring">Which pin goes where (DIY build)</h2>
 <p>ESP32-S3-DevKitC-1 to SX1262 module and SPI e-paper module. GPIO numbers match the Heltec Wireless Paper layout, so the variant stays familiar. The matching firmware definition is in <code>variants/diy_s3_eink/variant.h</code> in the repo.</p>
+{{BOARD}}
 {{PINS_DIY}}
 <div class="callout warn"><p><b>Before you power up:</b> antenna attached · radio and display on <b>3.3 V</b>, never 5 V · double-check that GND is shared · don't feed the 3V3 pin from the regulator while USB is plugged in unless your board has protection (disconnect the battery when flashing).</p></div>
 <h3>Power wiring</h3>

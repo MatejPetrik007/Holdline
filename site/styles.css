@@ -212,3 +212,118 @@ form.f .check input { margin-top: 4px; accent-color: var(--accent); width: 18px;
 .toc a { font-size: .86rem; padding: 5px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); text-decoration: none; color: var(--ink); }
 .toc a:hover { border-color: var(--accent); }
 .math { font-family: var(--mono); font-size: .9rem; background: var(--surface-2); padding: 12px 16px; border-radius: 10px; }
+
+/* ---------- blackout simulation (always "night": it's a blackout) ---------- */
+.sim, .sim-stats {
+  --s-bg: #0a0e14; --s-panel: #111821; --s-panel-2: #16202b; --s-line: #243243; --s-fg: #e3e9f0; --s-muted: #8796a8;
+  --s-signal: #f5b942; --s-signal-dim: #8a6a2a; --s-cell: #6ea8ff; --s-fail: #ff6a5c; --s-glow: #ffd98f; --s-river: #16374a;
+  color-scheme: dark;
+}
+.sim { display: grid; grid-template-columns: 210px minmax(0, 1fr) 260px; gap: 12px; padding: 12px; background: var(--s-bg); color: var(--s-fg); border-radius: var(--radius); margin: 24px 0 12px; box-shadow: var(--shadow); }
+.sim-panel { background: var(--s-panel); border: 1px solid var(--s-line); border-radius: 10px; min-width: 0; }
+.sim-console { padding: 14px; display: flex; flex-direction: column; gap: 12px; font-size: .84rem; }
+.sim-who { font: .7rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--s-muted); }
+.sim-title { font-weight: 700; font-size: 1.02rem; }
+.sim-msg { background: var(--s-panel-2); border: 1px solid var(--s-line); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; line-height: 1.45; }
+.sim-lang { font: .64rem var(--mono); color: var(--s-signal); letter-spacing: .1em; }
+.sim-meta { font: .7rem var(--mono); color: var(--s-muted); display: flex; flex-direction: column; gap: 2px; }
+.sim-route { display: flex; flex-direction: column; gap: 8px; }
+.sim-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 6px; background: var(--s-panel-2); border: 1px solid var(--s-line); }
+.sim-pill { font: .68rem var(--mono); padding: 2px 8px; border-radius: 99px; border: 1px solid var(--s-line); color: var(--s-muted); white-space: nowrap; }
+.sim-pill.busy { color: var(--s-fg); border-color: var(--s-muted); }
+.sim-pill.fail { color: var(--s-fail); border-color: var(--s-fail); }
+.sim-pill.ok { color: var(--s-bg); background: var(--s-signal); border-color: var(--s-signal); }
+.sim-mapbox { display: flex; flex-direction: column; overflow: hidden; }
+.sim-mapscroll { overflow-x: auto; }
+.sim-map { display: block; width: 100%; height: auto; min-width: 520px; }
+.sim-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--s-line); font-size: .82rem; }
+.sim-controls button, .sim-controls select { font: inherit; color: var(--s-fg); background: var(--s-panel-2); border: 1px solid var(--s-line); border-radius: 6px; padding: 6px 11px; cursor: pointer; }
+.sim-controls button:hover, .sim-controls select:hover { border-color: var(--s-muted); }
+.sim-controls button.primary { background: var(--s-signal); color: #1a1205; border-color: var(--s-signal); font-weight: 600; }
+.sim-controls label { display: flex; align-items: center; gap: 6px; color: var(--s-muted); }
+.sim :focus-visible { outline: 2px solid var(--s-signal); outline-offset: 2px; }
+.sim-hint { font-size: .76rem; color: var(--s-muted); margin-left: auto; }
+.sim-log { display: flex; flex-direction: column; overflow: hidden; position: relative; }
+@media (min-width: 1001px) { .sim-log .sim-pre { position: absolute; inset: 34px 0 0 0; max-height: none; min-height: 0; } }
+.sim-bar { display: flex; align-items: center; gap: 6px; padding: 9px 12px; border-bottom: 1px solid var(--s-line); font: .68rem var(--mono); color: var(--s-muted); }
+.sim-bar span { width: 9px; height: 9px; border-radius: 50%; background: var(--s-line); }
+.sim-bar b { font-weight: 400; margin-left: 6px; }
+.sim-pre { padding: 10px 12px; font: .7rem/1.6 var(--mono); overflow: auto; flex: 1; min-height: 200px; max-height: 500px; white-space: pre-wrap; word-break: break-word; color: var(--s-muted); }
+.sim-pre .t { color: #5d6d80; } .sim-pre .rx { color: var(--s-signal); } .sim-pre .cell { color: var(--s-cell); }
+.sim-pre .bad { color: var(--s-fail); } .sim-pre .q { color: #b9a27a; } .sim-pre .sys { color: var(--s-fg); }
+.sim-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: var(--s-line); border: 1px solid var(--s-line); border-radius: 10px; overflow: hidden; margin-bottom: 28px; }
+.sim-stats > div { background: var(--s-panel); color: var(--s-fg); padding: 11px 14px; display: flex; flex-direction: column; gap: 2px; }
+.sim-stats .k { font: .64rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--s-muted); }
+.sim-stats .v { font-size: 1.45rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sim-stats .v.amber { color: var(--s-signal); } .sim-stats .v.red { color: var(--s-fail); }
+.sim-map .light { fill: var(--s-glow); transition: opacity .35s ease; } .sim-map .light.off { opacity: 0; }
+.sim-map .river { fill: none; stroke: var(--s-river); stroke-width: 16; stroke-linecap: round; }
+.sim-map .border { fill: none; stroke: #3c5a70; stroke-width: 1.2; stroke-dasharray: 3 6; }
+.sim-map .country { font: 800 30px var(--sans); fill: #1c2a38; letter-spacing: .2em; }
+.sim-map .town { font: 700 15px var(--sans); fill: #4f6377; letter-spacing: .06em; }
+.sim-map .lbl { font: 11.5px var(--mono); fill: var(--s-muted); } .sim-map .lbl.strong { fill: var(--s-fg); }
+.sim-map .link { stroke: var(--s-line); stroke-width: 1.2; transition: stroke .4s, opacity .4s; }
+.sim-map .link.hot { stroke: var(--s-signal); opacity: .55; } .sim-map .link.dead { opacity: .15; }
+.sim-map .backhaul { stroke: var(--s-cell); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: .35; fill: none; }
+.sim-map .ring { fill: none; stroke: var(--s-signal); stroke-width: 1.5; }
+.sim-map .pkt { fill: var(--s-signal); } .sim-map .pkt.cell { fill: var(--s-cell); }
+.sim-map .node { cursor: pointer; }
+.sim-map .node .halo { fill: var(--s-signal); opacity: 0; }
+.sim-map .node .core { fill: var(--s-panel-2); stroke: var(--s-muted); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+.sim-map .node:is(.waiting, .tx, .got, .limit, .quiet, .hqtx) .core { fill: var(--s-signal); stroke: var(--s-signal); }
+.sim-map .node.quiet .core { fill: var(--s-signal-dim); }
+.sim-map .node.waiting .halo { animation: simpulse .7s ease-in-out infinite; }
+.sim-map .node.tx .halo { opacity: .25; }
+.sim-map .node.off .core { fill: var(--s-bg); stroke: var(--s-fail); stroke-dasharray: 3 3; }
+.sim-map .node.off .lbl { fill: var(--s-fail); }
+.sim-map .node .x { stroke: var(--s-fail); stroke-width: 2; opacity: 0; } .sim-map .node.off .x { opacity: 1; }
+.sim-map .node.hq .core { stroke: var(--s-fg); }
+@keyframes simpulse { 0%, 100% { opacity: .08; } 50% { opacity: .35; } }
+.sim-map .tower .mast { fill: none; stroke: var(--s-cell); stroke-width: 2; transition: stroke .4s; }
+.sim-map .tower .wave { fill: none; stroke: var(--s-cell); stroke-width: 1.5; opacity: .7; }
+.sim-map .tower.battery .mast, .sim-map .tower.battery .wave { stroke: var(--s-signal); }
+.sim-map .tower.dead .mast { stroke: #3d4a59; } .sim-map .tower.dead .wave { opacity: 0; }
+.sim-map .tower .xx { stroke: var(--s-fail); stroke-width: 2.5; opacity: 0; transition: opacity .2s; } .sim-map .tower.failed .xx { opacity: 1; }
+.sim-map .clock { font: 26px var(--mono); fill: var(--s-fg); font-variant-numeric: tabular-nums; }
+.sim-map .phase { font: 12px var(--mono); fill: var(--s-signal); letter-spacing: .08em; }
+.sim-map .legend { font: 11px var(--mono); fill: var(--s-muted); }
+@media (max-width: 1000px) {
+  .sim { grid-template-columns: 1fr; }
+  .sim-console { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .sim-pre { max-height: 240px; }
+}
+@media (max-width: 640px) {
+  .sim { padding: 8px; }
+  .sim-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sim-stats > div:last-child { grid-column: 1 / -1; }
+  .sim-hint { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .sim-map .node.waiting .halo { animation: none; opacity: .25; } .sim-map .light { transition: none; } }
+
+/* ---------- ESP32-S3 board diagram ---------- */
+.board-wrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; margin: 18px 0; }
+@media (max-width: 860px) { .board-wrap { grid-template-columns: 1fr; } }
+.board { width: 100%; height: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.board text { font-family: var(--mono); }
+.board .pin { cursor: pointer; }
+.board .pin rect { fill: var(--surface-2); stroke: var(--line); }
+.board .pin.used rect { stroke-width: 2; }
+.board .pin text { font-size: 10px; fill: var(--muted); }
+.board .pin.used text { fill: var(--ink); font-weight: 700; }
+.board .pin.hl rect { fill: var(--ink); }
+.board .pin.hl text { fill: var(--bg); }
+.board .wire { fill: none; stroke-width: 2.4; opacity: .85; }
+.board .wire.dim { opacity: .12; }
+.board .mod rect.body { stroke: var(--ink); stroke-width: 1.5; }
+.board .mod text { font-size: 11px; fill: var(--ink); }
+.board .mod .ttl { font-weight: 700; font-size: 12px; }
+.legend-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: .9rem; }
+.legend-list li { display: grid; grid-template-columns: 14px auto 1fr; gap: 10px; align-items: baseline; padding: 6px 10px; border-radius: 8px; cursor: pointer; max-width: none; }
+.legend-list li:hover, .legend-list li.hl { background: var(--surface-2); }
+.legend-list i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; transform: translateY(2px); }
+.legend-list code { white-space: nowrap; }
+.buy { display: flex; flex-wrap: wrap; gap: 6px; }
+.buy a { font-size: .8rem; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); text-decoration: none; background: var(--surface); white-space: nowrap; }
+.buy a:hover { border-color: var(--accent); }
+.badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.tier { border-left: 4px solid var(--accent); }

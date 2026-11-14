@@ -3,10 +3,64 @@ const DISCLAIMER = `<p><b>Upozornění:</b> toto je neoficiální komunitní bui
 export default {
   ui: {
     brand: 'Meshtastic E-Ink uzel',
-    nav: { home: 'Úvod', hardware: 'Hardware', build: 'Sestavení FW', solar: 'Solár', openhw: 'Open hardware', access: 'Přístupnost', faq: 'Otázky a odpovědi', verify: 'Ověření', security: 'Bezpečnost', releases: 'Vydání' },
+    nav: { home: 'Úvod', demo: 'Simulace blackoutu', hardware: 'Hardware', build: 'Sestavení FW', solar: 'Solár', openhw: 'Open hardware', access: 'Přístupnost', faq: 'Otázky a odpovědi', verify: 'Ověření', security: 'Bezpečnost', releases: 'Vydání' },
     up: 'ověř upstream',
     copy: 'KOPÍROVAT', copied: 'ZKOPÍROVÁNO',
     pinCols: ['Součástka', 'Signál', 'Pin ESP32-S3', 'K čemu slouží'],
+    bomCols: ["Díl", "Příklad", "Poznámka", "Kde koupit"],
+    shopNote: "Odkazy na obchody jsou ukázkové vyhledávací stránky, ne doporučení. Před objednáním ověř dostupnost, cenu a verzi 868 MHz.",
+    computeCols: ["Sestava", "Hardware", "GPU / akcelerátor", "Co dělá", "Příkon"],
+    board: {
+      aria: "Schéma pinů ESP32-S3-DevKitC-1 s GPIO pro e-paper displej, rádio SX1262, měření baterie a doplňky",
+      sub: "DIY zapojení · najeď na skupinu nebo pin",
+      v33: "3V3 → rádio, e-paper",
+      gnd: "GND (společná)",
+      groups: {
+        epaper: ["E-paper displej", "SPI + DC, RST, BUSY · GPIO2–7"],
+        radio: ["LoRa rádio SX1262", "SPI + NRST, BUSY, DIO1 · GPIO8–14"],
+        power: ["Napájení 3,3 V", "z LDO, nikdy ne 5 V"],
+        gnd: ["Zem", "společná pro všechny moduly"],
+        battery: ["Měření baterie", "dělič 100k/100k · GPIO1"],
+        addon: ["Doplňky přístupnosti", "I²C 17/18 · haptika 21 · sériová linka náramku 15/16"],
+        ui: ["Tlačítko BOOT", "už na desce · GPIO0"],
+      },
+      note: "Pořadí pinů odpovídá ESP32-S3-DevKitC-1 v1.1. Před pájením zkontroluj potisk své desky. Dodané uzly jsou už zapojené; tohle je pro ty, kdo si staví nebo opravují vlastní.",
+    },
+    demo: {
+      who: "Krizové centrum · Cieszyn", outgoing: "Odchozí varování", fits: "{n} B · vejde se do jednoho paketu",
+      channelLine: "Kanál OLZA · AES-256 · EU868", preset: "Preset LongFast · hop limit",
+      routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
+      mapLabel: "Mapa Cieszyna a Českého Těšína s mesh uzly na obou březích Olše",
+      riverLabel: "Olše · hranice",
+      legend: ["uzel · varování přijato", "uzel · zatím ne", "střešní router", "BTS vysílač"],
+      replay: "Přehrát znovu", resend: "Odeslat znovu přes mesh", hopLimit: "Hop limit", speed: "Rychlost", speeds: ["Pomalu", "Normálně", "Rychle"],
+      restore: "Obnovit všechny uzly", hint: "Klikni na uzel, vypneš ho, pak odešli znovu.", base: "základnová stanice",
+      statsLabel: "Souhrn doručení", stats: ["Mobilní síť", "Mesh doručil", "Max. skoků", "Vysílání", "Doba doručení"],
+      nodes: { hq: "Krizové centrum", hospital: "Nemocnice", roof: "Střecha Těšín" },
+      tipHq: "Základnová stanice krizového centra (Cieszyn)", tipNode: "{name} ({c}) · {role} · kliknutím vypneš / zapneš",
+      router: "střešní router", household: "domácí uzel",
+      pills: { waiting: "čeká", sending: "odesílá", failed: "selhalo", delivered: "doručeno {r}/{t}" },
+      phases: { normal: "SÍŤ V PROVOZU", blackout: "BLACKOUT · OBA BŘEHY", drained: "BATERIE VYSÍLAČŮ VYBITÉ", cell: "VAROVÁNÍ PŘES MOBILNÍ SÍŤ", mesh: "MESHTASTIC · ŘÍZENÝ FLOODING", done: "VAROVÁNÍ DORUČENO PŘES MESH" },
+      log: {
+        grid: "Síť v provozu · 3 BTS napájené ze sítě",
+        meshReady: "Mesh: {n} uzlů na baterii/solár, kanál OLZA",
+        lost: "Výpadek proudu v Cieszyně i Českém Těšíně",
+        battery: "BTS přešly na záložní baterie",
+        depleted: "{t}: baterie vybitá, vysílač offline",
+        sms: "SMS / cell broadcast → brány operátorů",
+        noCell: "Žádný vysílač nedostupný · 0 obyvatel varováno",
+        switching: "Přepínám na základnovou stanici Meshtastic…",
+        resend: "──── nové odeslání přes mesh ────",
+        tx: "TX varování id=0x4F1A · {b} B · hop_limit={h} · kanál OLZA",
+        ack: "implicitní ACK · {from} přeposlal náš paket",
+        quiet: "{n}: {from} to přeposlal dřív, mlčí",
+        rx: "{n} ({c}) rx skok {hop} · SNR {snr} dB · přeposlání za {ms} ms",
+        rxLimit: "{n} ({c}) rx skok {hop} · SNR {snr} dB · hop limit 0, nepřeposílá",
+        all: "Doručeno všem {t} uzlům · {tx} vysílání · {q} mlčelo",
+        missed: "Nedoručeno: {list}", offCount: " ({n} vypnuto)",
+        tip: "Tip: zvyš hop limit nebo obnov router a odešli znovu.",
+      },
+    },
     verify: {
       waiting: 'čekám na soubory: {n}/3',
       hash: 'SHA-256 firmwaru odpovídá manifestu', sig: 'Podpis', sigOk: 'platný pro klíč vydavatele', sigBad: 'NEPLATNÝ nebo chybí',
@@ -31,9 +85,10 @@ export default {
   <div>
     <p class="eyebrow">open hardware · off-grid · ESP32-S3 + E-Ink</p>
     <h1>Solární mesh uzel, který si postavíš doma.</h1>
-    <p class="lede">Open-hardware LoRa uzel s firmwarem <a href="https://meshtastic.org" rel="noopener">Meshtastic</a> a E-Ink displejem. Postav si ho sám a připoj se do sítě, nebo dostaneš hotový od státu. Pokud jsi neslyšící nebo nevidomý, zaregistruj se pro doplňky jako Braillova klávesnice nebo haptický pásek na kůži. Každé vydání firmwaru si před nahráním ověříš přímo v prohlížeči.</p>
+    <p class="lede">Open-hardware LoRa uzel s firmwarem <a href="https://meshtastic.org" rel="noopener">Meshtastic</a> a E-Ink displejem. Každá domácnost ho dostane od státu <b>kompletně složený</b>, takže pájení je jen volitelné: schémata jsou otevřená pro každého, kdo si chce postavit vlastní. Pokud jsi neslyšící, nevidomý nebo hluchoslepý, zaregistruj se pro doplňky jako Braillova klávesnice nebo haptický pásek na kůži. Každé vydání firmwaru si před nahráním ověříš přímo v prohlížeči.</p>
     <div class="cta">
-      <a class="btn primary" href="#/openhw">Postav si ho sám →</a>
+      <a class="btn primary" href="#/demo">Podívej se, jak funguje při blackoutu →</a>
+      <a class="btn" href="#/openhw">Postav si ho sám</a>
       <a class="btn" href="#/faq">Otázky a zapojení pinů</a>
       <a class="btn" href="#/access">Registrace – přístupnost</a>
     </div>
@@ -46,7 +101,7 @@ export default {
   <div class="card"><div class="feature-icon">▤</div><span class="num">02</span><h3>Úsporný E-Ink displej</h3><p>E-Ink drží poslední obraz bez jakékoli spotřeby, takže uzel na baterii ukazuje zprávy a stav celé týdny. Konfigurace pinů je v <a href="https://github.com/meshtastic/firmware" rel="noopener">repozitáři firmwaru</a>.</p></div>
   <div class="card"><div class="feature-icon">✓</div><span class="num">03</span><h3>Ověřitelný firmware</h3><p>Každé vydání má manifest s SHA-256 hashi, podepsaný postkvantovým <b>ML-DSA-65 (FIPS 204)</b> a Ed25519. Platný podpis dokazuje pravost od vydavatele; není to schválení žádnou autoritou.</p></div>
   <a class="card" href="#/solar"><div class="feature-icon">☀</div><span class="num">04</span><h3>Běží na slunce</h3><p>Dnešní malé solární panely uzel bez problému napájí mimo síť. Panel 2–6 W a jeden článek 18650 ho udrží v chodu i v noci a za zataženo. →</p></a>
-  <a class="card" href="#/openhw"><div class="feature-icon">⚒</div><span class="num">05</span><h3>Open hardware, postavený doma</h3><p>Schéma, zapojení pinů a seznam dílů jsou otevřené. Kdokoli si může postavit uzel doma a připojit se do sítě. Přidej se ke společnému nákupu za levnější díly. →</p></a>
+  <a class="card" href="#/openhw"><div class="feature-icon">⚒</div><span class="num">05</span><h3>Dojde složený, otevřený ke stavbě</h3><p>Uzel dorazí připravený: zapojíš solární panel a umístíš ho. Schéma, zapojení pinů a seznam dílů jsou otevřené, pokud si chceš postavit vlastní. →</p></a>
   <a class="card" href="#/access"><div class="feature-icon">⠿</div><span class="num">06</span><h3>Přístupné pro neslyšící a nevidomé</h3><p>Zaregistruj se pro doplňky jako Braillova klávesnice nebo haptický pásek na kůži. Jsou také open source, takže si je můžeš postavit i sám. →</p></a>
 </div>
 
@@ -65,6 +120,41 @@ export default {
   </div>
 </div>`,
 
+
+    demo: `
+<p class="eyebrow">simulace · Cieszyn (PL) / Český Těšín (CZ)</p>
+<h1>Blackout na Olši</h1>
+<p class="lede">Na obou březích řeky vypadl proud. Mobilní vysílače vydrží na baterie pár hodin a pak utichnou. Krizové centrum v Cieszyně potřebuje říct obyvatelům v obou zemích, kde najdou vodu a nabíjení. Podívej se, jak stejné varování selže v mobilní síti a pak se přes Meshtastic mesh dostane skok po skoku do každého domácího uzlu.</p>
+<div id="sim"></div>
+
+<div class="two">
+  <div class="card"><h2>Proč telefony utichnou</h2>
+    <p>Vysílač potřebuje proud ze sítě a funkční páteřní spojení. Většina má baterie na pár hodin. Při dlouhém regionálním blackoutu se vybijí jedna po druhé a SMS ani cell broadcast nemají kudy projít.</p>
+    <p>Hranice přidává druhou mezeru. Každá země varuje přes vlastní operátory, takže obyvatel Českého Těšína s českou SIM nemusí varování polského úřadu vůbec dostat, i když je pár set metrů daleko za mostem.</p></div>
+  <div class="card"><h2>Proč mesh funguje dál</h2>
+    <p>Uzly Meshtastic jsou malá LoRa rádia s minimální spotřebou: jeden článek 18650 a <a href="#/solar">solární panel</a> velikosti dlaně je udrží v chodu celé dny. Nepotřebují vysílač, SIM ani operátora. E-Ink displej ukáže varování i bez telefonu.</p>
+    <p>Polsko i Česko sdílí stejné bezlicenční pásmo EU868, takže uzly na obou březích jsou v jednom kanálu. Řeka je hranicí pro sítě, ne pro rádio.</p></div>
+</div>
+
+<h2>Jak se zpráva šíří</h2>
+<ol class="steps">
+  <li><h3>Centrum vysílá jednou</h3><p>Jeho střešní uzel odvysílá šifrovaný paket s hop limitem, výchozí je 3. Přijme ho každý uzel v dosahu, ve městě typicky 1–5 km, z kopce mnohem dál.</p></li>
+  <li><h3>Každý uzel ho přepošle jednou</h3><p>Tomu se říká <i>řízený flooding</i>. Uzel, který přijme nový paket, chvíli počká a pak ho odvysílá dál s hop limitem sníženým o jedna. Na nule končí.</p></li>
+  <li><h3>Vzdálené uzly jdou první</h3><p>Čekání závisí na síle signálu: slabý signál znamená, že uzel je od odesílatele daleko, takže čeká kratší dobu. Tím se zpráva šíří ven nejrychleji.</p></li>
+  <li><h3>Duplikáty se zahazují</h3><p>Každý paket má ID. Uzel, který ho už viděl, kopie zahodí. Běžný uzel, který slyší souseda přeposlat paket dřív, než na něj přijde řada, mlčí a šetří vysílací čas. Routery na vyvýšených místech, tady Góra Zamkowa, přeposílají vždy.</p></li>
+  <li><h3>Odesílatel ví, že zpráva odešla</h3><p>Když centrum uslyší svůj paket přeposlaný, bere to jako implicitní potvrzení.</p></li>
+  <li><h3>Ztratíš uzel, síť zůstane</h3><p>Vypni na mapě router Góra Zamkowa a odešli znovu: uzel Bulwary u řeky, který normálně mlčí, teď přenese varování do Českého Těšína.</p></li>
+</ol>
+
+<h2>Mobilní síť vs. mesh při blackoutu</h2>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Mobilní síť</th><th>Meshtastic mesh</th></tr></thead><tbody>
+<tr><td>Potřebuje proud ze sítě</td><td>Ano, baterie vydrží hodiny</td><td><b>Ne</b>, baterie a solár na dny</td></tr>
+<tr><td>Centrální bod selhání</td><td>Vysílače, páteř, jádro sítě</td><td><b>Žádný</b>, každý uzel je relé</td></tr>
+<tr><td>Přes hranici PL–CZ</td><td>Oddělení operátoři i varovné systémy</td><td><b>Jeden společný kanál</b> na obou březích</td></tr>
+<tr><td>Kapacita</td><td>Hlas, data, video</td><td>Jen krátký text, asi 200 bajtů na zprávu, sdílený vysílací čas</td></tr>
+<tr><td>Příprava</td><td>Už je v každé kapse</td><td>Uzly musí být rozmístěné, nabité a v kanálu ještě před blackoutem: proto každá domácnost jeden <a href="#/openhw">dostane složený</a></td></tr>
+</tbody></table></div>
+<p class="small">Mesh nenahrazuje sirény, rozhlas ani pochůzky dům od domu. Přidává kanál, který přežije, když ostatní vypadnou. Neslyšící a hluchoslepí obyvatelé dostanou stejné varování jako vibrace přes <a href="#/access">haptický náramek</a>. Simulace zjednodušuje dosah a časování a ignoruje kolize paketů; polohy uzlů jsou ilustrační.</p>`,
     hardware: `
 <p class="eyebrow">hardware</p>
 <h1>Desky ESP32-S3 s E-Ink displejem</h1>
@@ -145,105 +235,175 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 
     openhw: `
 <p class="eyebrow">open hardware</p>
-<h1>Open hardware: postavit si ho může každý doma</h1>
-<p class="lede">Firmware, schéma, zapojení pinů, seznam dílů i doplňky pro přístupnost jsou otevřené. Postav si uzel doma, nahraj ověřený firmware a připoj se do sítě. Pokud si ho stavět nechceš, stát ti hotový uzel dodá automaticky.</p>
-<div class="toc"><a href="#/openhw#paths">Tři cesty k uzlu</a><a href="#/openhw#bom">Seznam dílů</a><a href="#/openhw#connect">Připojení do sítě</a><a href="#/openhw#selfhost">Doplňky svépomocí a společný nákup</a></div>
+<h1>Dojde složený. Otevřený, takže si ho můžeš postavit sám.</h1>
+<p class="lede">Každá domácnost dostane uzel od státu <b>kompletně složený, nahraný a otestovaný</b>. Nic nemusíš pájet. Schémata, zapojení pinů a seznam dílů jsou otevřené, aby si ho kdokoli, kdo chce, mohl postavit, opravit nebo vylepšit doma.</p>
+<div class="toc"><a href="#/openhw#box">Co dorazí</a><a href="#/openhw#paths">Tři cesty k uzlu</a><a href="#/openhw#pins">Který pin kam</a><a href="#/openhw#bom">Díly a kde koupit</a><a href="#/openhw#connect">Připojení vlastního uzlu</a><a href="#/openhw#selfhost">Postavím si sám: dej vědět</a></div>
+
+<h2 id="box">Co dorazí v krabici</h2>
+<div class="two">
+  <div>
+    <ul>
+      <li><b>Složený uzel</b> v odolné krabičce IP65: deska, LoRa rádio, E-Ink displej, baterie, nabíječka a regulátor, vše zapojené, zapájené, nahrané <a href="#/verify">ověřeným firmwarem</a> a nastavené na region <code>EU_868</code> a kanál sítě.</li>
+      <li><b>Anténa</b> (šroubovací SMA).</li>
+      <li><b>Solární panel</b> s konektorem, který nejde zapojit obráceně.</li>
+      <li><b>Držák</b> a tištěný rychlý návod (na požádání v Braillově písmu nebo velkým písmem).</li>
+    </ul>
+  </div>
+  <ol class="steps">
+    <li><h3>Našroubuj anténu</h3><p>Jako první.</p></li>
+    <li><h3>Zapoj solární panel</h3><p>Jediné spojení, které děláš sám. Bez nářadí.</p></li>
+    <li><h3>Umísti ho vysoko, panelem na jih</h3><p>Parapet, balkon nebo střecha. Výška je nejdůležitější.</p></li>
+    <li><h3>Stiskni tlačítko</h3><p>Displej ukáže <code>MESH · n nodes</code>. Hotovo.</p></li>
+  </ol>
+</div>
 
 <h2 id="paths">Tři cesty k uzlu</h2>
 <div class="grid">
-  <div class="card"><span class="num">A</span><h3>Postav si ho sám</h3><p>Řiď se seznamem dílů a <a href="#/faq#wiring">návodem na zapojení</a>, nahraj firmware a připoj se do sítě. Open hardware znamená, že návrh smíš kopírovat, upravovat a sdílet.</p></div>
-  <div class="card"><span class="num">B</span><h3>Dodá ho stát</h3><p>Všichni ostatní dostanou standardní solární uzel s nahraným firmwarem, který stát dodá automaticky. Podrobnosti o doručení zveřejňuje centrální autorita v <a href="#/faq#channel">kanálu jen pro čtení</a>.</p></div>
-  <a class="card" href="#/access"><span class="num">C</span><h3>Neslyšící, nevidomí, hluchoslepí</h3><p>Zaregistruj se a k uzlu dostaneš doplňky pro přístupnost, jako je Braillova klávesnice nebo haptický pásek na kůži. →</p></a>
+  <div class="card"><span class="num">A · VÝCHOZÍ</span><h3>Dojde složený</h3><p>Nemusíš nic dělat: každá registrovaná adresa dostane složený uzel automaticky. Pájení není nikdy potřeba. Termíny doručení zveřejňujeme v <a href="#/faq#channel">kanálu jen pro čtení</a>.</p></div>
+  <a class="card" href="#/openhw#selfhost"><span class="num">B · VOLITELNĚ</span><h3>Postav si ho sám</h3><p>Chceš si ho zapájet sám? Dej nám vědět formulářem níže, ať ti stát žádný neposílá. Sady dílů jsou ve společném nákupu. →</p></a>
+  <a class="card" href="#/access"><span class="num">C</span><h3>Neslyšící, nevidomí, hluchoslepí</h3><p>Dojde složený s doplňky, které ti sedí. Hluchoslepí ho dostanou osobně i s nastavením. →</p></a>
 </div>
 
-<h2 id="bom">Seznam dílů (referenční DIY sestava)</h2>
-<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Díl</th><th>Příklad</th><th>Poznámka</th></tr></thead><tbody>
-<tr><td>Deska MCU</td><td>ESP32-S3-DevKitC-1 (N8R8 nebo N16R8)</td><td>Doporučena PSRAM</td></tr>
-<tr><td>LoRa rádio</td><td>Modul SX1262 s TCXO, např. Waveshare Core1262 nebo Ebyte E22</td><td>Zvol pásmo pro svůj region (EU: 868 MHz). E22 potřebuje zapojit RXEN/TXEN, viz datasheet</td></tr>
-<tr><td>Displej</td><td>SPI e-paper modul 2,13″ nebo 2,9″ (černobílý)</td><td>Musí odpovídat ovladači displeje ve variantě {{UP}}</td></tr>
-<tr><td>Anténa</td><td>Naladěná anténa 868 MHz, kablík u.FL→SMA</td><td>Rádio nikdy nezapínej bez antény</td></tr>
-<tr><td>Solární panel</td><td>6 V, 2–6 W</td><td>Viz <a href="#/solar">Solár</a></td></tr>
-<tr><td>Nabíječka</td><td>CN3791 (MPPT) nebo TP4056 s ochranou</td><td>1S Li-ion, 4,2 V</td></tr>
-<tr><td>Baterie</td><td>1–2 × 18650 s ochranou, nebo LiFePO4</td><td>LiFePO4 potřebuje nabíječku na 3,6 V</td></tr>
-<tr><td>Regulátor</td><td>LDO 3,3 V s malým klidovým proudem (ME6211, HT7333)</td><td>Napájí pin 3V3</td></tr>
-<tr><td>Ostatní</td><td>2 × rezistor 100 kΩ, krabička IP65, kabelové vývodky</td><td>Dělič napětí baterie na GPIO1</td></tr>
-</tbody></table></div>
-<p>Návrhové soubory jsou v repu ve složkách <code>hardware/</code> a <code>variants/diy_s3_eink/</code>: <a href="{{REPO}}">{{REPO}}</a>. Licence hardwaru CERN-OHL-S-2.0, firmware GPL-3.0 (stejně jako upstream).</p>
+<h2 id="pins">Který pin kam</h2>
+<p>Potřebuješ jen, když si uzel stavíš nebo opravuješ sám. Dodané uzly jsou zapojené přesně takhle.</p>
+{{BOARD}}
+<p>Celé tabulky: <a href="#/faq#wiring">Otázky a odpovědi → zapojení</a> · Heltec Wireless Paper (deska v dodaném uzlu): <a href="#/hardware#pins">Hardware → piny</a>.</p>
 
-<h2 id="connect">Připojení do sítě</h2>
+<h2 id="bom">Díly a kde je koupit</h2>
+{{BOM}}
+<p>Návrhové soubory: <code>hardware/</code> a <code>variants/diy_s3_eink/</code> v <a href="{{REPO}}">repozitáři</a>. Licence hardwaru CERN-OHL-S-2.0, firmware GPL-3.0 (jako upstream). Díly pro doplňky přístupnosti: <a href="#/access#build">Přístupnost → postav si sám</a>.</p>
+
+<h2 id="connect">Připojení vlastního uzlu</h2>
+<p class="small">Dodané uzly jsou už nastavené. Tyto kroky jsou jen pro uzly, které sis postavil sám.</p>
 <ol class="steps">
-  <li><h3>Nastav region</h3><p>V aplikaci Meshtastic nebo v CLI nastav LoRa region <code>EU_868</code> pro Česko i Polsko (jiné země: ověř upstream).</p><pre><code>meshtastic --set lora.region EU_868</code></pre></li>
-  <li><h3>Přidej kanál sítě</h3><p>Centrální autorita zveřejňuje URL / QR kód kanálu v <a href="#/faq#channel">kanálu jen pro čtení</a>. Otevři ho v aplikaci nebo použij CLI.</p><pre><code>meshtastic --seturl "&lt;URL kanálu z kanálu jen pro čtení&gt;"</code></pre></li>
-  <li><h3>Zkontroluj, že jsi v síti</h3><p>Během pár minut by se v seznamu uzlů měli objevit sousedé. Nikdo? Dej anténu výš, zkontroluj region a projdi <a href="#/faq">otázky a odpovědi</a>.</p></li>
+  <li><h3>Nastav region</h3><p>V aplikaci Meshtastic nebo v CLI nastav LoRa region <code>EU_868</code> pro Česko a Polsko (jiné země: ověř upstream).</p><pre><code>meshtastic --set lora.region EU_868</code></pre></li>
+  <li><h3>Přidej kanál sítě</h3><p>Centrální autorita zveřejňuje URL / QR kód kanálu v <a href="#/faq#channel">kanálu jen pro čtení</a>.</p><pre><code>meshtastic --seturl "&lt;URL kanálu z kanálu jen pro čtení&gt;"</code></pre></li>
+  <li><h3>Ověř, že jsi v síti</h3><p>Během pár minut by se v seznamu uzlů měli objevit sousedé. Nikdo? Dej anténu výš, zkontroluj region a přečti si <a href="#/faq">otázky a odpovědi</a>.</p></li>
 </ol>
 
-<h2 id="selfhost">Doplňky svépomocí a společný nákup</h2>
-<p>Braillova klávesnice i haptický pásek jsou open source a open hardware, takže si je můžeš postavit a provozovat (selfhostovat) sám a nemusíš čekat na dodaný kus. Přidej se ke <b>společnému nákupu</b> a získáš sady dílů za velkoobchodní ceny. Registrace jde soukromě centrální autoritě a nikdy se nezveřejňuje.</p>
+<h2 id="selfhost">Postavím si sám: dej vědět</h2>
+<p>Vyplň jen tehdy, pokud si chceš postavit vlastní. Všichni ostatní dostanou složený uzel automaticky a nemusí dělat nic. Údaje jdou soukromě centrální autoritě a nikdy se nezveřejňují.</p>
 <div class="card">
-<form class="f reg" data-kind="svépomoc / společný nákup">
+<form class="f reg" data-kind="self-build / opt-out of assembled delivery">
   <div class="row2">
     <label><span class="lbl">Jméno</span><input type="text" name="name" required autocomplete="name"></label>
     <label><span class="lbl">E-mail</span><input type="email" name="email" required autocomplete="email"></label>
   </div>
   <div class="row2">
     <label><span class="lbl">Země</span><select name="country"><option>Česko</option><option>Polsko</option><option>Slovensko</option><option>Jiná</option></select></label>
-    <label><span class="lbl">Město / kraj</span><input type="text" name="region"></label>
+    <label><span class="lbl">Město / region</span><input type="text" name="region"></label>
   </div>
-  <fieldset><legend>Co chceš postavit?</legend>
-    <label class="check"><input type="checkbox" name="node"> Mesh uzel (ESP32-S3 + E-Ink + solár)</label>
-    <label class="check"><input type="checkbox" name="braille"> Doplněk Braillova klávesnice</label>
-    <label class="check"><input type="checkbox" name="haptic"> Doplněk haptický pásek na kůži</label>
+  <label><span class="lbl">Adresa domácnosti (abychom našli tvoje doručení)</span><textarea name="address" rows="2" autocomplete="street-address" required></textarea></label>
+  <label><span class="lbl">Složený uzel od státu</span><select name="delivery"><option>Neposílejte: postavím si vlastní</option><option>Pošlete i tak: stavím další uzel navíc</option></select></label>
+  <fieldset><legend>Co si postavíš?</legend>
+    <label class="check"><input type="checkbox" name="node" checked> Mesh uzel (ESP32-S3 + E-Ink + solár)</label>
+    <label class="check"><input type="checkbox" name="braille"> Braillova klávesnice</label>
+    <label class="check"><input type="checkbox" name="haptic"> Haptický náramek Pro</label>
+    <label class="check"><input type="checkbox" name="hub"> Poslechový hub (řeč na text)</label>
   </fieldset>
   <div class="row2">
-    <label><span class="lbl">Zapojit se do společného nákupu?</span><select name="groupbuy"><option value="yes">Ano, rezervujte mi sady</option><option value="no">Ne, díly si seženu sám</option></select></label>
+    <label><span class="lbl">Přidáš se ke společnému nákupu?</span><select name="groupbuy"><option value="yes">Ano, rezervujte mi sady dílů</option><option value="no">Ne, díly si koupím sám</option></select></label>
     <label><span class="lbl">Počet sad</span><input type="number" name="qty" min="1" max="50" value="1"></label>
   </div>
-  <label><span class="lbl">Zkušenosti</span><select name="experience"><option>První projekt s elektronikou</option><option>Umím pájet a nahrávat firmware</option><option>Zkušený kutil</option></select></label>
-  <label class="check"><input type="checkbox" name="consent" required> Souhlasím, aby centrální autorita zpracovala tyto údaje za účelem organizace společného nákupu.</label>
-  <button class="btn primary" type="submit">Odeslat registraci</button>
+  <label><span class="lbl">Zkušenosti</span><select name="experience"><option>První projekt s elektronikou</option><option>Umím pájet a nahrávat desky</option><option>Zkušený maker</option></select></label>
+  <label class="check"><input type="checkbox" name="consent" required> Souhlasím, že centrální autorita zpracuje tyto údaje, aby zrušila nebo upravila mé doručení a zorganizovala společný nákup.</label>
+  <button class="btn primary" type="submit">Odeslat</button>
   <div class="form-msg" aria-live="polite"></div>
 </form>
 </div>`,
 
     access: `
 <p class="eyebrow">přístupnost</p>
-<h1>Mesh komunikace pro neslyšící, nevidomé a hluchoslepé</h1>
-<p class="lede">Komunikace mimo síť musí fungovat pro každého. Pokud jsi neslyšící, nedoslýchavý, nevidomý, slabozraký nebo hluchoslepý, zaregistruj se níže a stát ti dodá uzel s doplňky pro přístupnost.</p>
+<h1>Mesh zprávy pro neslyšící, nevidomé a hluchoslepé</h1>
+<p class="lede">Každý uzel dorazí složený. Pokud jsi neslyšící, nevidomý nebo hluchoslepý, stát ho dodá s doplňky, které ti sedí, nastavené a otestované. Hluchoslepí lidé ho dostanou <b>osobně</b> od instruktora, který komunikuje tak jako oni.</p>
+<div class="toc"><a href="#/access#who">Kdo dostane co</a><a href="#/access#deafblind">Jak to funguje pro hluchoslepé</a><a href="#/access#build">Haptický náramek Pro: postav si sám</a><a href="#/access#compute">Jaký počítač nebo GPU</a><a href="#/access#register">Registrace</a></div>
 
+<h2 id="who">Kdo dostane co</h2>
 <div class="grid">
-  <div class="card"><div class="feature-icon">⠿</div><h3>Braillova klávesnice</h3><p>Šesti- nebo osmibodový Braillův vstup, kterým píšeš zprávy rovnou do uzlu. Doplněný o výstup stavu vhodný pro čtečky obrazovky v doprovodné aplikaci. Pro nevidomé a hluchoslepé.</p></div>
-  <div class="card"><div class="feature-icon">≋</div><h3>Haptický pásek na kůži</h3><p>Nositelný pásek, který příchozí zprávy a výstrahy převádí na vibrační vzory na kůži, takže nic nezávisí na zvuku ani zraku. Pro neslyšící a hluchoslepé.</p></div>
-  <div class="card"><div class="feature-icon">▤</div><h3>Kontrastní E-Ink</h3><p>E-Ink displej je čitelný i na přímém slunci a výstrahy ukazuje vizuálně, bez zvuku. Rozložení s velkým písmem je v plánu.</p></div>
+  <div class="card"><div class="feature-icon">⠿</div><h3>Nevidomí a slabozrací</h3>
+    <ul><li><b>Braillova klávesnice</b> (6- nebo 8bodová, akordová), která píše přímo do uzlu.</li><li>Zprávy čte nahlas odečítač obrazovky v telefonu přes aplikaci Meshtastic {{UP}}.</li><li>Hmatové značky na krabičce a tlačítkách; rychlý návod v Braillově písmu a jako audio.</li></ul>
+    <p class="small">Doručení: kurýr, a pokud chceš, provedení po telefonu.</p></div>
+  <div class="card"><div class="feature-icon">≋</div><h3>Neslyšící a nedoslýchaví</h3>
+    <ul><li><b>Haptický náramek Pro</b> od státu: 8 motorků kolem zápěstí.</li><li>Přímo v náramku rozpozná důležité zvuky (siréna, požární hlásič, zvonek, klepání, tvoje jméno) a každému dá vlastní vibrační vzor.</li><li>Zprávy z mesh zavibrují a objeví se na E-Ink displeji.</li><li>Volitelný <b>poslechový hub</b>: živé titulky řeči v místnosti na E-Ink a v telefonu.</li></ul>
+    <p class="small">Doručení: kurýr, s videem nastavení v českém znakovém jazyce a textem.</p></div>
+  <div class="card"><div class="feature-icon">✋</div><h3>Hluchoslepí</h3>
+    <ul><li><b>Haptický náramek Pro v Braillově rozložení</b>: 6 motorků na předloktí tvoří jeden Braillův znak, další 2 hlásí mezeru a poplach. Zprávy cítíš písmeno po písmenu.</li><li><b>Braillova klávesnice</b> pro odpověď; každou klávesu potvrdí vibrace.</li><li>Nic nezávisí na zraku ani sluchu.</li></ul>
+    <p class="small">Doručení: <b>osobně</b>, viz níže.</p></div>
 </div>
 
-<div class="callout"><p><b>Open source, takže i svépomocí.</b> Oba doplňky jsou open hardware. Pokud si je ty nebo někdo, kdo ti pomáhá, chcete postavit sami, použijte <a href="#/openhw#selfhost">formulář pro svépomoc a společný nákup</a>.</p></div>
+<h2 id="deafblind">Jak to funguje pro hluchoslepé</h2>
+<div class="two">
+  <div>
+    <h3>Doručení a nastavení</h3>
+    <ul>
+      <li>Žádné dopisy ani telefonáty: ozveme se přes kanál, který uvedeš ve formuláři, obvykle přes asistenta, tlumočníka nebo tvou organizaci.</li>
+      <li>Přijde vyškolený instruktor a komunikuje tak, jak ti vyhovuje: taktilní znakový jazyk, Lormova abeceda, psaní do dlaně nebo Braillovo písmo.</li>
+      <li>Společně nastavíte sílu vibrací a rychlost čtení, procvičíte vzory a namontujete uzel. Krabička má hmatové značky a solární konektor nejde zapojit obráceně.</li>
+      <li>Lze spárovat důvěryhodnou osobu, která dostane tvoje SOS. Po pár týdnech následná návštěva.</li>
+    </ul>
+  </div>
+  <ol class="steps">
+    <li><h3>Přijde zpráva</h3><p>Uzel ji předá náramku. Všechny motorky dají dva dlouhé pulzy: pozor.</p></li>
+    <li><h3>Začneš číst</h3><p>Ťukni na náramek. Písmena běží jako Braillovy znaky na motorcích 2 × 3, 1–4 za sekundu podle nastavení. Ťuknutí = pauza, dvojí ťuknutí = znovu.</p></li>
+    <li><h3>Odpovíš</h3><p>Piš na Braillově klávesnici; každý znak se vrátí jako vibrace. Enter ho odešle do mesh.</p></li>
+    <li><h3>Varování nepřehlédneš</h3><p>Varování centrální autority má silný opakovaný vzor, který běží, dokud ho nepotvrdíš podržením klávesy.</p></li>
+    <li><h3>SOS</h3><p>Podrž dvě klávesy 3 sekundy: SOS odejde tvým důvěryhodným osobám a centrální autoritě.</p></li>
+  </ol>
+</div>
+
+<h2 id="build">Haptický náramek Pro: co to je, aby sis ho mohl postavit sám</h2>
+<p>Náramek dodává stát, ale je to open hardware jako všechno ostatní. Je to ESP32-S3 s mikrofonem, který přes haptické budiče ovládá 8 lineárních rezonančních aktuátorů (LRA). Funguje se <b>standardním Meshtasticem</b>: přijaté zprávy jdou do náramku přes Serial modul v režimu <code>TEXTMSG</code>, jednoduchý náramek s jedním motorkem může místo toho použít modul External Notification {{UP}}. Žádný fork firmwaru.</p>
+<div class="two">
+  <div><h3>Zapojení</h3><ul>
+    <li>XIAO <code>D4/SDA</code>, <code>D5/SCL</code> → I²C mux TCA9548A → 8 × DRV2605L (jeden na kanál muxu) → 8 × LRA.</li>
+    <li>XIAO <code>D6/TX</code> → GPIO16 uzlu, XIAO <code>D7/RX</code> ← GPIO15 uzlu, společná GND. Nebo bezdrátově přes BLE.</li>
+    <li>Rozložení na zápěstí (neslyšící): 8 motorků v kruhu, takže zvuk ukáže i směr. Braillovo rozložení (hluchoslepí): znak 2 × 3 na předloktí + 2 ovládací motorky.</li>
+    <li>1S LiPo 500–1000 mAh na bateriové plošky XIAO.</li>
+  </ul></div>
+  <div><h3>Piny uzlu pro doplňky</h3>{{PINS_ADDONS}}</div>
+</div>
+{{BOM_ADDONS}}
+<div class="callout warn"><p><b>Stav: referenční návrh.</b> Firmware náramku a soubory krabičky zveřejníme v <code>hardware/addons/</code> v repozitáři. Motorky mají proudové špičky: napájej je z baterie přes budiče, nikdy z GPIO. Zaoblená izolovaná krabička; žádná nepřetržitá vibrace delší než pár sekund.</p></div>
+
+<h2 id="compute">Jaký počítač nebo GPU to utáhne</h2>
+<p>Rozpoznávání zvuků běží přímo v náramku bez GPU, takže funguje i při blackoutu. Převod řeči na text potřebuje víc výkonu: to je volitelný poslechový hub. Hub od státu je Jetson Orin Nano; tabulka ukazuje, co dalšího stačí, když si ho postavíš sám.</p>
+{{COMPUTE}}
+<p class="small">Orientační hodnoty. Převod řeči na text: <a href="https://github.com/ggml-org/whisper.cpp" rel="noopener">whisper.cpp</a> nebo <a href="https://github.com/SYSTRAN/faster-whisper" rel="noopener">faster-whisper</a>, obojí open source a běží úplně offline. Hub potřebuje síť nebo velkou baterii; při blackoutu náramek sám dál doručuje zprávy z mesh i zvuková upozornění.</p>
+
+<div class="callout"><p><b>Raději si ho postavíš sám?</b> Použij <a href="#/openhw#selfhost">formulář pro vlastní stavbu</a>; sady dílů jsou ve společném nákupu.</p></div>
 
 <h2 id="register">Registrační formulář</h2>
-<p>Tvoje údaje jdou soukromě pouze centrální autoritě. Nikdy se nezveřejňují a nikdy se neukazují ostatním uživatelům.</p>
+<p>Údaje jdou soukromě jen centrální autoritě. Nikdy se nezveřejňují a nezobrazují ostatním uživatelům.</p>
 <div class="card">
-<form class="f reg" data-kind="registrace – přístupnost">
+<form class="f reg" data-kind="accessibility registration">
   <div class="row2">
     <label><span class="lbl">Celé jméno</span><input type="text" name="name" required autocomplete="name"></label>
-    <label><span class="lbl">Preferovaný jazyk</span><select name="lang"><option>Čeština</option><option>English</option><option>Polski</option></select></label>
+    <label><span class="lbl">Preferovaný jazyk</span><select name="lang"><option>Čeština</option><option>Polski</option><option>English</option></select></label>
   </div>
   <div class="row2">
     <label><span class="lbl">E-mail</span><input type="email" name="email" autocomplete="email"></label>
     <label><span class="lbl">Telefon (pro SMS)</span><input type="tel" name="phone" autocomplete="tel"></label>
   </div>
-  <label><span class="lbl">Jak tě máme kontaktovat?</span><select name="contact"><option>E-mail</option><option>SMS</option><option>Přes asistenta nebo pečovatele</option><option>Dopis v Braillově písmu</option></select></label>
+  <label><span class="lbl">Jak tě máme kontaktovat?</span><select name="contact"><option>E-mail</option><option>SMS</option><option>Přes asistenta, tlumočníka nebo pečovatele</option><option>Přes mou organizaci neslyšících, nevidomých nebo hluchoslepých</option><option>Dopis v Braillově písmu</option></select></label>
   <fieldset><legend>Jsem</legend>
     <label class="check"><input type="checkbox" name="deaf"> Neslyšící nebo nedoslýchavý</label>
     <label class="check"><input type="checkbox" name="blind"> Nevidomý nebo slabozraký</label>
     <label class="check"><input type="checkbox" name="deafblind"> Hluchoslepý</label>
   </fieldset>
-  <fieldset><legend>Doplňky, které potřebuji</legend>
+  <fieldset><legend>Potřebuji doplňky</legend>
     <label class="check"><input type="checkbox" name="braille"> Braillova klávesnice</label>
-    <label class="check"><input type="checkbox" name="haptic"> Haptický pásek na kůži (vibrace)</label>
+    <label class="check"><input type="checkbox" name="haptic"> Haptický náramek Pro</label>
+    <label class="check"><input type="checkbox" name="hub"> Poslechový hub (živé titulky)</label>
   </fieldset>
-  <label><span class="lbl">Rozložení Braillova písma (pokud se týká)</span><select name="braille_layout"><option>6bodové</option><option>8bodové</option><option>Nevím</option></select></label>
+  <div class="row2">
+    <label><span class="lbl">Rozložení náramku</span><select name="band_layout"><option>Kruh na zápěstí (neslyšící)</option><option>Braillův znak na předloktí (hluchoslepí)</option><option>Nevím, rozhodneme při nastavení</option></select></label>
+    <label><span class="lbl">Braillovo rozložení</span><select name="braille_layout"><option>6bodové</option><option>8bodové</option><option>Nevím</option></select></label>
+  </div>
+  <label><span class="lbl">Hluchoslepí: jak s tebou má instruktor komunikovat?</span><select name="tactile"><option>Netýká se</option><option>Taktilní znakový jazyk</option><option>Lormova abeceda</option><option>Psaní do dlaně</option><option>Braillovo písmo</option><option>Přes mého tlumočníka nebo asistenta</option></select></label>
   <label><span class="lbl">Doručovací adresa</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
+  <label><span class="lbl">Asistent, tlumočník nebo důvěryhodná osoba (nepovinné)</span><input type="text" name="trusted"></label>
   <label><span class="lbl">Něco dalšího, co bychom měli vědět?</span><textarea name="notes" rows="3"></textarea></label>
-  <label class="check"><input type="checkbox" name="consent" required> Souhlasím, aby centrální autorita zpracovala tyto údaje za účelem dodání zařízení a doplňků.</label>
+  <label class="check"><input type="checkbox" name="consent" required> Souhlasím, že centrální autorita zpracuje tyto údaje, aby mi dodala zařízení a doplňky.</label>
   <button class="btn primary" type="submit">Odeslat registraci</button>
   <div class="form-msg" aria-live="polite"></div>
 </form>
@@ -255,28 +415,39 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 <p class="lede">Jak to složit dohromady, který pin je k čemu a jak se dostat do sítě. Nenašel jsi odpověď? <a href="#/faq#ask">Zeptej se centrální autority</a>; odpověď se zveřejní ve všech třech jazycích v kanálu jen pro čtení.</p>
 <div class="toc"><a href="#/faq#assembly">Sestavení</a><a href="#/faq#wiring">Který pin kam</a><a href="#/faq#ask">Položit otázku</a><a href="#/faq#channel">Kanál jen pro čtení</a></div>
 
-<h2 id="assembly">Jak to složit dohromady</h2>
-<details class="qa" open><summary>Jak uzel sestavit, krok za krokem?</summary><div>
+<h2 id="assembly">Když uzel dorazí</h2>
+<details class="qa" open><summary>Co mám udělat, když uzel dorazí?</summary><div>
+<p>Skoro nic. Dorazí <b>složený, zapájený, nahraný a nastavený</b>.</p>
 <ol>
-  <li><b>Nejdřív test na stole.</b> Připoj DevKitC přes USB, nahraj firmware (viz <a href="#/build">Sestavení FW</a>) a ověř, že deska nabootuje, než zapojíš cokoli dalšího.</li>
-  <li><b>Anténa na rádiový modul.</b> Anténu připoj vždy dřív, než rádio dostane napájení. Vysílání bez antény může SX1262 zničit.</li>
-  <li><b>Zapoj rádio</b> (SPI + BUSY, DIO1, RESET) podle tabulky níže. Vodiče drž krátké, pod 10 cm.</li>
-  <li><b>Zapoj e-paper modul</b> (SPI + DC, RST, BUSY). Sdílí 3V3 a GND.</li>
-  <li><b>Nahraj DIY variantu</b> a zkontroluj, že se displej vykreslí a rádio se inicializuje (sériový log, 115200 baud).</li>
-  <li><b>Přidej napájení:</b> panel → nabíječka → baterie → regulátor 3,3 V → pin 3V3. Přidej dělič baterie 100k/100k na GPIO1.</li>
-  <li><b>Zabal to:</b> krabička IP65, kabelová vývodka pro kabel od panelu, anténa venku a co nejvýš.</li>
+  <li>Našroubuj anténu. Vždy dřív, než uzel dostane napájení.</li>
+  <li>Zapoj solární panel (konektor nejde zapojit obráceně).</li>
+  <li>Umísti ho co nejvýš, panelem na jih.</li>
+  <li>Stiskni tlačítko. Displej ukáže <code>MESH · n nodes</code>.</li>
 </ol></div></details>
-<details class="qa"><summary>Musím pájet?</summary><div><p>S Heltec Wireless Paper ne: je to jedna deska. Připojíš jen anténu a baterii. DIY sestava vyžaduje základní pájení kolíkových lišt a napájení, nebo na první test propojovací kablíky na nepájivém poli.</p></div></details>
-<details class="qa"><summary>Můžu místo SX1262 použít rádio SX1276 / RFM95?</summary><div><p>Meshtastic podporuje více rádií, ale sada pinů je jiná (DIO0 místo BUSY/DIO1) a variant soubor je potřeba upravit. SX1262 doporučujeme kvůli nižší spotřebě a lepší citlivosti. Podporu rádií ověř upstream {{UP}}.</p></div></details>
-<details class="qa"><summary>Jakou frekvenci použít v Česku a Polsku?</summary><div><p>Pásmo EU 868 MHz, v Meshtasticu region <code>EU_868</code>. Kupuj verzi rádia a antény na 868 MHz. Jiné země: ověř místní pravidla a seznam regionů upstream {{UP}}.</p></div></details>
-<details class="qa"><summary>Displej zůstává prázdný. Co teď?</summary><div><p>Zkontroluj zapojení BUSY a RST, ověř, že model displeje ve variantě odpovídá tvému panelu (2,13″ a 2,9″ mají různé ovladače), a změř 3,3 V na modulu. U desek Heltec je displej napájen přes Vext (GPIO45, LOW = zapnuto).</p></div></details>
-<details class="qa"><summary>Jak připojím svůj uzel do sítě?</summary><div><p>Nastav region a pak použij URL kanálu, kterou centrální autorita zveřejňuje v kanálu jen pro čtení. Krok za krokem: <a href="#/openhw#connect">Open hardware → Připojení</a>.</p></div></details>
-<details class="qa"><summary>Jak poznám, že je firmware pravý?</summary><div><p>Použij stránku <a href="#/verify">Ověření</a>: zkontroluje SHA-256 hash a podpisy ML-DSA-65 + Ed25519 přímo v prohlížeči. Pak porovnej otisk klíče s tím v README na GitHubu.</p></div></details>
-<details class="qa"><summary>Můžu si Braillovu klávesnici nebo haptický pásek připojit sám?</summary><div><p>Ano. Oba doplňky jsou open hardware. Připojují se na volné GPIO nebo přes I²C; přiřazení pinů je v repu ve složce <code>hardware/addons/</code>. Viz <a href="#/access">Přístupnost</a> a <a href="#/openhw#selfhost">formulář pro svépomoc</a>.</p></div></details>
-<details class="qa"><summary>Můžu si tu psát s ostatními uživateli?</summary><div><p>Ne. Na tomto webu se můžeš ptát jen centrální autority. Otázky a oficiální odpovědi se objevují v kanálu jen pro čtení; mezi uživateli tu nejsou žádné odpovědi ani komentáře.</p></div></details>
+<details class="qa"><summary>Musím pájet?</summary><div><p><b>Ne.</b> Každý uzel dorazí kompletně složený. Pájení je jen pro ty, kdo se rozhodnou postavit si vlastní; proto jsou schémata a zapojení pinů zveřejněné. Pokud chceš, dej vědět <a href="#/openhw#selfhost">formulářem pro vlastní stavbu</a>, ať ti stát žádný neposílá.</p></div></details>
+<details class="qa"><summary>Chci si postavit vlastní. Jak ho sestavit krok za krokem?</summary><div>
+<ol>
+  <li><b>Nejdřív test na stole.</b> Připoj DevKitC přes USB, nahraj firmware (viz <a href="#/build">Sestavení FW</a>) a ověř, že deska nabootuje, než cokoli zapojíš.</li>
+  <li><b>Anténa na rádiový modul.</b> Anténu připoj vždy dřív, než rádio dostane napájení. Vysílání bez ní může zničit SX1262.</li>
+  <li><b>Zapoj rádio</b> (SPI + BUSY, DIO1, RESET) podle <a href="#/faq#wiring">schématu níže</a>. Vodiče krátké, pod 10 cm.</li>
+  <li><b>Zapoj e-paper modul</b> (SPI + DC, RST, BUSY). Sdílí 3V3 a GND.</li>
+  <li><b>Nahraj DIY variantu</b> a ověř, že displej kreslí a rádio se inicializuje (sériový log na 115200 baud).</li>
+  <li><b>Přidej napájení:</b> panel → nabíječka → baterie → regulátor 3,3 V → pin 3V3. Přidej dělič baterie 100k/100k na GPIO1.</li>
+  <li><b>Do krabičky:</b> IP65, kabelová průchodka pro panel, anténa venku, co nejvýš.</li>
+</ol>
+<p>Díly a kde je koupit: <a href="#/openhw#bom">Open hardware → díly</a>.</p></div></details>
+<details class="qa"><summary>Můžu místo SX1262 použít SX1276 / RFM95?</summary><div><p>Meshtastic podporuje víc rádií, ale sada pinů se liší (DIO0 místo BUSY/DIO1) a variantu je nutné upravit. SX1262 doporučujeme kvůli nižší spotřebě a lepší citlivosti. Podporu rádií ověř upstream {{UP}}.</p></div></details>
+<details class="qa"><summary>Jakou frekvenci použít v Česku a Polsku?</summary><div><p>Pásmo EU 868 MHz, region <code>EU_868</code> v Meshtasticu. Dodané uzly jsou už nastavené. Když stavíš vlastní, kup verzi rádia a antény na 868 MHz. Jiné země: ověř místní pravidla a seznam regionů upstream {{UP}}.</p></div></details>
+<details class="qa"><summary>Displej zůstává prázdný. Co teď?</summary><div><p>Dodaný uzel: zkontroluj solární konektor a nech baterii pár hodin nabíjet na denním světle, pak se zeptej v <a href="#/faq#ask">otázkách</a>. Vlastní stavba: zkontroluj zapojení BUSY a RST, ověř, že model displeje ve variantě odpovídá tvému panelu (2,13″ a 2,9″ mají jiné ovladače), a změř 3,3 V na modulu. Na deskách Heltec se displej napájí přes Vext (GPIO45, LOW = zap.).</p></div></details>
+<details class="qa"><summary>Jak připojím uzel do sítě?</summary><div><p>Dodané uzly jsou už připojené. Vlastní stavba: nastav region a pak použij URL kanálu zveřejněnou v kanálu jen pro čtení. Krok za krokem: <a href="#/openhw#connect">Open hardware → Připojení</a>.</p></div></details>
+<details class="qa"><summary>Jak poznám, že je firmware pravý?</summary><div><p>Použij stránku <a href="#/verify">Ověření</a>: zkontroluje hash SHA-256 a podpisy ML-DSA-65 + Ed25519 v prohlížeči, pak porovnej otisk klíče s tím v README na GitHubu.</p></div></details>
+<details class="qa"><summary>Můžu si Braillovu klávesnici nebo haptický náramek připojit sám?</summary><div><p>Ano. Oba doplňky jsou open hardware: klávesnice používá I²C na GPIO17/18, haptický náramek Pro sériový modul na GPIO15/16. Viz <a href="#/access#build">Přístupnost → postav si sám</a>.</p></div></details>
+<details class="qa"><summary>Co mesh dělá při blackoutu?</summary><div><p>Doručuje zprávy dál, i když mobilní vysílače utichnou. Podívej se na <a href="#/demo">simulaci blackoutu</a>.</p></div></details>
+<details class="qa"><summary>Můžu tu chatovat s ostatními uživateli?</summary><div><p>Ne. Na tomto webu se můžeš ptát jen centrální autority. Otázky a oficiální odpovědi se objevují v kanálu jen pro čtení; mezi uživateli nejsou odpovědi ani komentáře.</p></div></details>
 
 <h2 id="wiring">Který pin kam (DIY sestava)</h2>
 <p>ESP32-S3-DevKitC-1 k modulu SX1262 a SPI e-paper modulu. Čísla GPIO odpovídají rozložení Heltec Wireless Paper, takže varianta zůstává povědomá. Odpovídající definice pro firmware je v repu v <code>variants/diy_s3_eink/variant.h</code>.</p>
+{{BOARD}}
 {{PINS_DIY}}
 <div class="callout warn"><p><b>Než zapneš napájení:</b> anténa připojená · rádio i displej na <b>3,3 V</b>, nikdy 5 V · zkontroluj společnou zem GND · nenapájej pin 3V3 z regulátoru, když je zapojené USB, pokud deska nemá ochranu (při nahrávání odpoj baterii).</p></div>
 <h3>Zapojení napájení</h3>

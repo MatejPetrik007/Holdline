@@ -2,6 +2,8 @@
 
 Licence: **CERN-OHL-S-2.0** (see `LICENSE-HARDWARE`). You may build, modify, sell and share this design, as long as you share your modifications under the same licence.
 
+> **Every household receives this node fully assembled, flashed and configured.** The only connection people make themselves is the keyed solar plug. Everything below is for those who choose to build or repair their own (and should tell the central authority via the self-build form on the website, so no assembled node is sent).
+
 > Status: reference wiring. It has not yet been validated as a PCB. Check every item marked *check upstream* against [meshtastic/firmware](https://github.com/meshtastic/firmware) before building.
 
 ## Parts list
@@ -40,9 +42,12 @@ Licence: **CERN-OHL-S-2.0** (see `LICENSE-HARDWARE`). You may build, modify, sel
 | Battery sense | BAT+ → 100k → **GPIO1** → 100k → GND | GPIO1 | ADC1 |
 | Button | BOOT | GPIO0 | on board |
 | Add-on bus | I²C SDA / SCL | GPIO17 / GPIO18 | Braille keyboard |
-| Haptic | vibration driver input | GPIO21 | haptic band |
+| Haptic | vibration driver input | GPIO21 | basic haptic band |
+| Band serial | TX / RX | GPIO15 / GPIO16 | haptic band Pro (Serial module, TEXTMSG) |
 
 Power chain: **panel → charger SOLAR/IN → battery (BAT±) → charger OUT± → 3.3 V LDO → DevKitC 3V3**. Disconnect the battery while flashing over USB unless your board has back-feed protection.
+
+An interactive pin diagram and shop links are on the website (Open hardware → Which pin goes where / Parts and where to buy).
 
 Firmware definition: [`variants/diy_s3_eink/`](../variants/diy_s3_eink/).
 

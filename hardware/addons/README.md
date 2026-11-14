@@ -11,13 +11,34 @@ A chorded 6- or 8-dot Braille keyboard with its own small microcontroller (e.g. 
 - Wiring to the node: `3V3`, `GND`, `SDA → GPIO17`, `SCL → GPIO18` (DIY build). On Heltec boards use the free I²C header pins from the board's pinout.
 - Feedback: each typed character can trigger a short vibration on the haptic band, so deafblind users get confirmation without sound or sight.
 
-## 2. Haptic skin band (deaf and deafblind users)
+## 2. Haptic band Pro (deaf and deafblind users, supplied by the state)
 
-A wearable band with 1–4 vibration motors that turns messages and alerts into patterns on the skin.
+An ESP32-S3 band with a microphone and 8 linear resonant actuators (LRA). It works with **standard Meshtastic**, no fork:
 
-- Simple version: one ERM or LRA motor driven by a logic-level MOSFET (or a DRV2605L haptic driver), input on **GPIO21**. Use Meshtastic's **External Notification** module with the *vibra* output set to that GPIO (*check upstream*).
-- Patterns: short-short = new message, long = alert, repeating = SOS. Advanced builds can output messages as Morse or as Braille dot patterns across four motors.
-- Wireless option: a separate BLE band (e.g. nRF52-based) paired with the node; firmware for this is planned.
+- **Link to the node:** Meshtastic **Serial module** in `TEXTMSG` mode (*check upstream*). Node GPIO15 (TX) → band RX, node GPIO16 (RX) ← band TX, common GND. Received text messages arrive on the band; text typed on the band is sent to the mesh. Wireless BLE link planned.
+- **Hardware:** Seeed XIAO ESP32S3 Sense (built-in mic, 8 MB PSRAM) → I²C (D4/D5) → TCA9548A mux → 8 × DRV2605L → 8 × 10 mm LRA. 1S LiPo 500–1000 mAh on the XIAO battery pads.
+- **Deaf layout:** 8 motors in a ring around the wrist. On-device sound recognition (siren, smoke alarm, doorbell, knock, own name) with a small TensorFlow Lite Micro / ESP-DL model; each sound gets its own pattern, and the ring can show direction.
+- **Deafblind layout:** 6 motors as one Braille cell (2 × 3) on the forearm + 2 control motors (space, alert). Messages are played letter by letter, 1–4 characters per second; tap to pause, double-tap to repeat. Replies on the Braille keyboard, each key echoed as vibration. Central-authority alerts repeat until acknowledged; holding two keys for 3 s sends SOS.
+- **Deafblind delivery:** in person, by an instructor who communicates in the person's preferred way (tactile sign language, Lorm, print-on-palm, Braille), with a follow-up visit.
+
+### Simple version
+
+One ERM or LRA motor via a logic-level MOSFET or a DRV2605L on **GPIO21**, driven by Meshtastic's **External Notification** module (*vibra* output). Patterns: short-short = message, long = alert, repeating = SOS.
+
+### Optional listening hub (live captions)
+
+Speech-to-text runs on a separate hub, shown on the E-Ink screen and the phone, with keywords sent to the band:
+
+| Setup | Hardware | GPU / accelerator | Notes |
+|---|---|---|---|
+| Band only | XIAO ESP32S3 Sense | none | sound recognition only, works in a blackout |
+| Hub, CPU | Raspberry Pi 5, 8 GB | none | whisper.cpp tiny / base |
+| Hub, GPU (state-supplied) | NVIDIA Jetson Orin Nano Super, 8 GB | 1024-core Ampere, 67 TOPS INT8 | Whisper small in real time |
+| Home PC | any | NVIDIA ≥ 4 GB VRAM for small, ≥ 6 GB for large-v3-turbo, or Apple M1+ | mains power only |
+
+Rough planning values. Software: [whisper.cpp](https://github.com/ggml-org/whisper.cpp), [faster-whisper](https://github.com/SYSTRAN/faster-whisper), fully offline.
+
+Status: reference design. Band firmware and enclosure files will be published here.
 
 ## Safety
 
@@ -26,5 +47,5 @@ A wearable band with 1–4 vibration motors that turns messages and alerts into 
 
 ## Get one
 
-- **Supplied**: register on the website (Accessibility → registration form).
+- **Supplied (default)**: register on the website (Accessibility → registration form). Delivered assembled and set up; in person for deafblind people.
 - **Self-build / group purchase**: Open hardware → self-build form.

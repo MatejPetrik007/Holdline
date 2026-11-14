@@ -3,10 +3,64 @@ const DISCLAIMER = `<p><b>Zastrzeżenie:</b> to nieoficjalny, społecznościowy 
 export default {
   ui: {
     brand: 'Węzeł Meshtastic E-Ink',
-    nav: { home: 'Start', hardware: 'Sprzęt', build: 'Kompilacja', solar: 'Solar', openhw: 'Open hardware', access: 'Dostępność', faq: 'Pytania i odpowiedzi', verify: 'Weryfikacja', security: 'Bezpieczeństwo', releases: 'Wydania' },
+    nav: { home: 'Start', demo: 'Symulacja blackoutu', hardware: 'Sprzęt', build: 'Kompilacja', solar: 'Solar', openhw: 'Open hardware', access: 'Dostępność', faq: 'Pytania i odpowiedzi', verify: 'Weryfikacja', security: 'Bezpieczeństwo', releases: 'Wydania' },
     up: 'sprawdź upstream',
     copy: 'KOPIUJ', copied: 'SKOPIOWANO',
     pinCols: ['Element', 'Sygnał', 'Pin ESP32-S3', 'Do czego służy'],
+    bomCols: ["Część", "Przykład", "Uwagi", "Gdzie kupić"],
+    shopNote: "Linki do sklepów to przykładowe strony wyszukiwania, nie rekomendacje. Przed zamówieniem sprawdź dostępność, cenę i wersję 868 MHz.",
+    computeCols: ["Zestaw", "Sprzęt", "GPU / akcelerator", "Co robi", "Pobór mocy"],
+    board: {
+      aria: "Schemat pinów ESP32-S3-DevKitC-1 z GPIO dla wyświetlacza e-paper, radia SX1262, pomiaru baterii i dodatków",
+      sub: "połączenia DIY · najedź na grupę lub pin",
+      v33: "3V3 → radio, e-paper",
+      gnd: "GND (wspólna)",
+      groups: {
+        epaper: ["Wyświetlacz e-paper", "SPI + DC, RST, BUSY · GPIO2–7"],
+        radio: ["Radio LoRa SX1262", "SPI + NRST, BUSY, DIO1 · GPIO8–14"],
+        power: ["Zasilanie 3,3 V", "z LDO, nigdy 5 V"],
+        gnd: ["Masa", "wspólna dla wszystkich modułów"],
+        battery: ["Pomiar baterii", "dzielnik 100k/100k · GPIO1"],
+        addon: ["Dodatki dostępności", "I²C 17/18 · haptyka 21 · łącze szeregowe opaski 15/16"],
+        ui: ["Przycisk BOOT", "już na płytce · GPIO0"],
+      },
+      note: "Kolejność pinów jak w ESP32-S3-DevKitC-1 v1.1. Przed lutowaniem sprawdź nadruk na swojej płytce. Dostarczone węzły są już połączone; to dla tych, którzy budują lub naprawiają własne.",
+    },
+    demo: {
+      who: "Centrum kryzysowe · Cieszyn", outgoing: "Wychodzący alert", fits: "{n} B · mieści się w jednym pakiecie",
+      channelLine: "Kanał OLZA · AES-256 · EU868", preset: "Preset LongFast · hop limit",
+      routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
+      mapLabel: "Mapa Cieszyna i Czeskiego Cieszyna z węzłami mesh po obu stronach Olzy",
+      riverLabel: "Olza · granica",
+      legend: ["węzeł · alert odebrany", "węzeł · jeszcze nie", "router na dachu", "stacja BTS"],
+      replay: "Odtwórz ponownie", resend: "Wyślij ponownie przez mesh", hopLimit: "Hop limit", speed: "Prędkość", speeds: ["Wolno", "Normalnie", "Szybko"],
+      restore: "Przywróć wszystkie węzły", hint: "Kliknij węzeł, aby go wyłączyć, potem wyślij ponownie.", base: "stacja bazowa",
+      statsLabel: "Podsumowanie dostarczenia", stats: ["Sieć komórkowa", "Mesh dotarł", "Maks. skoków", "Transmisje", "Czas dostarczenia"],
+      nodes: { hq: "Centrum kryzysowe", hospital: "Szpital", roof: "Dach Těšín" },
+      tipHq: "Stacja bazowa centrum kryzysowego (Cieszyn)", tipNode: "{name} ({c}) · {role} · kliknij, aby wyłączyć / włączyć",
+      router: "router na dachu", household: "węzeł domowy",
+      pills: { waiting: "czeka", sending: "wysyła", failed: "błąd", delivered: "dostarczono {r}/{t}" },
+      phases: { normal: "SIEĆ DZIAŁA", blackout: "BLACKOUT · OBA BRZEGI", drained: "BATERIE BTS ROZŁADOWANE", cell: "ALERT PRZEZ SIEĆ KOMÓRKOWĄ", mesh: "MESHTASTIC · STEROWANY FLOODING", done: "ALERT DOSTARCZONY PRZEZ MESH" },
+      log: {
+        grid: "Sieć działa · 3 stacje BTS zasilane z sieci",
+        meshReady: "Mesh: {n} węzłów na baterii/solarze, kanał OLZA",
+        lost: "Brak prądu w Cieszynie i Czeskim Cieszynie",
+        battery: "Stacje BTS przeszły na baterie zapasowe",
+        depleted: "{t}: bateria rozładowana, stacja offline",
+        sms: "SMS / cell broadcast → bramki operatorów",
+        noCell: "Żadna stacja nieosiągalna · 0 mieszkańców powiadomionych",
+        switching: "Przełączam na stację bazową Meshtastic…",
+        resend: "──── ponowne wysłanie przez mesh ────",
+        tx: "TX alert id=0x4F1A · {b} B · hop_limit={h} · kanał OLZA",
+        ack: "niejawne ACK · {from} przekazał nasz pakiet",
+        quiet: "{n}: {from} przekazał go pierwszy, milczy",
+        rx: "{n} ({c}) rx skok {hop} · SNR {snr} dB · przekazanie za {ms} ms",
+        rxLimit: "{n} ({c}) rx skok {hop} · SNR {snr} dB · hop limit 0, nie przekazuje",
+        all: "Dostarczono do wszystkich {t} węzłów · {tx} transmisji · {q} milczało",
+        missed: "Nie dotarło do: {list}", offCount: " ({n} wyłączonych)",
+        tip: "Wskazówka: zwiększ hop limit lub przywróć router i wyślij ponownie.",
+      },
+    },
     verify: {
       waiting: 'czekam na pliki: {n}/3',
       hash: 'SHA-256 firmware\'u zgadza się z manifestem', sig: 'Podpis', sigOk: 'ważny dla klucza wydawcy', sigBad: 'NIEWAŻNY lub brak',
@@ -31,9 +85,10 @@ export default {
   <div>
     <p class="eyebrow">open hardware · off-grid · ESP32-S3 + E-Ink</p>
     <h1>Solarny węzeł mesh, który zbudujesz w domu.</h1>
-    <p class="lede">Węzeł LoRa typu open hardware z firmware'em <a href="https://meshtastic.org" rel="noopener">Meshtastic</a> i wyświetlaczem E-Ink. Zbuduj go sam i dołącz do sieci albo otrzymaj gotowy od państwa. Jeśli jesteś osobą głuchą lub niewidomą, zarejestruj się po dodatki takie jak klawiatura brajlowska czy haptyczna opaska na skórę. Każde wydanie firmware'u zweryfikujesz w przeglądarce przed wgraniem.</p>
+    <p class="lede">Węzeł LoRa typu open hardware z firmware'em <a href="https://meshtastic.org" rel="noopener">Meshtastic</a> i wyświetlaczem E-Ink. Każde gospodarstwo domowe dostaje go od państwa <b>całkowicie złożonego</b>, więc lutowanie jest opcjonalne: schematy są otwarte dla każdego, kto chce zbudować własny. Jeśli jesteś osobą głuchą, niewidomą lub głuchoniewidomą, zarejestruj się po dodatki takie jak klawiatura brajlowska czy haptyczna opaska na skórę. Każde wydanie firmware'u zweryfikujesz w przeglądarce przed wgraniem.</p>
     <div class="cta">
-      <a class="btn primary" href="#/openhw">Zbuduj go sam →</a>
+      <a class="btn primary" href="#/demo">Zobacz, jak działa podczas blackoutu →</a>
+      <a class="btn" href="#/openhw">Zbuduj go sam</a>
       <a class="btn" href="#/faq">Pytania i pinout</a>
       <a class="btn" href="#/access">Rejestracja – dostępność</a>
     </div>
@@ -46,7 +101,7 @@ export default {
   <div class="card"><div class="feature-icon">▤</div><span class="num">02</span><h3>Energooszczędny E-Ink</h3><p>E-Ink utrzymuje ostatni obraz bez poboru prądu, więc węzeł na baterii pokazuje wiadomości i stan przez tygodnie. Konfiguracja pinów jest w <a href="https://github.com/meshtastic/firmware" rel="noopener">repozytorium firmware'u</a>.</p></div>
   <div class="card"><div class="feature-icon">✓</div><span class="num">03</span><h3>Weryfikowalny firmware</h3><p>Każde wydanie ma manifest z hashami SHA-256, podpisany postkwantowym <b>ML-DSA-65 (FIPS 204)</b> oraz Ed25519. Ważny podpis dowodzi autentyczności od wydawcy; nie jest to zatwierdzenie przez żaden organ.</p></div>
   <a class="card" href="#/solar"><div class="feature-icon">☀</div><span class="num">04</span><h3>Działa na słońce</h3><p>Dzisiejsze małe panele słoneczne bez problemu zasilą węzeł poza siecią. Panel 2–6 W i jedno ogniwo 18650 utrzymają go w pracy w nocy i w pochmurne dni. →</p></a>
-  <a class="card" href="#/openhw"><div class="feature-icon">⚒</div><span class="num">05</span><h3>Open hardware, budowany w domu</h3><p>Schemat, pinout i lista części są otwarte. Każdy może zbudować węzeł w domu i podłączyć się do sieci. Dołącz do wspólnego zakupu, by mieć tańsze części. →</p></a>
+  <a class="card" href="#/openhw"><div class="feature-icon">⚒</div><span class="num">05</span><h3>Przychodzi złożony, otwarty do budowy</h3><p>Węzeł przychodzi gotowy: podłączasz panel słoneczny i montujesz. Schemat, pinout i lista części są otwarte, jeśli wolisz zbudować własny. →</p></a>
   <a class="card" href="#/access"><div class="feature-icon">⠿</div><span class="num">06</span><h3>Dostępny dla osób głuchych i niewidomych</h3><p>Zarejestruj się po dodatki takie jak klawiatura brajlowska lub haptyczna opaska na skórę. Są również open source, więc możesz je zbudować sam. →</p></a>
 </div>
 
@@ -65,6 +120,41 @@ export default {
   </div>
 </div>`,
 
+
+    demo: `
+<p class="eyebrow">symulacja · Cieszyn (PL) / Český Těšín (CZ)</p>
+<h1>Blackout nad Olzą</h1>
+<p class="lede">Na obu brzegach rzeki nie ma prądu. Stacje komórkowe wytrzymują na bateriach kilka godzin, potem milkną. Centrum kryzysowe w Cieszynie musi powiedzieć mieszkańcom obu krajów, gdzie jest woda i ładowanie. Zobacz, jak ten sam alert zawodzi w sieci komórkowej, a potem dociera do każdego domowego węzła przez mesh Meshtastic, skok po skoku.</p>
+<div id="sim"></div>
+
+<div class="two">
+  <div class="card"><h2>Dlaczego telefony milkną</h2>
+    <p>Stacja bazowa potrzebuje prądu z sieci i działającego łącza do sieci szkieletowej. Większość ma baterie na kilka godzin. Przy długim regionalnym blackoucie rozładowują się jedna po drugiej i SMS-y ani cell broadcast nie mają już którędy przejść.</p>
+    <p>Granica dodaje drugą lukę. Każdy kraj ostrzega przez własnych operatorów, więc mieszkaniec Czeskiego Cieszyna z czeską kartą SIM może nie zobaczyć alertu polskiego urzędu, choć jest kilkaset metrów dalej, za mostem.</p></div>
+  <div class="card"><h2>Dlaczego mesh działa dalej</h2>
+    <p>Węzły Meshtastic to małe radia LoRa o minimalnym poborze prądu: jedno ogniwo 18650 i <a href="#/solar">panel słoneczny</a> wielkości dłoni utrzymują je przez wiele dni. Nie potrzebują stacji, karty SIM ani operatora. Ekran E-Ink pokaże alert nawet bez telefonu.</p>
+    <p>Polska i Czechy dzielą to samo pasmo bez licencji EU868, więc węzły na obu brzegach są w jednym kanale. Rzeka jest granicą dla sieci, nie dla radia.</p></div>
+</div>
+
+<h2>Jak rozchodzi się wiadomość</h2>
+<ol class="steps">
+  <li><h3>Centrum nadaje raz</h3><p>Jego węzeł na dachu nadaje zaszyfrowany pakiet z hop limitem, domyślnie 3. Odbiera go każdy węzeł w zasięgu, w mieście zwykle 1–5 km, ze wzgórza dużo dalej.</p></li>
+  <li><h3>Każdy węzeł przekazuje go raz</h3><p>To <i>sterowany flooding</i>. Węzeł, który odbierze nowy pakiet, czeka chwilę, a potem nadaje go dalej z hop limitem zmniejszonym o jeden. Na zerze się zatrzymuje.</p></li>
+  <li><h3>Dalekie węzły idą pierwsze</h3><p>Czas oczekiwania zależy od siły sygnału: słaby sygnał oznacza, że węzeł jest daleko od nadawcy, więc czeka krócej. Dzięki temu wiadomość najszybciej rozchodzi się na zewnątrz.</p></li>
+  <li><h3>Duplikaty są ignorowane</h3><p>Każdy pakiet ma ID. Węzeł, który już go widział, odrzuca kopie. Zwykły węzeł, który usłyszy sąsiada przekazującego pakiet przed swoją kolejką, milczy i oszczędza czas antenowy. Routery w wysokich punktach, tu Góra Zamkowa, przekazują zawsze.</p></li>
+  <li><h3>Nadawca wie, że poszło</h3><p>Gdy centrum usłyszy swój pakiet przekazany dalej, traktuje to jako niejawne potwierdzenie.</p></li>
+  <li><h3>Tracisz węzeł, sieć zostaje</h3><p>Wyłącz na mapie router Góra Zamkowa i wyślij ponownie: węzeł Bulwary nad rzeką, który normalnie milczy, przenosi teraz alert do Czeskiego Cieszyna.</p></li>
+</ol>
+
+<h2>Sieć komórkowa a mesh podczas blackoutu</h2>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Sieć komórkowa</th><th>Meshtastic mesh</th></tr></thead><tbody>
+<tr><td>Potrzebuje prądu z sieci</td><td>Tak, baterie na godziny</td><td><b>Nie</b>, bateria i solar na dni</td></tr>
+<tr><td>Centralny punkt awarii</td><td>Stacje, łącza szkieletowe, rdzeń sieci</td><td><b>Brak</b>, każdy węzeł przekazuje</td></tr>
+<tr><td>Przez granicę PL–CZ</td><td>Osobni operatorzy i systemy ostrzegania</td><td><b>Jeden wspólny kanał</b> na obu brzegach</td></tr>
+<tr><td>Pojemność</td><td>Głos, dane, wideo</td><td>Tylko krótki tekst, ok. 200 bajtów na wiadomość, wspólny czas antenowy</td></tr>
+<tr><td>Przygotowanie</td><td>Już w każdej kieszeni</td><td>Węzły muszą być rozmieszczone, naładowane i w kanale przed blackoutem: dlatego każde gospodarstwo dostaje jeden <a href="#/openhw">złożony</a></td></tr>
+</tbody></table></div>
+<p class="small">Mesh nie zastępuje syren, radia ani patroli od drzwi do drzwi. Dodaje kanał, który przetrwa, gdy inne padną. Osoby głuche i głuchoniewidome dostają ten sam alert jako wibrację przez <a href="#/access">opaskę haptyczną</a>. Symulacja upraszcza zasięg i czasy oraz pomija kolizje pakietów; położenie węzłów jest poglądowe.</p>`,
     hardware: `
 <p class="eyebrow">sprzęt</p>
 <h1>Płytki ESP32-S3 z wyświetlaczem E-Ink</h1>
@@ -145,42 +235,56 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 
     openhw: `
 <p class="eyebrow">open hardware</p>
-<h1>Open hardware: każdy może zbudować go w domu</h1>
-<p class="lede">Firmware, schemat, pinout, lista części i dodatki dostępności są otwarte. Zbuduj węzeł w domu, wgraj zweryfikowany firmware i dołącz do sieci. Jeśli nie chcesz budować, państwo automatycznie dostarczy Ci gotowy węzeł.</p>
-<div class="toc"><a href="#/openhw#paths">Trzy drogi do węzła</a><a href="#/openhw#bom">Lista części</a><a href="#/openhw#connect">Podłączenie do sieci</a><a href="#/openhw#selfhost">Dodatki DIY i wspólny zakup</a></div>
+<h1>Przychodzi złożony. Otwarty, więc możesz zbudować go sam.</h1>
+<p class="lede">Każde gospodarstwo domowe dostaje od państwa węzeł <b>całkowicie złożony, wgrany i przetestowany</b>. Nie musisz niczego lutować. Schematy, pinout i lista części są otwarte, aby każdy, kto chce, mógł zbudować, naprawić lub ulepszyć węzeł w domu.</p>
+<div class="toc"><a href="#/openhw#box">Co przychodzi</a><a href="#/openhw#paths">Trzy drogi do węzła</a><a href="#/openhw#pins">Który pin gdzie</a><a href="#/openhw#bom">Części i gdzie kupić</a><a href="#/openhw#connect">Podłączenie własnego węzła</a><a href="#/openhw#selfhost">Zbuduję sam: daj znać</a></div>
+
+<h2 id="box">Co przychodzi w pudełku</h2>
+<div class="two">
+  <div>
+    <ul>
+      <li><b>Złożony węzeł</b> w szczelnej obudowie IP65: płytka, radio LoRa, ekran E-Ink, bateria, ładowarka i regulator, wszystko połączone, zlutowane, wgrane <a href="#/verify">zweryfikowanym firmware'em</a> i ustawione na region <code>EU_868</code> oraz kanał sieci.</li>
+      <li><b>Antena</b> (przykręcana SMA).</li>
+      <li><b>Panel słoneczny</b> z wtyczką, której nie da się włożyć odwrotnie.</li>
+      <li><b>Uchwyt montażowy</b> i drukowana skrócona instrukcja (na życzenie w brajlu lub dużym drukiem).</li>
+    </ul>
+  </div>
+  <ol class="steps">
+    <li><h3>Przykręć antenę</h3><p>Przed wszystkim innym.</p></li>
+    <li><h3>Podłącz panel słoneczny</h3><p>Jedyne połączenie, które robisz sam. Bez narzędzi.</p></li>
+    <li><h3>Zamontuj wysoko, panelem na południe</h3><p>Parapet, balkon lub dach. Wysokość jest najważniejsza.</p></li>
+    <li><h3>Naciśnij przycisk</h3><p>Ekran pokaże <code>MESH · n nodes</code>. Gotowe.</p></li>
+  </ol>
+</div>
 
 <h2 id="paths">Trzy drogi do węzła</h2>
 <div class="grid">
-  <div class="card"><span class="num">A</span><h3>Zbuduj sam</h3><p>Skorzystaj z listy części i <a href="#/faq#wiring">instrukcji połączeń</a>, wgraj firmware i dołącz do sieci. Open hardware oznacza, że możesz projekt kopiować, modyfikować i udostępniać.</p></div>
-  <div class="card"><span class="num">B</span><h3>Dostarczy państwo</h3><p>Wszyscy pozostali otrzymają standardowy węzeł solarny z wgranym firmware'em, dostarczany automatycznie przez państwo. Szczegóły dostawy centralny organ publikuje w <a href="#/faq#channel">kanale tylko do odczytu</a>.</p></div>
-  <a class="card" href="#/access"><span class="num">C</span><h3>Osoby głuche, niewidome, głuchoniewidome</h3><p>Zarejestruj się, a razem z węzłem otrzymasz dodatki dostępności, takie jak klawiatura brajlowska lub haptyczna opaska na skórę. →</p></a>
+  <div class="card"><span class="num">A · DOMYŚLNIE</span><h3>Przychodzi złożony</h3><p>Nie musisz nic robić: każdy zarejestrowany adres dostaje złożony węzeł automatycznie. Lutowanie nigdy nie jest wymagane. Terminy dostaw publikujemy w <a href="#/faq#channel">kanale tylko do odczytu</a>.</p></div>
+  <a class="card" href="#/openhw#selfhost"><span class="num">B · OPCJONALNIE</span><h3>Zbuduj go sam</h3><p>Chcesz zlutować własny? Daj nam znać formularzem poniżej, żeby państwo nie wysyłało ci węzła. Zestawy części są we wspólnym zakupie. →</p></a>
+  <a class="card" href="#/access"><span class="num">C</span><h3>Osoby głuche, niewidome, głuchoniewidome</h3><p>Przychodzi złożony z dodatkami, które ci pasują. Osoby głuchoniewidome dostają go osobiście, razem z konfiguracją. →</p></a>
 </div>
 
-<h2 id="bom">Lista części (referencyjny zestaw DIY)</h2>
-<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Część</th><th>Przykład</th><th>Uwagi</th></tr></thead><tbody>
-<tr><td>Płytka MCU</td><td>ESP32-S3-DevKitC-1 (N8R8 lub N16R8)</td><td>Zalecana PSRAM</td></tr>
-<tr><td>Radio LoRa</td><td>Moduł SX1262 z TCXO, np. Waveshare Core1262 lub Ebyte E22</td><td>Wybierz pasmo dla swojego regionu (UE: 868 MHz). E22 wymaga podłączenia RXEN/TXEN, zob. datasheet</td></tr>
-<tr><td>Wyświetlacz</td><td>Moduł e-papieru SPI 2,13″ lub 2,9″ (czarno-biały)</td><td>Musi odpowiadać sterownikowi wyświetlacza w wariancie {{UP}}</td></tr>
-<tr><td>Antena</td><td>Dostrojona antena 868 MHz, pigtail u.FL→SMA</td><td>Nigdy nie włączaj radia bez anteny</td></tr>
-<tr><td>Panel słoneczny</td><td>6 V, 2–6 W</td><td>Zob. <a href="#/solar">Solar</a></td></tr>
-<tr><td>Ładowarka</td><td>CN3791 (MPPT) lub TP4056 z zabezpieczeniem</td><td>1S Li-ion, 4,2 V</td></tr>
-<tr><td>Bateria</td><td>1–2 × 18650 z zabezpieczeniem lub LiFePO4</td><td>LiFePO4 wymaga ładowarki 3,6 V</td></tr>
-<tr><td>Regulator</td><td>LDO 3,3 V o małym prądzie spoczynkowym (ME6211, HT7333)</td><td>Zasila pin 3V3</td></tr>
-<tr><td>Inne</td><td>2 × rezystor 100 kΩ, obudowa IP65, dławiki kablowe</td><td>Dzielnik napięcia baterii na GPIO1</td></tr>
-</tbody></table></div>
-<p>Pliki projektu są w repo w katalogach <code>hardware/</code> i <code>variants/diy_s3_eink/</code>: <a href="{{REPO}}">{{REPO}}</a>. Licencja sprzętu CERN-OHL-S-2.0, firmware GPL-3.0 (jak upstream).</p>
+<h2 id="pins">Który pin gdzie</h2>
+<p>Potrzebne tylko, jeśli budujesz lub naprawiasz węzeł sam. Dostarczone węzły są połączone dokładnie tak.</p>
+{{BOARD}}
+<p>Pełne tabele: <a href="#/faq#wiring">Pytania i odpowiedzi → połączenia</a> · Heltec Wireless Paper (płytka w dostarczonym węźle): <a href="#/hardware#pins">Sprzęt → piny</a>.</p>
 
-<h2 id="connect">Podłączenie do sieci</h2>
+<h2 id="bom">Części i gdzie je kupić</h2>
+{{BOM}}
+<p>Pliki projektowe: <code>hardware/</code> i <code>variants/diy_s3_eink/</code> w <a href="{{REPO}}">repozytorium</a>. Licencja sprzętu CERN-OHL-S-2.0, firmware GPL-3.0 (jak upstream). Części do dodatków dostępności: <a href="#/access#build">Dostępność → zbuduj sam</a>.</p>
+
+<h2 id="connect">Podłączenie własnego węzła</h2>
+<p class="small">Dostarczone węzły są już skonfigurowane. Te kroki dotyczą tylko węzłów zbudowanych samodzielnie.</p>
 <ol class="steps">
   <li><h3>Ustaw region</h3><p>W aplikacji Meshtastic lub CLI ustaw region LoRa <code>EU_868</code> dla Polski i Czech (inne kraje: sprawdź upstream).</p><pre><code>meshtastic --set lora.region EU_868</code></pre></li>
-  <li><h3>Dodaj kanał sieci</h3><p>Centralny organ publikuje URL / kod QR kanału w <a href="#/faq#channel">kanale tylko do odczytu</a>. Otwórz go w aplikacji lub zastosuj przez CLI.</p><pre><code>meshtastic --seturl "&lt;URL kanału z kanału tylko do odczytu&gt;"</code></pre></li>
-  <li><h3>Sprawdź, czy jesteś w sieci</h3><p>W ciągu kilku minut na liście węzłów powinni pojawić się sąsiedzi. Nikogo? Podnieś antenę wyżej, sprawdź region i przeczytaj <a href="#/faq">pytania i odpowiedzi</a>.</p></li>
+  <li><h3>Dodaj kanał sieci</h3><p>Centralny organ publikuje URL / kod QR kanału w <a href="#/faq#channel">kanale tylko do odczytu</a>.</p><pre><code>meshtastic --seturl "&lt;URL kanału z kanału tylko do odczytu&gt;"</code></pre></li>
+  <li><h3>Sprawdź, czy jesteś w sieci</h3><p>W ciągu kilku minut na liście węzłów powinni pojawić się sąsiedzi. Nikogo? Podnieś antenę, sprawdź region i przeczytaj <a href="#/faq">pytania i odpowiedzi</a>.</p></li>
 </ol>
 
-<h2 id="selfhost">Dodatki DIY i wspólny zakup</h2>
-<p>Klawiatura brajlowska i opaska haptyczna są open source i open hardware, więc możesz je zbudować i uruchomić (self-hostować) samodzielnie, zamiast czekać na dostarczony egzemplarz. Dołącz do <b>wspólnego zakupu</b>, aby otrzymać zestawy części w cenach hurtowych. Rejestracja trafia prywatnie do centralnego organu i nigdy nie jest publikowana.</p>
+<h2 id="selfhost">Zbuduję sam: daj znać</h2>
+<p>Wypełnij tylko, jeśli chcesz zbudować własny. Wszyscy inni dostają złożony węzeł automatycznie i nie muszą nic robić. Dane trafiają prywatnie do centralnego organu i nigdy nie są publikowane.</p>
 <div class="card">
-<form class="f reg" data-kind="DIY / wspólny zakup">
+<form class="f reg" data-kind="self-build / opt-out of assembled delivery">
   <div class="row2">
     <label><span class="lbl">Imię i nazwisko</span><input type="text" name="name" required autocomplete="name"></label>
     <label><span class="lbl">E-mail</span><input type="email" name="email" required autocomplete="email"></label>
@@ -189,61 +293,117 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
     <label><span class="lbl">Kraj</span><select name="country"><option>Polska</option><option>Czechy</option><option>Słowacja</option><option>Inny</option></select></label>
     <label><span class="lbl">Miasto / region</span><input type="text" name="region"></label>
   </div>
-  <fieldset><legend>Co chcesz zbudować?</legend>
-    <label class="check"><input type="checkbox" name="node"> Węzeł mesh (ESP32-S3 + E-Ink + solar)</label>
-    <label class="check"><input type="checkbox" name="braille"> Dodatek: klawiatura brajlowska</label>
-    <label class="check"><input type="checkbox" name="haptic"> Dodatek: haptyczna opaska na skórę</label>
+  <label><span class="lbl">Adres gospodarstwa (żeby dopasować twoją dostawę)</span><textarea name="address" rows="2" autocomplete="street-address" required></textarea></label>
+  <label><span class="lbl">Złożony węzeł od państwa</span><select name="delivery"><option>Nie wysyłajcie: zbuduję własny</option><option>Wyślijcie mimo to: buduję dodatkowy węzeł</option></select></label>
+  <fieldset><legend>Co zbudujesz?</legend>
+    <label class="check"><input type="checkbox" name="node" checked> Węzeł mesh (ESP32-S3 + E-Ink + solar)</label>
+    <label class="check"><input type="checkbox" name="braille"> Klawiatura brajlowska</label>
+    <label class="check"><input type="checkbox" name="haptic"> Opaska haptyczna Pro</label>
+    <label class="check"><input type="checkbox" name="hub"> Hub nasłuchowy (mowa na tekst)</label>
   </fieldset>
   <div class="row2">
-    <label><span class="lbl">Dołączyć do wspólnego zakupu?</span><select name="groupbuy"><option value="yes">Tak, zarezerwujcie dla mnie zestawy</option><option value="no">Nie, sam kupię części</option></select></label>
+    <label><span class="lbl">Dołączasz do wspólnego zakupu?</span><select name="groupbuy"><option value="yes">Tak, zarezerwujcie mi zestawy części</option><option value="no">Nie, kupię części sam</option></select></label>
     <label><span class="lbl">Liczba zestawów</span><input type="number" name="qty" min="1" max="50" value="1"></label>
   </div>
-  <label><span class="lbl">Doświadczenie</span><select name="experience"><option>Pierwszy projekt elektroniczny</option><option>Umiem lutować i wgrywać firmware</option><option>Doświadczony majsterkowicz</option></select></label>
-  <label class="check"><input type="checkbox" name="consent" required> Zgadzam się, aby centralny organ przetwarzał te dane w celu organizacji wspólnego zakupu.</label>
-  <button class="btn primary" type="submit">Wyślij rejestrację</button>
+  <label><span class="lbl">Doświadczenie</span><select name="experience"><option>Pierwszy projekt elektroniczny</option><option>Umiem lutować i wgrywać płytki</option><option>Doświadczony maker</option></select></label>
+  <label class="check"><input type="checkbox" name="consent" required> Zgadzam się, aby centralny organ przetwarzał te dane w celu anulowania lub zmiany mojej dostawy i organizacji wspólnego zakupu.</label>
+  <button class="btn primary" type="submit">Wyślij</button>
   <div class="form-msg" aria-live="polite"></div>
 </form>
 </div>`,
 
     access: `
 <p class="eyebrow">dostępność</p>
-<h1>Komunikacja mesh dla osób głuchych, niewidomych i głuchoniewidomych</h1>
-<p class="lede">Komunikacja poza siecią musi działać dla każdego. Jeśli jesteś osobą głuchą, niedosłyszącą, niewidomą, słabowidzącą lub głuchoniewidomą, zarejestruj się poniżej, a państwo dostarczy Ci węzeł z dodatkami dostępności.</p>
+<h1>Wiadomości mesh dla osób głuchych, niewidomych i głuchoniewidomych</h1>
+<p class="lede">Każdy węzeł przychodzi złożony. Jeśli jesteś osobą głuchą, niewidomą lub głuchoniewidomą, państwo dostarcza go z dodatkami, które ci pasują, skonfigurowany i przetestowany. Osoby głuchoniewidome dostają go <b>osobiście</b> od instruktora, który komunikuje się tak jak one.</p>
+<div class="toc"><a href="#/access#who">Kto dostaje co</a><a href="#/access#deafblind">Jak to działa dla osób głuchoniewidomych</a><a href="#/access#build">Opaska haptyczna Pro: zbuduj sam</a><a href="#/access#compute">Jaki komputer lub GPU</a><a href="#/access#register">Rejestracja</a></div>
 
+<h2 id="who">Kto dostaje co</h2>
 <div class="grid">
-  <div class="card"><div class="feature-icon">⠿</div><h3>Klawiatura brajlowska</h3><p>Sześcio- lub ośmiopunktowe wejście brajlowskie, którym piszesz wiadomości bezpośrednio do węzła. Uzupełnione o komunikaty stanu przyjazne czytnikom ekranu w aplikacji towarzyszącej. Dla osób niewidomych i głuchoniewidomych.</p></div>
-  <div class="card"><div class="feature-icon">≋</div><h3>Haptyczna opaska na skórę</h3><p>Opaska do noszenia, która zamienia przychodzące wiadomości i alerty na wzory wibracji na skórze, więc nic nie zależy od słuchu ani wzroku. Dla osób głuchych i głuchoniewidomych.</p></div>
-  <div class="card"><div class="feature-icon">▤</div><h3>Kontrastowy E-Ink</h3><p>Ekran E-Ink jest czytelny nawet w pełnym słońcu i pokazuje alerty wizualnie, bez dźwięku. Planowane są układy z dużą czcionką.</p></div>
+  <div class="card"><div class="feature-icon">⠿</div><h3>Osoby niewidome i słabowidzące</h3>
+    <ul><li><b>Klawiatura brajlowska</b> (6- lub 8-punktowa, akordowa), która pisze prosto do węzła.</li><li>Wiadomości czyta na głos czytnik ekranu w telefonie przez aplikację Meshtastic {{UP}}.</li><li>Oznaczenia dotykowe na obudowie i przyciskach; skrócona instrukcja w brajlu i jako audio.</li></ul>
+    <p class="small">Dostawa: kurier, a jeśli chcesz, instruktaż przez telefon.</p></div>
+  <div class="card"><div class="feature-icon">≋</div><h3>Osoby głuche i słabosłyszące</h3>
+    <ul><li><b>Opaska haptyczna Pro</b> od państwa: 8 silniczków wokół nadgarstka.</li><li>Sama rozpoznaje ważne dźwięki (syrena, czujnik dymu, dzwonek, pukanie, twoje imię) i nadaje każdemu własny wzór wibracji.</li><li>Wiadomości z mesh wibrują i pojawiają się na ekranie E-Ink.</li><li>Opcjonalny <b>hub nasłuchowy</b>: napisy na żywo z mowy w pomieszczeniu na E-Ink i w telefonie.</li></ul>
+    <p class="small">Dostawa: kurier, z filmem konfiguracji w polskim języku migowym i tekstem.</p></div>
+  <div class="card"><div class="feature-icon">✋</div><h3>Osoby głuchoniewidome</h3>
+    <ul><li><b>Opaska haptyczna Pro w układzie brajlowskim</b>: 6 silniczków na przedramieniu tworzy jedną komórkę brajla, 2 kolejne sygnalizują spację i alarm. Wiadomości czujesz litera po literze.</li><li><b>Klawiatura brajlowska</b> do odpowiedzi; każdy klawisz potwierdza wibracja.</li><li>Nic nie zależy od wzroku ani słuchu.</li></ul>
+    <p class="small">Dostawa: <b>osobiście</b>, patrz niżej.</p></div>
 </div>
 
-<div class="callout"><p><b>Open source, więc również samodzielnie.</b> Oba dodatki są open hardware. Jeśli Ty lub ktoś, kto Ci pomaga, wolicie je zbudować, użyjcie <a href="#/openhw#selfhost">formularza DIY i wspólnego zakupu</a>.</p></div>
+<h2 id="deafblind">Jak to działa dla osób głuchoniewidomych</h2>
+<div class="two">
+  <div>
+    <h3>Dostawa i konfiguracja</h3>
+    <ul>
+      <li>Bez listów i telefonów: kontaktujemy się przez kanał wskazany w formularzu, zwykle przez asystenta, tłumacza-przewodnika lub twoją organizację.</li>
+      <li>Przychodzi przeszkolony instruktor i komunikuje się tak, jak ci odpowiada: dotykowy język migowy, alfabet Lorma, pisanie na dłoni lub brajl.</li>
+      <li>Razem ustawiacie siłę wibracji i tempo czytania, ćwiczycie wzory i montujecie węzeł. Obudowa ma oznaczenia dotykowe, a wtyczki solarnej nie da się włożyć odwrotnie.</li>
+      <li>Można sparować zaufaną osobę, która otrzyma twoje SOS. Po kilku tygodniach wizyta kontrolna.</li>
+    </ul>
+  </div>
+  <ol class="steps">
+    <li><h3>Przychodzi wiadomość</h3><p>Węzeł przekazuje ją opasce. Wszystkie silniczki dają dwa długie impulsy: uwaga.</p></li>
+    <li><h3>Zaczynasz czytać</h3><p>Stuknij w opaskę. Litery płyną jako komórki brajla na silniczkach 2 × 3, 1–4 na sekundę wg ustawień. Stuknięcie = pauza, podwójne = powtórz.</p></li>
+    <li><h3>Odpowiadasz</h3><p>Pisz na klawiaturze brajlowskiej; każdy znak wraca jako wibracja. Enter wysyła go do mesh.</p></li>
+    <li><h3>Alertu nie przegapisz</h3><p>Ostrzeżenia centralnego organu mają silny, powtarzający się wzór, który trwa, dopóki nie potwierdzisz go przytrzymaniem klawisza.</p></li>
+    <li><h3>SOS</h3><p>Przytrzymaj dwa klawisze przez 3 sekundy: SOS trafia do twoich zaufanych osób i centralnego organu.</p></li>
+  </ol>
+</div>
+
+<h2 id="build">Opaska haptyczna Pro: co to jest, żeby można ją zbudować samemu</h2>
+<p>Opaskę dostarcza państwo, ale jak wszystko tutaj jest to open hardware. To ESP32-S3 z mikrofonem, który przez sterowniki haptyczne steruje 8 liniowymi aktuatorami rezonansowymi (LRA). Działa ze <b>standardowym Meshtastic</b>: odebrane wiadomości trafiają do opaski przez moduł Serial w trybie <code>TEXTMSG</code>, a prosta opaska z jednym silniczkiem może zamiast tego użyć modułu External Notification {{UP}}. Bez forka firmware'u.</p>
+<div class="two">
+  <div><h3>Połączenia</h3><ul>
+    <li>XIAO <code>D4/SDA</code>, <code>D5/SCL</code> → multiplekser I²C TCA9548A → 8 × DRV2605L (jeden na kanał) → 8 × LRA.</li>
+    <li>XIAO <code>D6/TX</code> → GPIO16 węzła, XIAO <code>D7/RX</code> ← GPIO15 węzła, wspólna GND. Albo bezprzewodowo przez BLE.</li>
+    <li>Układ na nadgarstek (osoby głuche): 8 silniczków w pierścieniu, więc dźwięk pokazuje też kierunek. Układ brajlowski (osoby głuchoniewidome): komórka 2 × 3 na przedramieniu + 2 silniczki sterujące.</li>
+    <li>1S LiPo 500–1000 mAh na padach baterii XIAO.</li>
+  </ul></div>
+  <div><h3>Piny węzła dla dodatków</h3>{{PINS_ADDONS}}</div>
+</div>
+{{BOM_ADDONS}}
+<div class="callout warn"><p><b>Status: projekt referencyjny.</b> Firmware opaski i pliki obudowy opublikujemy w <code>hardware/addons/</code> w repozytorium. Silniczki mają skoki prądu: zasilaj je z baterii przez sterowniki, nigdy z GPIO. Zaokrąglona, izolowana obudowa; bez ciągłej wibracji dłuższej niż kilka sekund.</p></div>
+
+<h2 id="compute">Jaki komputer lub GPU to uciągnie</h2>
+<p>Rozpoznawanie dźwięków działa w samej opasce, bez GPU, więc działa też podczas blackoutu. Zamiana mowy na tekst wymaga więcej mocy: to opcjonalny hub nasłuchowy. Hub od państwa to Jetson Orin Nano; tabela pokazuje, co jeszcze wystarczy, jeśli budujesz własny.</p>
+{{COMPUTE}}
+<p class="small">Wartości orientacyjne. Mowa na tekst: <a href="https://github.com/ggml-org/whisper.cpp" rel="noopener">whisper.cpp</a> lub <a href="https://github.com/SYSTRAN/faster-whisper" rel="noopener">faster-whisper</a>, oba open source i działają całkowicie offline. Hub potrzebuje zasilania z sieci lub dużej baterii; podczas blackoutu sama opaska nadal dostarcza wiadomości z mesh i alerty dźwiękowe.</p>
+
+<div class="callout"><p><b>Wolisz zbudować sam?</b> Użyj <a href="#/openhw#selfhost">formularza samodzielnej budowy</a>; zestawy części są we wspólnym zakupie.</p></div>
 
 <h2 id="register">Formularz rejestracyjny</h2>
-<p>Twoje dane trafiają prywatnie wyłącznie do centralnego organu. Nigdy nie są publikowane ani pokazywane innym użytkownikom.</p>
+<p>Dane trafiają prywatnie tylko do centralnego organu. Nigdy nie są publikowane ani pokazywane innym użytkownikom.</p>
 <div class="card">
-<form class="f reg" data-kind="rejestracja – dostępność">
+<form class="f reg" data-kind="accessibility registration">
   <div class="row2">
     <label><span class="lbl">Imię i nazwisko</span><input type="text" name="name" required autocomplete="name"></label>
-    <label><span class="lbl">Preferowany język</span><select name="lang"><option>Polski</option><option>English</option><option>Čeština</option></select></label>
+    <label><span class="lbl">Preferowany język</span><select name="lang"><option>Polski</option><option>Čeština</option><option>English</option></select></label>
   </div>
   <div class="row2">
     <label><span class="lbl">E-mail</span><input type="email" name="email" autocomplete="email"></label>
     <label><span class="lbl">Telefon (do SMS)</span><input type="tel" name="phone" autocomplete="tel"></label>
   </div>
-  <label><span class="lbl">Jak mamy się z Tobą kontaktować?</span><select name="contact"><option>E-mail</option><option>SMS</option><option>Przez asystenta lub opiekuna</option><option>List w brajlu</option></select></label>
+  <label><span class="lbl">Jak mamy się z tobą kontaktować?</span><select name="contact"><option>E-mail</option><option>SMS</option><option>Przez asystenta, tłumacza lub opiekuna</option><option>Przez moją organizację osób głuchych, niewidomych lub głuchoniewidomych</option><option>List w brajlu</option></select></label>
   <fieldset><legend>Jestem osobą</legend>
-    <label class="check"><input type="checkbox" name="deaf"> Głuchą lub niedosłyszącą</label>
+    <label class="check"><input type="checkbox" name="deaf"> Głuchą lub słabosłyszącą</label>
     <label class="check"><input type="checkbox" name="blind"> Niewidomą lub słabowidzącą</label>
     <label class="check"><input type="checkbox" name="deafblind"> Głuchoniewidomą</label>
   </fieldset>
-  <fieldset><legend>Potrzebne dodatki</legend>
+  <fieldset><legend>Potrzebuję dodatków</legend>
     <label class="check"><input type="checkbox" name="braille"> Klawiatura brajlowska</label>
-    <label class="check"><input type="checkbox" name="haptic"> Haptyczna opaska na skórę (wibracje)</label>
+    <label class="check"><input type="checkbox" name="haptic"> Opaska haptyczna Pro</label>
+    <label class="check"><input type="checkbox" name="hub"> Hub nasłuchowy (napisy na żywo)</label>
   </fieldset>
-  <label><span class="lbl">Układ brajla (jeśli dotyczy)</span><select name="braille_layout"><option>6-punktowy</option><option>8-punktowy</option><option>Nie wiem</option></select></label>
+  <div class="row2">
+    <label><span class="lbl">Układ opaski</span><select name="band_layout"><option>Pierścień na nadgarstku (osoby głuche)</option><option>Komórka brajla na przedramieniu (osoby głuchoniewidome)</option><option>Nie wiem, ustalimy przy konfiguracji</option></select></label>
+    <label><span class="lbl">Układ brajla</span><select name="braille_layout"><option>6-punktowy</option><option>8-punktowy</option><option>Nie wiem</option></select></label>
+  </div>
+  <label><span class="lbl">Osoby głuchoniewidome: jak instruktor ma się z tobą komunikować?</span><select name="tactile"><option>Nie dotyczy</option><option>Dotykowy język migowy</option><option>Alfabet Lorma</option><option>Pisanie na dłoni</option><option>Brajl</option><option>Przez mojego tłumacza-przewodnika lub asystenta</option></select></label>
   <label><span class="lbl">Adres dostawy</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
+  <label><span class="lbl">Asystent, tłumacz lub zaufana osoba (opcjonalnie)</span><input type="text" name="trusted"></label>
   <label><span class="lbl">Coś jeszcze, o czym powinniśmy wiedzieć?</span><textarea name="notes" rows="3"></textarea></label>
-  <label class="check"><input type="checkbox" name="consent" required> Zgadzam się, aby centralny organ przetwarzał te dane w celu dostarczenia urządzenia i dodatków.</label>
+  <label class="check"><input type="checkbox" name="consent" required> Zgadzam się, aby centralny organ przetwarzał te dane w celu dostarczenia mi urządzenia i dodatków.</label>
   <button class="btn primary" type="submit">Wyślij rejestrację</button>
   <div class="form-msg" aria-live="polite"></div>
 </form>
@@ -255,28 +415,39 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 <p class="lede">Jak to złożyć, który pin do czego i jak dostać się do sieci. Nie znalazłeś odpowiedzi? <a href="#/faq#ask">Zapytaj centralny organ</a>; odpowiedź zostanie opublikowana we wszystkich trzech językach w kanale tylko do odczytu.</p>
 <div class="toc"><a href="#/faq#assembly">Montaż</a><a href="#/faq#wiring">Który pin gdzie</a><a href="#/faq#ask">Zadaj pytanie</a><a href="#/faq#channel">Kanał tylko do odczytu</a></div>
 
-<h2 id="assembly">Jak to złożyć</h2>
-<details class="qa" open><summary>Jak zmontować węzeł krok po kroku?</summary><div>
+<h2 id="assembly">Gdy węzeł dotrze</h2>
+<details class="qa" open><summary>Co muszę zrobić, gdy węzeł dotrze?</summary><div>
+<p>Prawie nic. Przychodzi <b>złożony, zlutowany, wgrany i skonfigurowany</b>.</p>
 <ol>
-  <li><b>Najpierw test na biurku.</b> Podłącz DevKitC przez USB, wgraj firmware (zob. <a href="#/build">Kompilacja</a>) i sprawdź, czy płytka się uruchamia, zanim podłączysz cokolwiek innego.</li>
-  <li><b>Antena na moduł radiowy.</b> Zawsze podłącz antenę, zanim radio dostanie zasilanie. Nadawanie bez anteny może zniszczyć SX1262.</li>
-  <li><b>Podłącz radio</b> (SPI + BUSY, DIO1, RESET) według tabeli poniżej. Przewody krótkie, poniżej 10 cm.</li>
-  <li><b>Podłącz moduł e-papieru</b> (SPI + DC, RST, BUSY). Współdzieli 3V3 i GND.</li>
-  <li><b>Wgraj wariant DIY</b> i sprawdź, czy wyświetlacz rysuje obraz, a radio się inicjalizuje (log szeregowy 115200 baud).</li>
-  <li><b>Dodaj zasilanie:</b> panel → ładowarka → bateria → regulator 3,3 V → pin 3V3. Dodaj dzielnik baterii 100k/100k na GPIO1.</li>
-  <li><b>Zamknij w obudowie:</b> obudowa IP65, dławik kablowy na przewód panelu, antena na zewnątrz i jak najwyżej.</li>
+  <li>Przykręć antenę. Zawsze zanim węzeł dostanie zasilanie.</li>
+  <li>Podłącz panel słoneczny (wtyczki nie da się włożyć odwrotnie).</li>
+  <li>Zamontuj go jak najwyżej, panelem na południe.</li>
+  <li>Naciśnij przycisk. Ekran pokaże <code>MESH · n nodes</code>.</li>
 </ol></div></details>
-<details class="qa"><summary>Czy muszę lutować?</summary><div><p>Z Heltec Wireless Paper nie: to jedna płytka. Podłączasz tylko antenę i baterię. Zestaw DIY wymaga podstawowego lutowania listew goldpin i zasilania albo, na pierwszy test, przewodów połączeniowych na płytce stykowej.</p></div></details>
-<details class="qa"><summary>Czy zamiast SX1262 mogę użyć radia SX1276 / RFM95?</summary><div><p>Meshtastic obsługuje kilka radiów, ale zestaw pinów jest inny (DIO0 zamiast BUSY/DIO1) i trzeba zmienić plik wariantu. SX1262 zalecamy ze względu na mniejszy pobór i lepszą czułość. Obsługę radiów sprawdź upstream {{UP}}.</p></div></details>
-<details class="qa"><summary>Jakiej częstotliwości używać w Polsce i Czechach?</summary><div><p>Pasma UE 868 MHz, w Meshtastic region <code>EU_868</code>. Kupuj wersję radia i anteny na 868 MHz. Inne kraje: sprawdź lokalne przepisy i listę regionów upstream {{UP}}.</p></div></details>
-<details class="qa"><summary>Ekran pozostaje pusty. Co teraz?</summary><div><p>Sprawdź połączenia BUSY i RST, upewnij się, że model wyświetlacza w wariancie odpowiada Twojemu panelowi (2,13″ i 2,9″ mają różne sterowniki), i zmierz 3,3 V na module. Na płytkach Heltec wyświetlacz jest zasilany przez Vext (GPIO45, LOW = wł.).</p></div></details>
-<details class="qa"><summary>Jak podłączyć mój węzeł do sieci?</summary><div><p>Ustaw region, a następnie zastosuj URL kanału publikowany przez centralny organ w kanale tylko do odczytu. Krok po kroku: <a href="#/openhw#connect">Open hardware → Podłączenie</a>.</p></div></details>
-<details class="qa"><summary>Skąd mam wiedzieć, że firmware jest prawdziwy?</summary><div><p>Użyj strony <a href="#/verify">Weryfikacja</a>: sprawdza hash SHA-256 i podpisy ML-DSA-65 + Ed25519 w przeglądarce. Następnie porównaj odcisk klucza z tym w README na GitHubie.</p></div></details>
-<details class="qa"><summary>Czy mogę sam podłączyć klawiaturę brajlowską lub opaskę haptyczną?</summary><div><p>Tak. Oba dodatki są open hardware. Podłącza się je do wolnych GPIO lub przez I²C; przypisanie pinów jest w repo w <code>hardware/addons/</code>. Zob. <a href="#/access">Dostępność</a> i <a href="#/openhw#selfhost">formularz DIY</a>.</p></div></details>
-<details class="qa"><summary>Czy mogę tu pisać z innymi użytkownikami?</summary><div><p>Nie. Na tej stronie możesz pytać tylko centralny organ. Pytania i oficjalne odpowiedzi pojawiają się w kanale tylko do odczytu; między użytkownikami nie ma tu odpowiedzi ani komentarzy.</p></div></details>
+<details class="qa"><summary>Czy muszę lutować?</summary><div><p><b>Nie.</b> Każdy węzeł przychodzi całkowicie złożony. Lutowanie jest tylko dla tych, którzy zdecydują się zbudować własny; dlatego schematy i pinout są publiczne. Jeśli chcesz, daj znać <a href="#/openhw#selfhost">formularzem samodzielnej budowy</a>, żeby państwo nie wysyłało ci węzła.</p></div></details>
+<details class="qa"><summary>Chcę zbudować własny. Jak go złożyć krok po kroku?</summary><div>
+<ol>
+  <li><b>Najpierw test na biurku.</b> Podłącz DevKitC przez USB, wgraj firmware (zob. <a href="#/build">Kompilacja</a>) i sprawdź, czy płytka startuje, zanim cokolwiek podłączysz.</li>
+  <li><b>Antena na moduł radiowy.</b> Zawsze podłącz antenę, zanim radio dostanie zasilanie. Nadawanie bez niej może zniszczyć SX1262.</li>
+  <li><b>Podłącz radio</b> (SPI + BUSY, DIO1, RESET) według <a href="#/faq#wiring">schematu poniżej</a>. Krótkie przewody, poniżej 10 cm.</li>
+  <li><b>Podłącz moduł e-paper</b> (SPI + DC, RST, BUSY). Dzieli 3V3 i GND.</li>
+  <li><b>Wgraj wariant DIY</b> i sprawdź, czy ekran rysuje, a radio się inicjalizuje (log szeregowy 115200 baud).</li>
+  <li><b>Dodaj zasilanie:</b> panel → ładowarka → bateria → regulator 3,3 V → pin 3V3. Dodaj dzielnik baterii 100k/100k na GPIO1.</li>
+  <li><b>Do obudowy:</b> IP65, dławik kablowy na przewód panelu, antena na zewnątrz, jak najwyżej.</li>
+</ol>
+<p>Części i gdzie je kupić: <a href="#/openhw#bom">Open hardware → części</a>.</p></div></details>
+<details class="qa"><summary>Czy mogę użyć SX1276 / RFM95 zamiast SX1262?</summary><div><p>Meshtastic obsługuje kilka radiów, ale zestaw pinów jest inny (DIO0 zamiast BUSY/DIO1) i trzeba zmienić wariant. SX1262 zalecamy ze względu na mniejszy pobór prądu i lepszą czułość. Obsługę radiów sprawdź upstream {{UP}}.</p></div></details>
+<details class="qa"><summary>Jakiej częstotliwości używać w Polsce i Czechach?</summary><div><p>Pasmo EU 868 MHz, region <code>EU_868</code> w Meshtastic. Dostarczone węzły są już ustawione. Jeśli budujesz własny, kup wersję radia i anteny na 868 MHz. Inne kraje: sprawdź lokalne przepisy i listę regionów upstream {{UP}}.</p></div></details>
+<details class="qa"><summary>Ekran pozostaje pusty. Co teraz?</summary><div><p>Dostarczony węzeł: sprawdź wtyczkę panelu i pozwól baterii ładować się kilka godzin w świetle dziennym, potem zapytaj w <a href="#/faq#ask">pytaniach</a>. Własna budowa: sprawdź połączenia BUSY i RST, upewnij się, że model wyświetlacza w wariancie pasuje do twojego panelu (2,13″ i 2,9″ mają inne sterowniki), i zmierz 3,3 V na module. Na płytkach Heltec wyświetlacz jest zasilany przez Vext (GPIO45, LOW = wł.).</p></div></details>
+<details class="qa"><summary>Jak podłączyć węzeł do sieci?</summary><div><p>Dostarczone węzły są już podłączone. Własna budowa: ustaw region, potem użyj URL kanału opublikowanego w kanale tylko do odczytu. Krok po kroku: <a href="#/openhw#connect">Open hardware → Podłączenie</a>.</p></div></details>
+<details class="qa"><summary>Skąd mam wiedzieć, że firmware jest autentyczny?</summary><div><p>Użyj strony <a href="#/verify">Weryfikacja</a>: sprawdza hash SHA-256 i podpisy ML-DSA-65 + Ed25519 w przeglądarce, potem porównaj odcisk klucza z tym w README na GitHubie.</p></div></details>
+<details class="qa"><summary>Czy mogę sam podłączyć klawiaturę brajlowską lub opaskę haptyczną?</summary><div><p>Tak. Oba dodatki to open hardware: klawiatura używa I²C na GPIO17/18, opaska haptyczna Pro modułu szeregowego na GPIO15/16. Zob. <a href="#/access#build">Dostępność → zbuduj sam</a>.</p></div></details>
+<details class="qa"><summary>Co robi mesh podczas blackoutu?</summary><div><p>Dalej dostarcza wiadomości, gdy stacje komórkowe milkną. Zobacz <a href="#/demo">symulację blackoutu</a>.</p></div></details>
+<details class="qa"><summary>Czy mogę tu czatować z innymi użytkownikami?</summary><div><p>Nie. Na tej stronie możesz pytać tylko centralny organ. Pytania i oficjalne odpowiedzi pojawiają się w kanale tylko do odczytu; między użytkownikami nie ma odpowiedzi ani komentarzy.</p></div></details>
 
 <h2 id="wiring">Który pin gdzie (zestaw DIY)</h2>
 <p>ESP32-S3-DevKitC-1 do modułu SX1262 i modułu e-papieru SPI. Numery GPIO odpowiadają układowi Heltec Wireless Paper, więc wariant pozostaje znajomy. Odpowiednia definicja firmware'u jest w repo w <code>variants/diy_s3_eink/variant.h</code>.</p>
+{{BOARD}}
 {{PINS_DIY}}
 <div class="callout warn"><p><b>Przed włączeniem zasilania:</b> antena podłączona · radio i wyświetlacz na <b>3,3 V</b>, nigdy 5 V · sprawdź wspólną masę GND · nie zasilaj pinu 3V3 z regulatora przy podłączonym USB, jeśli płytka nie ma zabezpieczenia (przy wgrywaniu odłącz baterię).</p></div>
 <h3>Połączenia zasilania</h3>
