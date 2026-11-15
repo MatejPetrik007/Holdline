@@ -2,7 +2,7 @@ const DISCLAIMER = `<p><b>Disclaimer:</b> this is an unofficial community build 
 
 export default {
   ui: {
-    brand: 'Meshtastic E-Ink Node',
+    brand: 'LastLink',
     nav: { home: 'Home', demo: 'Blackout demo', hardware: 'Hardware', build: 'Build', solar: 'Solar', openhw: 'Open hardware', access: 'Accessibility', faq: 'Q&A', verify: 'Verify', security: 'Security', releases: 'Releases' },
     up: 'check upstream',
     copy: 'COPY', copied: 'COPIED',
@@ -237,7 +237,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 <p class="eyebrow">open hardware</p>
 <h1>Delivered assembled. Open, so you can build it yourself.</h1>
 <p class="lede">Every household receives a node <b>fully assembled, flashed and tested</b> by the state. You don't need to solder anything. The schematics, pinout and parts list are open so that anyone who wants to can build, repair or improve one at home.</p>
-<div class="toc"><a href="#/openhw#box">What arrives</a><a href="#/openhw#paths">Three ways to get a node</a><a href="#/openhw#pins">Which pin goes where</a><a href="#/openhw#bom">Parts and where to buy</a><a href="#/openhw#connect">Connect a self-built node</a><a href="#/openhw#selfhost">Build it yourself: tell us</a></div>
+<div class="toc"><a href="#/openhw#box">What arrives</a><a href="#/openhw#paths">Three ways to get a node</a><a href="#/openhw#pins">Which pin goes where</a><a href="#/openhw#bom">Parts and where to buy</a><a href="#/openhw#connect">Connect a self-built node</a><a href="#/openhw#sign">Sign language: parts</a><a href="#/openhw#selfhost">Build it yourself: tell us</a></div>
 
 <h2 id="box">What arrives in the box</h2>
 <div class="two">
@@ -273,6 +273,11 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 {{BOM}}
 <p>Design files: <code>hardware/</code> and <code>variants/diy_s3_eink/</code> in <a href="{{REPO}}">the repository</a>. Hardware licence CERN-OHL-S-2.0, firmware GPL-3.0 (as upstream). Accessibility add-on parts: <a href="#/access#build">Accessibility → build it yourself</a>.</p>
 
+<h2 id="sign">Sign-language screen: parts and where to buy</h2>
+<p>For Deaf people whose first language is a sign language, the hub can show mesh messages <b>in sign language</b>. It runs on the same <b>NVIDIA Jetson Orin Nano</b> as the live captions, so if you already have the listening hub you only add a screen, a battery and a button. The system is normally off; when a message arrives, the band vibrates and you know to switch it on. How it works: <a href="#/access#sign">Accessibility → messages in sign language</a>.</p>
+{{BOM_SIGN}}
+<p class="small">Sign-language screen kits are part of the group purchase: tick <b>Sign-language screen</b> in the <a href="#/openhw#selfhost">self-build form</a>. To get one assembled and set up by the state, use the <a href="#/access#register">accessibility registration</a>.</p>
+
 <h2 id="connect">Connect a self-built node</h2>
 <p class="small">Delivered nodes are already configured. These steps are only for nodes you built yourself.</p>
 <ol class="steps">
@@ -300,6 +305,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
     <label class="check"><input type="checkbox" name="braille"> Braille keyboard add-on</label>
     <label class="check"><input type="checkbox" name="haptic"> Haptic band Pro</label>
     <label class="check"><input type="checkbox" name="hub"> Listening hub (speech-to-text)</label>
+    <label class="check"><input type="checkbox" name="sign"> Sign-language screen (messages in sign language)</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Join the group purchase?</span><select name="groupbuy"><option value="yes">Yes, reserve parts kits for me</option><option value="no">No, I'll buy the parts myself</option></select></label>
@@ -316,7 +322,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 <p class="eyebrow">accessibility</p>
 <h1>Mesh messaging for deaf, blind and deafblind people</h1>
 <p class="lede">Every node arrives assembled. If you are deaf, blind or deafblind, the state supplies it with the add-ons that fit you, set up and tested. Deafblind people receive theirs <b>in person</b>, from an instructor who communicates the way they do.</p>
-<div class="toc"><a href="#/access#who">Who gets what</a><a href="#/access#deafblind">How it works for deafblind people</a><a href="#/access#build">Haptic band Pro: build it yourself</a><a href="#/access#compute">Which computer or GPU</a><a href="#/access#register">Registration</a></div>
+<div class="toc"><a href="#/access#who">Who gets what</a><a href="#/access#deafblind">How it works for deafblind people</a><a href="#/access#build">Haptic band Pro: build it yourself</a><a href="#/access#sign">Messages in sign language</a><a href="#/access#compute">Which computer or GPU</a><a href="#/access#register">Registration</a></div>
 
 <h2 id="who">Who gets what</h2>
 <div class="grid">
@@ -324,7 +330,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
     <ul><li><b>Braille keyboard</b> (6- or 8-dot, chorded) that types straight into the node.</li><li>Messages read aloud by your phone's screen reader through the Meshtastic app {{UP}}.</li><li>Tactile markings on the case and buttons; quick guide in Braille and as audio.</li></ul>
     <p class="small">Delivery: courier, plus a phone walkthrough if you want one.</p></div>
   <div class="card"><div class="feature-icon">≋</div><h3>Deaf or hard of hearing</h3>
-    <ul><li><b>Haptic band Pro</b>, supplied by the state: 8 motors around the wrist.</li><li>Recognises important sounds on the band itself (siren, smoke alarm, doorbell, knock, your name) and gives each its own vibration pattern.</li><li>Mesh messages vibrate and appear on the E-Ink screen.</li><li>Optional <b>listening hub</b>: live captions of speech in the room on the E-Ink and your phone.</li></ul>
+    <ul><li><b>Haptic band Pro</b>, supplied by the state: 8 motors around the wrist.</li><li>Recognises important sounds on the band itself (siren, smoke alarm, doorbell, knock, your name) and gives each its own vibration pattern.</li><li>Mesh messages vibrate and appear on the E-Ink screen.</li><li>Optional <b>listening hub</b>: live captions of speech in the room on the E-Ink and your phone.</li><li><b>Sign-language screen</b> for the hub: messages and alerts in Czech or Polish Sign Language. <a href="#/access#sign">How it works →</a></li></ul>
     <p class="small">Delivery: courier, with a set-up video in Czech or Polish sign language and as text.</p></div>
   <div class="card"><div class="feature-icon">✋</div><h3>Deafblind</h3>
     <ul><li><b>Haptic band Pro in Braille layout</b>: 6 motors on the forearm form one Braille cell, 2 more signal space and alerts. Messages are felt letter by letter.</li><li><b>Braille keyboard</b> to reply; every key is confirmed by vibration.</li><li>Nothing depends on sight or sound.</li></ul>
@@ -365,6 +371,27 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 {{BOM_ADDONS}}
 <div class="callout warn"><p><b>Status: reference design.</b> The band firmware and enclosure files will be published in <code>hardware/addons/</code> in the repository. Motors draw current spikes: power them from the battery through the drivers, never from a GPIO. Rounded, insulated housing; no continuous vibration longer than a few seconds.</p></div>
 
+<h2 id="sign">Messages in sign language</h2>
+<p>Written Czech or Polish isn't every Deaf person's first language. So the hub can show messages in <b>sign language</b>: Czech Sign Language (ČZJ), Polish Sign Language (PJM) or International Sign. It runs on the same NVIDIA Jetson Orin Nano as the listening hub, fully offline, on a 10″ screen.</p>
+<div class="two">
+  <ol class="steps">
+    <li><h3>A message arrives</h3><p>The node passes it to the band. The band stores it and vibrates the <b>“sign language”</b> pattern: three waves running around the wrist. The text also appears on the E-Ink.</p></li>
+    <li><h3>Switch the system on</h3><p>Press the big button on the screen stand. The Jetson boots in about a minute and pulls any messages that arrived while it was off from the band over BLE.</p></li>
+    <li><h3>The message in sign language</h3><p>The screen plays the message in your sign language with captions. Tap = replay, hold = slower.</p></li>
+    <li><h3>The system switches off again</h3><p>After 10 minutes without a touch the hub shuts down to save the battery. The band keeps watching the mesh and the sounds in the room.</p></li>
+  </ol>
+  <div>
+    <h3>What you see in sign language</h3>
+    <ul>
+      <li><b>Central-authority alerts</b> (flood, evacuation, shelter, drinking water, power outage, all clear…): pre-recorded videos made by Deaf native signers together with Deaf organisations. Each alert carries a template code; place and time are added as text and fingerspelling.</li>
+      <li><b>Other messages</b> are shown as large, readable text. Machine translation of free text into sign language isn't reliable enough yet to use for alerts.</li>
+      <li>The central authority updates the video library through a <a href="#/verify">signed release</a>, just like the firmware.</li>
+      <li>You choose the language in the <a href="#/access#register">registration</a>.</li>
+    </ul>
+  </div>
+</div>
+<div class="callout warn"><p><b>Status: reference design.</b> No video gets made without Deaf native signers; an avatar does not replace them. Alerts on the band and the E-Ink always arrive, even if you never switch the system on. Parts and where to buy: <a href="#/openhw#sign">Open hardware → sign language</a>.</p></div>
+
 <h2 id="compute">Which computer or GPU runs it</h2>
 <p>Sound recognition runs on the band itself, without a GPU, so it keeps working in a blackout. Turning speech into text needs more compute: that's the optional listening hub. The state-supplied hub is a Jetson Orin Nano; the table shows what else is enough if you build your own.</p>
 {{COMPUTE}}
@@ -394,11 +421,13 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
     <label class="check"><input type="checkbox" name="braille"> Braille keyboard</label>
     <label class="check"><input type="checkbox" name="haptic"> Haptic band Pro</label>
     <label class="check"><input type="checkbox" name="hub"> Listening hub (live captions)</label>
+    <label class="check"><input type="checkbox" name="sign"> Sign-language screen (messages in sign language)</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Band layout</span><select name="band_layout"><option>Wrist ring (deaf)</option><option>Braille cell on the forearm (deafblind)</option><option>Not sure, decide at set-up</option></select></label>
     <label><span class="lbl">Braille layout</span><select name="braille_layout"><option>6-dot</option><option>8-dot</option><option>Not sure</option></select></label>
   </div>
+  <label><span class="lbl">Sign language on the screen</span><select name="sign_lang"><option>Not applicable</option><option>Czech Sign Language (ČZJ)</option><option>Polish Sign Language (PJM)</option><option>International Sign</option></select></label>
   <label><span class="lbl">Deafblind: how should the instructor communicate with you?</span><select name="tactile"><option>Not applicable</option><option>Tactile sign language</option><option>Lorm</option><option>Print-on-palm</option><option>Braille</option><option>Through my interpreter or carer</option></select></label>
   <label><span class="lbl">Delivery address</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">Carer, interpreter or trusted contact (optional)</span><input type="text" name="trusted"></label>

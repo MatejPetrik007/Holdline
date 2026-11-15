@@ -1,9 +1,9 @@
-import { CONFIG } from './config.js?v=2';
-import { PINS, BOM, BOM_ADDONS, COMPUTE } from './pins.js?v=2';
-import { mountDemo } from './demo.js?v=2';
-import en from './content/en.js?v=2';
-import cs from './content/cs.js?v=2';
-import pl from './content/pl.js?v=2';
+import { CONFIG } from './config.js?v=4';
+import { PINS, BOM, BOM_ADDONS, BOM_SIGN, COMPUTE } from './pins.js?v=4';
+import { mountDemo } from './demo.js?v=4';
+import en from './content/en.js?v=4';
+import cs from './content/cs.js?v=4';
+import pl from './content/pl.js?v=4';
 
 const LANGS = { en, cs, pl };
 const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'openhw', 'access', 'faq', 'verify', 'security', 'releases'];
@@ -66,7 +66,7 @@ const buyLinks = (buy) => `<span class="buy">${buy.map(([l, u]) => `<a href="${e
 function bomTable(rows) {
   const c = T.ui.bomCols;
   return `<div class="tbl-wrap"><table class="tbl"><thead><tr>${c.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows
-    .map((r) => `<tr><td><b>${esc(tr(r.part))}</b></td><td>${esc(r.ex)}</td><td>${esc(tr(r.note))}</td><td>${buyLinks(r.buy)}</td></tr>`)
+    .map((r) => `<tr><td><b>${esc(tr(r.part))}</b></td><td>${esc(tr(r.ex))}</td><td>${esc(tr(r.note))}</td><td>${buyLinks(r.buy)}</td></tr>`)
     .join('')}</tbody></table></div><p class="small">${T.ui.shopNote}</p>`;
 }
 function computeTable() {
@@ -191,19 +191,24 @@ function fill(html) {
     .replaceAll('{{BOARD}}', boardSvg)
     .replaceAll('{{BOM}}', () => bomTable(BOM))
     .replaceAll('{{BOM_ADDONS}}', () => bomTable(BOM_ADDONS))
+    .replaceAll('{{BOM_SIGN}}', () => bomTable(BOM_SIGN))
     .replaceAll('{{COMPUTE}}', computeTable)
     .replaceAll('{{POWER_CHAIN}}', powerTable())
     .replaceAll('{{REPO}}', `https://github.com/${CONFIG.repo}`);
 }
 
 // ---------- render ----------
+// Absolute links to the public domain; relative while developing locally.
+const LOCAL = location.protocol === 'file:' || /^(localhost|127\.|\[::1\])/.test(location.hostname);
+const BASE = LOCAL || !CONFIG.siteUrl ? '' : CONFIG.siteUrl;
 let unmount = null;
 function render(fromHash) {
   const { page, anchor } = route();
   if (unmount) { unmount(); unmount = null; }
   document.documentElement.lang = lang;
   $$('#langs button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.lang === lang));
-  $('#nav').innerHTML = ROUTES.map((r) => `<a href="#/${r}" ${r === page ? 'aria-current="page"' : ''}>${T.ui.nav[r]}</a>`).join('');
+  $('.brand').href = `${BASE}#/`;
+  $('#nav').innerHTML = ROUTES.map((r) => `<a href="${BASE}#/${r}" ${r === page ? 'aria-current="page"' : ''}>${T.ui.nav[r]}</a>`).join('');
   $('#foot').innerHTML = fill(T.ui.footer);
   document.title = `${T.ui.nav[page]} · ${T.ui.brand}`;
   $('#main').innerHTML = fill(T.pages[page]);

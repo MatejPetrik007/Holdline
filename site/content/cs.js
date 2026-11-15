@@ -2,7 +2,7 @@ const DISCLAIMER = `<p><b>Upozornění:</b> toto je neoficiální komunitní bui
 
 export default {
   ui: {
-    brand: 'Meshtastic E-Ink uzel',
+    brand: 'LastLink',
     nav: { home: 'Úvod', demo: 'Simulace blackoutu', hardware: 'Hardware', build: 'Sestavení FW', solar: 'Solár', openhw: 'Open hardware', access: 'Přístupnost', faq: 'Otázky a odpovědi', verify: 'Ověření', security: 'Bezpečnost', releases: 'Vydání' },
     up: 'ověř upstream',
     copy: 'KOPÍROVAT', copied: 'ZKOPÍROVÁNO',
@@ -237,7 +237,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 <p class="eyebrow">open hardware</p>
 <h1>Dojde složený. Otevřený, takže si ho můžeš postavit sám.</h1>
 <p class="lede">Každá domácnost dostane uzel od státu <b>kompletně složený, nahraný a otestovaný</b>. Nic nemusíš pájet. Schémata, zapojení pinů a seznam dílů jsou otevřené, aby si ho kdokoli, kdo chce, mohl postavit, opravit nebo vylepšit doma.</p>
-<div class="toc"><a href="#/openhw#box">Co dorazí</a><a href="#/openhw#paths">Tři cesty k uzlu</a><a href="#/openhw#pins">Který pin kam</a><a href="#/openhw#bom">Díly a kde koupit</a><a href="#/openhw#connect">Připojení vlastního uzlu</a><a href="#/openhw#selfhost">Postavím si sám: dej vědět</a></div>
+<div class="toc"><a href="#/openhw#box">Co dorazí</a><a href="#/openhw#paths">Tři cesty k uzlu</a><a href="#/openhw#pins">Který pin kam</a><a href="#/openhw#bom">Díly a kde koupit</a><a href="#/openhw#connect">Připojení vlastního uzlu</a><a href="#/openhw#sign">Znakový jazyk: díly</a><a href="#/openhw#selfhost">Postavím si sám: dej vědět</a></div>
 
 <h2 id="box">Co dorazí v krabici</h2>
 <div class="two">
@@ -273,6 +273,11 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 {{BOM}}
 <p>Návrhové soubory: <code>hardware/</code> a <code>variants/diy_s3_eink/</code> v <a href="{{REPO}}">repozitáři</a>. Licence hardwaru CERN-OHL-S-2.0, firmware GPL-3.0 (jako upstream). Díly pro doplňky přístupnosti: <a href="#/access#build">Přístupnost → postav si sám</a>.</p>
 
+<h2 id="sign">Znakový jazyk na displeji: díly a nákup</h2>
+<p>Pro neslyšící, jejichž prvním jazykem je znakový jazyk, umí hub ukázat zprávy z mesh <b>ve znakovém jazyce</b>. Běží na stejném <b>NVIDIA Jetson Orin Nano</b> jako živé titulky, takže pokud poslechový hub už máš, přidáváš jen displej, baterii a tlačítko. Systém je normálně vypnutý; když přijde zpráva, náramek zavibruje a ty víš, že ho máš zapnout. Jak to funguje: <a href="#/access#sign">Přístupnost → zprávy ve znakovém jazyce</a>.</p>
+{{BOM_SIGN}}
+<p class="small">Sady dílů pro znakový displej jsou ve společném nákupu: zaškrtni <b>Znakový displej</b> ve <a href="#/openhw#selfhost">formuláři pro vlastní stavbu</a>. Od státu ho dostaneš složený a nastavený přes <a href="#/access#register">registraci přístupnosti</a>.</p>
+
 <h2 id="connect">Připojení vlastního uzlu</h2>
 <p class="small">Dodané uzly jsou už nastavené. Tyto kroky jsou jen pro uzly, které sis postavil sám.</p>
 <ol class="steps">
@@ -300,6 +305,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
     <label class="check"><input type="checkbox" name="braille"> Braillova klávesnice</label>
     <label class="check"><input type="checkbox" name="haptic"> Haptický náramek Pro</label>
     <label class="check"><input type="checkbox" name="hub"> Poslechový hub (řeč na text)</label>
+    <label class="check"><input type="checkbox" name="sign"> Znakový displej (zprávy ve znakovém jazyce)</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Přidáš se ke společnému nákupu?</span><select name="groupbuy"><option value="yes">Ano, rezervujte mi sady dílů</option><option value="no">Ne, díly si koupím sám</option></select></label>
@@ -316,7 +322,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 <p class="eyebrow">přístupnost</p>
 <h1>Mesh zprávy pro neslyšící, nevidomé a hluchoslepé</h1>
 <p class="lede">Každý uzel dorazí složený. Pokud jsi neslyšící, nevidomý nebo hluchoslepý, stát ho dodá s doplňky, které ti sedí, nastavené a otestované. Hluchoslepí lidé ho dostanou <b>osobně</b> od instruktora, který komunikuje tak jako oni.</p>
-<div class="toc"><a href="#/access#who">Kdo dostane co</a><a href="#/access#deafblind">Jak to funguje pro hluchoslepé</a><a href="#/access#build">Haptický náramek Pro: postav si sám</a><a href="#/access#compute">Jaký počítač nebo GPU</a><a href="#/access#register">Registrace</a></div>
+<div class="toc"><a href="#/access#who">Kdo dostane co</a><a href="#/access#deafblind">Jak to funguje pro hluchoslepé</a><a href="#/access#build">Haptický náramek Pro: postav si sám</a><a href="#/access#sign">Zprávy ve znakovém jazyce</a><a href="#/access#compute">Jaký počítač nebo GPU</a><a href="#/access#register">Registrace</a></div>
 
 <h2 id="who">Kdo dostane co</h2>
 <div class="grid">
@@ -324,7 +330,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
     <ul><li><b>Braillova klávesnice</b> (6- nebo 8bodová, akordová), která píše přímo do uzlu.</li><li>Zprávy čte nahlas odečítač obrazovky v telefonu přes aplikaci Meshtastic {{UP}}.</li><li>Hmatové značky na krabičce a tlačítkách; rychlý návod v Braillově písmu a jako audio.</li></ul>
     <p class="small">Doručení: kurýr, a pokud chceš, provedení po telefonu.</p></div>
   <div class="card"><div class="feature-icon">≋</div><h3>Neslyšící a nedoslýchaví</h3>
-    <ul><li><b>Haptický náramek Pro</b> od státu: 8 motorků kolem zápěstí.</li><li>Přímo v náramku rozpozná důležité zvuky (siréna, požární hlásič, zvonek, klepání, tvoje jméno) a každému dá vlastní vibrační vzor.</li><li>Zprávy z mesh zavibrují a objeví se na E-Ink displeji.</li><li>Volitelný <b>poslechový hub</b>: živé titulky řeči v místnosti na E-Ink a v telefonu.</li></ul>
+    <ul><li><b>Haptický náramek Pro</b> od státu: 8 motorků kolem zápěstí.</li><li>Přímo v náramku rozpozná důležité zvuky (siréna, požární hlásič, zvonek, klepání, tvoje jméno) a každému dá vlastní vibrační vzor.</li><li>Zprávy z mesh zavibrují a objeví se na E-Ink displeji.</li><li>Volitelný <b>poslechový hub</b>: živé titulky řeči v místnosti na E-Ink a v telefonu.</li><li><b>Znakový displej</b> k hubu: zprávy a varování v českém nebo polském znakovém jazyce. <a href="#/access#sign">Jak to funguje →</a></li></ul>
     <p class="small">Doručení: kurýr, s videem nastavení v českém znakovém jazyce a textem.</p></div>
   <div class="card"><div class="feature-icon">✋</div><h3>Hluchoslepí</h3>
     <ul><li><b>Haptický náramek Pro v Braillově rozložení</b>: 6 motorků na předloktí tvoří jeden Braillův znak, další 2 hlásí mezeru a poplach. Zprávy cítíš písmeno po písmenu.</li><li><b>Braillova klávesnice</b> pro odpověď; každou klávesu potvrdí vibrace.</li><li>Nic nezávisí na zraku ani sluchu.</li></ul>
@@ -365,6 +371,27 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 {{BOM_ADDONS}}
 <div class="callout warn"><p><b>Stav: referenční návrh.</b> Firmware náramku a soubory krabičky zveřejníme v <code>hardware/addons/</code> v repozitáři. Motorky mají proudové špičky: napájej je z baterie přes budiče, nikdy z GPIO. Zaoblená izolovaná krabička; žádná nepřetržitá vibrace delší než pár sekund.</p></div>
 
+<h2 id="sign">Zprávy ve znakovém jazyce</h2>
+<p>Psaná čeština nebo polština není pro každého neslyšícího prvním jazykem. Proto hub umí ukázat zprávy ve <b>znakovém jazyce</b>: českém (ČZJ), polském (PJM) nebo v mezinárodním znakovém systému. Běží na stejném NVIDIA Jetson Orin Nano jako poslechový hub, úplně offline, a zobrazuje se na 10″ displeji.</p>
+<div class="two">
+  <ol class="steps">
+    <li><h3>Přijde zpráva</h3><p>Uzel ji předá náramku. Náramek si ji uloží a zavibruje vzorem <b>„znakový jazyk“</b>: tři vlny dokola kolem zápěstí. Text se zároveň objeví na E-Ink.</p></li>
+    <li><h3>Zapneš systém</h3><p>Stiskni velké tlačítko na stojanu displeje. Jetson naběhne zhruba za minutu a přes BLE si z náramku stáhne zprávy, které přišly, když byl vypnutý.</p></li>
+    <li><h3>Zpráva ve znakovém jazyce</h3><p>Displej přehraje zprávu ve tvém znakovém jazyce s titulky. Dotkni se displeje = znovu, podrž = pomaleji.</p></li>
+    <li><h3>Systém se zase vypne</h3><p>Po 10 minutách bez dotyku se hub sám vypne a šetří baterii. Náramek dál hlídá mesh i zvuky v místnosti.</p></li>
+  </ol>
+  <div>
+    <h3>Co uvidíš ve znakovém jazyce</h3>
+    <ul>
+      <li><b>Varování centrální autority</b> (povodeň, evakuace, úkryt, pitná voda, výpadek proudu, konec nebezpečí…): předtočená videa, která natáčejí neslyšící rodilí mluvčí s organizacemi neslyšících. Varování nese kód šablony; místo a čas se doplní textem a prstovou abecedou.</li>
+      <li><b>Ostatní zprávy</b> uvidíš jako velký čitelný text. Strojový překlad volného textu do znakového jazyka zatím není dost spolehlivý na to, abychom ho používali na varování.</li>
+      <li>Knihovnu videí aktualizuje centrální autorita <a href="#/verify">podepsaným vydáním</a>, stejně jako firmware.</li>
+      <li>Jazyk vybereš v <a href="#/access#register">registraci</a>.</li>
+    </ul>
+  </div>
+</div>
+<div class="callout warn"><p><b>Stav: referenční návrh.</b> Žádné video nevznikne bez neslyšících rodilých mluvčích; avatar je nenahradí. Varování na náramku a na E-Ink dorazí vždy, i když systém nezapneš. Díly a nákup: <a href="#/openhw#sign">Open hardware → znakový jazyk</a>.</p></div>
+
 <h2 id="compute">Jaký počítač nebo GPU to utáhne</h2>
 <p>Rozpoznávání zvuků běží přímo v náramku bez GPU, takže funguje i při blackoutu. Převod řeči na text potřebuje víc výkonu: to je volitelný poslechový hub. Hub od státu je Jetson Orin Nano; tabulka ukazuje, co dalšího stačí, když si ho postavíš sám.</p>
 {{COMPUTE}}
@@ -394,11 +421,13 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
     <label class="check"><input type="checkbox" name="braille"> Braillova klávesnice</label>
     <label class="check"><input type="checkbox" name="haptic"> Haptický náramek Pro</label>
     <label class="check"><input type="checkbox" name="hub"> Poslechový hub (živé titulky)</label>
+    <label class="check"><input type="checkbox" name="sign"> Znakový displej (zprávy ve znakovém jazyce)</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Rozložení náramku</span><select name="band_layout"><option>Kruh na zápěstí (neslyšící)</option><option>Braillův znak na předloktí (hluchoslepí)</option><option>Nevím, rozhodneme při nastavení</option></select></label>
     <label><span class="lbl">Braillovo rozložení</span><select name="braille_layout"><option>6bodové</option><option>8bodové</option><option>Nevím</option></select></label>
   </div>
+  <label><span class="lbl">Znakový jazyk na displeji</span><select name="sign_lang"><option>Netýká se</option><option>Český znakový jazyk (ČZJ)</option><option>Polský znakový jazyk (PJM)</option><option>Mezinárodní znakový systém</option></select></label>
   <label><span class="lbl">Hluchoslepí: jak s tebou má instruktor komunikovat?</span><select name="tactile"><option>Netýká se</option><option>Taktilní znakový jazyk</option><option>Lormova abeceda</option><option>Psaní do dlaně</option><option>Braillovo písmo</option><option>Přes mého tlumočníka nebo asistenta</option></select></label>
   <label><span class="lbl">Doručovací adresa</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">Asistent, tlumočník nebo důvěryhodná osoba (nepovinné)</span><input type="text" name="trusted"></label>

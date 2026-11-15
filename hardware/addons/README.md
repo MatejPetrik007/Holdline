@@ -38,6 +38,15 @@ Speech-to-text runs on a separate hub, shown on the E-Ink screen and the phone, 
 
 Rough planning values. Software: [whisper.cpp](https://github.com/ggml-org/whisper.cpp), [faster-whisper](https://github.com/SYSTRAN/faster-whisper), fully offline.
 
+### Optional sign-language screen (same Jetson hub)
+
+For Deaf users whose first language is a sign language (Czech ČZJ, Polish PJM, International Sign). Runs on the **same NVIDIA Jetson Orin Nano** as the listening hub, fully offline.
+
+- **Flow:** the node passes a message to the band → the band stores it and vibrates the *sign language* pattern (three waves around the wrist) → the user presses the big power button on the screen stand → the Jetson boots (about a minute), pulls stored messages from the band over BLE and plays them in sign language with captions → it shuts down after 10 minutes idle to save the battery.
+- **Content:** central-authority alerts use pre-recorded clips made by Deaf native signers with Deaf organisations, selected by a template code; place and time are added as text and fingerspelling. Other messages are shown as large text: free-text machine translation into sign language is not reliable enough for alerts. The clip library is updated as a signed release, like the firmware.
+- **Parts:** Jetson Orin Nano Super 8 GB (shared with the hub), 10.1″ HDMI touchscreen, 256 GB NVMe SSD for the clip library, 12 V LiFePO4 20–50 Ah for blackouts (check the dev kit input range upstream), large latching power button on the Jetson power header.
+- The band and E-Ink always deliver alerts, even if the screen is never switched on.
+
 Status: reference design. Band firmware and enclosure files will be published here.
 
 ## Safety

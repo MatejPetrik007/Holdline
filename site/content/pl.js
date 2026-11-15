@@ -2,7 +2,7 @@ const DISCLAIMER = `<p><b>Zastrzeżenie:</b> to nieoficjalny, społecznościowy 
 
 export default {
   ui: {
-    brand: 'Węzeł Meshtastic E-Ink',
+    brand: 'LastLink',
     nav: { home: 'Start', demo: 'Symulacja blackoutu', hardware: 'Sprzęt', build: 'Kompilacja', solar: 'Solar', openhw: 'Open hardware', access: 'Dostępność', faq: 'Pytania i odpowiedzi', verify: 'Weryfikacja', security: 'Bezpieczeństwo', releases: 'Wydania' },
     up: 'sprawdź upstream',
     copy: 'KOPIUJ', copied: 'SKOPIOWANO',
@@ -237,7 +237,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 <p class="eyebrow">open hardware</p>
 <h1>Przychodzi złożony. Otwarty, więc możesz zbudować go sam.</h1>
 <p class="lede">Każde gospodarstwo domowe dostaje od państwa węzeł <b>całkowicie złożony, wgrany i przetestowany</b>. Nie musisz niczego lutować. Schematy, pinout i lista części są otwarte, aby każdy, kto chce, mógł zbudować, naprawić lub ulepszyć węzeł w domu.</p>
-<div class="toc"><a href="#/openhw#box">Co przychodzi</a><a href="#/openhw#paths">Trzy drogi do węzła</a><a href="#/openhw#pins">Który pin gdzie</a><a href="#/openhw#bom">Części i gdzie kupić</a><a href="#/openhw#connect">Podłączenie własnego węzła</a><a href="#/openhw#selfhost">Zbuduję sam: daj znać</a></div>
+<div class="toc"><a href="#/openhw#box">Co przychodzi</a><a href="#/openhw#paths">Trzy drogi do węzła</a><a href="#/openhw#pins">Który pin gdzie</a><a href="#/openhw#bom">Części i gdzie kupić</a><a href="#/openhw#connect">Podłączenie własnego węzła</a><a href="#/openhw#sign">Język migowy: części</a><a href="#/openhw#selfhost">Zbuduję sam: daj znać</a></div>
 
 <h2 id="box">Co przychodzi w pudełku</h2>
 <div class="two">
@@ -273,6 +273,11 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 {{BOM}}
 <p>Pliki projektowe: <code>hardware/</code> i <code>variants/diy_s3_eink/</code> w <a href="{{REPO}}">repozytorium</a>. Licencja sprzętu CERN-OHL-S-2.0, firmware GPL-3.0 (jak upstream). Części do dodatków dostępności: <a href="#/access#build">Dostępność → zbuduj sam</a>.</p>
 
+<h2 id="sign">Ekran z językiem migowym: części i gdzie kupić</h2>
+<p>Dla osób Głuchych, których pierwszym językiem jest język migowy, hub potrafi pokazać wiadomości z mesh <b>w języku migowym</b>. Działa na tym samym <b>NVIDIA Jetson Orin Nano</b> co napisy na żywo, więc jeśli masz już hub nasłuchowy, dokładasz tylko ekran, akumulator i przycisk. System jest normalnie wyłączony; gdy przychodzi wiadomość, opaska wibruje i wiesz, że trzeba go włączyć. Jak to działa: <a href="#/access#sign">Dostępność → wiadomości w języku migowym</a>.</p>
+{{BOM_SIGN}}
+<p class="small">Zestawy części do ekranu z językiem migowym są we wspólnym zakupie: zaznacz <b>Ekran z językiem migowym</b> w <a href="#/openhw#selfhost">formularzu własnej budowy</a>. Złożony i skonfigurowany od państwa dostaniesz przez <a href="#/access#register">rejestrację dostępności</a>.</p>
+
 <h2 id="connect">Podłączenie własnego węzła</h2>
 <p class="small">Dostarczone węzły są już skonfigurowane. Te kroki dotyczą tylko węzłów zbudowanych samodzielnie.</p>
 <ol class="steps">
@@ -300,6 +305,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
     <label class="check"><input type="checkbox" name="braille"> Klawiatura brajlowska</label>
     <label class="check"><input type="checkbox" name="haptic"> Opaska haptyczna Pro</label>
     <label class="check"><input type="checkbox" name="hub"> Hub nasłuchowy (mowa na tekst)</label>
+    <label class="check"><input type="checkbox" name="sign"> Ekran z językiem migowym (wiadomości w języku migowym)</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Dołączasz do wspólnego zakupu?</span><select name="groupbuy"><option value="yes">Tak, zarezerwujcie mi zestawy części</option><option value="no">Nie, kupię części sam</option></select></label>
@@ -316,7 +322,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 <p class="eyebrow">dostępność</p>
 <h1>Wiadomości mesh dla osób głuchych, niewidomych i głuchoniewidomych</h1>
 <p class="lede">Każdy węzeł przychodzi złożony. Jeśli jesteś osobą głuchą, niewidomą lub głuchoniewidomą, państwo dostarcza go z dodatkami, które ci pasują, skonfigurowany i przetestowany. Osoby głuchoniewidome dostają go <b>osobiście</b> od instruktora, który komunikuje się tak jak one.</p>
-<div class="toc"><a href="#/access#who">Kto dostaje co</a><a href="#/access#deafblind">Jak to działa dla osób głuchoniewidomych</a><a href="#/access#build">Opaska haptyczna Pro: zbuduj sam</a><a href="#/access#compute">Jaki komputer lub GPU</a><a href="#/access#register">Rejestracja</a></div>
+<div class="toc"><a href="#/access#who">Kto dostaje co</a><a href="#/access#deafblind">Jak to działa dla osób głuchoniewidomych</a><a href="#/access#build">Opaska haptyczna Pro: zbuduj sam</a><a href="#/access#sign">Wiadomości w języku migowym</a><a href="#/access#compute">Jaki komputer lub GPU</a><a href="#/access#register">Rejestracja</a></div>
 
 <h2 id="who">Kto dostaje co</h2>
 <div class="grid">
@@ -324,7 +330,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
     <ul><li><b>Klawiatura brajlowska</b> (6- lub 8-punktowa, akordowa), która pisze prosto do węzła.</li><li>Wiadomości czyta na głos czytnik ekranu w telefonie przez aplikację Meshtastic {{UP}}.</li><li>Oznaczenia dotykowe na obudowie i przyciskach; skrócona instrukcja w brajlu i jako audio.</li></ul>
     <p class="small">Dostawa: kurier, a jeśli chcesz, instruktaż przez telefon.</p></div>
   <div class="card"><div class="feature-icon">≋</div><h3>Osoby głuche i słabosłyszące</h3>
-    <ul><li><b>Opaska haptyczna Pro</b> od państwa: 8 silniczków wokół nadgarstka.</li><li>Sama rozpoznaje ważne dźwięki (syrena, czujnik dymu, dzwonek, pukanie, twoje imię) i nadaje każdemu własny wzór wibracji.</li><li>Wiadomości z mesh wibrują i pojawiają się na ekranie E-Ink.</li><li>Opcjonalny <b>hub nasłuchowy</b>: napisy na żywo z mowy w pomieszczeniu na E-Ink i w telefonie.</li></ul>
+    <ul><li><b>Opaska haptyczna Pro</b> od państwa: 8 silniczków wokół nadgarstka.</li><li>Sama rozpoznaje ważne dźwięki (syrena, czujnik dymu, dzwonek, pukanie, twoje imię) i nadaje każdemu własny wzór wibracji.</li><li>Wiadomości z mesh wibrują i pojawiają się na ekranie E-Ink.</li><li>Opcjonalny <b>hub nasłuchowy</b>: napisy na żywo z mowy w pomieszczeniu na E-Ink i w telefonie.</li><li><b>Ekran z językiem migowym</b> do hubu: wiadomości i ostrzeżenia w polskim lub czeskim języku migowym. <a href="#/access#sign">Jak to działa →</a></li></ul>
     <p class="small">Dostawa: kurier, z filmem konfiguracji w polskim języku migowym i tekstem.</p></div>
   <div class="card"><div class="feature-icon">✋</div><h3>Osoby głuchoniewidome</h3>
     <ul><li><b>Opaska haptyczna Pro w układzie brajlowskim</b>: 6 silniczków na przedramieniu tworzy jedną komórkę brajla, 2 kolejne sygnalizują spację i alarm. Wiadomości czujesz litera po literze.</li><li><b>Klawiatura brajlowska</b> do odpowiedzi; każdy klawisz potwierdza wibracja.</li><li>Nic nie zależy od wzroku ani słuchu.</li></ul>
@@ -365,6 +371,27 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 {{BOM_ADDONS}}
 <div class="callout warn"><p><b>Status: projekt referencyjny.</b> Firmware opaski i pliki obudowy opublikujemy w <code>hardware/addons/</code> w repozytorium. Silniczki mają skoki prądu: zasilaj je z baterii przez sterowniki, nigdy z GPIO. Zaokrąglona, izolowana obudowa; bez ciągłej wibracji dłuższej niż kilka sekund.</p></div>
 
+<h2 id="sign">Wiadomości w języku migowym</h2>
+<p>Pisany polski czy czeski nie jest dla każdej osoby Głuchej pierwszym językiem. Dlatego hub potrafi pokazać wiadomości w <b>języku migowym</b>: polskim (PJM), czeskim (ČZJ) lub w International Sign. Działa na tym samym NVIDIA Jetson Orin Nano co hub nasłuchowy, całkowicie offline, na ekranie 10″.</p>
+<div class="two">
+  <ol class="steps">
+    <li><h3>Przychodzi wiadomość</h3><p>Węzeł przekazuje ją opasce. Opaska ją zapisuje i wibruje wzorem <b>„język migowy”</b>: trzy fale biegnące wokół nadgarstka. Tekst pojawia się też na E-Ink.</p></li>
+    <li><h3>Włączasz system</h3><p>Naciśnij duży przycisk na stojaku ekranu. Jetson uruchamia się w około minutę i przez BLE pobiera z opaski wiadomości, które przyszły, gdy był wyłączony.</p></li>
+    <li><h3>Wiadomość w języku migowym</h3><p>Ekran odtwarza wiadomość w twoim języku migowym z napisami. Dotknij = powtórz, przytrzymaj = wolniej.</p></li>
+    <li><h3>System sam się wyłącza</h3><p>Po 10 minutach bez dotyku hub się wyłącza i oszczędza akumulator. Opaska dalej pilnuje mesh i dźwięków w pomieszczeniu.</p></li>
+  </ol>
+  <div>
+    <h3>Co zobaczysz w języku migowym</h3>
+    <ul>
+      <li><b>Ostrzeżenia centralnego organu</b> (powódź, ewakuacja, schronienie, woda pitna, brak prądu, koniec zagrożenia…): nagrane wcześniej filmy, które tworzą Głusi rodzimi użytkownicy języka migowego razem z organizacjami Głuchych. Ostrzeżenie niesie kod szablonu; miejsce i czas są dodawane tekstem i alfabetem palcowym.</li>
+      <li><b>Pozostałe wiadomości</b> zobaczysz jako duży, czytelny tekst. Maszynowe tłumaczenie dowolnego tekstu na język migowy nie jest jeszcze na tyle niezawodne, żeby używać go do ostrzeżeń.</li>
+      <li>Bibliotekę filmów centralny organ aktualizuje <a href="#/verify">podpisanym wydaniem</a>, tak jak firmware.</li>
+      <li>Język wybierasz w <a href="#/access#register">rejestracji</a>.</li>
+    </ul>
+  </div>
+</div>
+<div class="callout warn"><p><b>Status: projekt referencyjny.</b> Żaden film nie powstanie bez Głuchych rodzimych użytkowników języka migowego; awatar ich nie zastąpi. Ostrzeżenia na opasce i E-Ink docierają zawsze, nawet jeśli nie włączysz systemu. Części i gdzie kupić: <a href="#/openhw#sign">Open hardware → język migowy</a>.</p></div>
+
 <h2 id="compute">Jaki komputer lub GPU to uciągnie</h2>
 <p>Rozpoznawanie dźwięków działa w samej opasce, bez GPU, więc działa też podczas blackoutu. Zamiana mowy na tekst wymaga więcej mocy: to opcjonalny hub nasłuchowy. Hub od państwa to Jetson Orin Nano; tabela pokazuje, co jeszcze wystarczy, jeśli budujesz własny.</p>
 {{COMPUTE}}
@@ -394,11 +421,13 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
     <label class="check"><input type="checkbox" name="braille"> Klawiatura brajlowska</label>
     <label class="check"><input type="checkbox" name="haptic"> Opaska haptyczna Pro</label>
     <label class="check"><input type="checkbox" name="hub"> Hub nasłuchowy (napisy na żywo)</label>
+    <label class="check"><input type="checkbox" name="sign"> Ekran z językiem migowym (wiadomości w języku migowym)</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Układ opaski</span><select name="band_layout"><option>Pierścień na nadgarstku (osoby głuche)</option><option>Komórka brajla na przedramieniu (osoby głuchoniewidome)</option><option>Nie wiem, ustalimy przy konfiguracji</option></select></label>
     <label><span class="lbl">Układ brajla</span><select name="braille_layout"><option>6-punktowy</option><option>8-punktowy</option><option>Nie wiem</option></select></label>
   </div>
+  <label><span class="lbl">Język migowy na ekranie</span><select name="sign_lang"><option>Nie dotyczy</option><option>Polski język migowy (PJM)</option><option>Czeski język migowy (ČZJ)</option><option>International Sign</option></select></label>
   <label><span class="lbl">Osoby głuchoniewidome: jak instruktor ma się z tobą komunikować?</span><select name="tactile"><option>Nie dotyczy</option><option>Dotykowy język migowy</option><option>Alfabet Lorma</option><option>Pisanie na dłoni</option><option>Brajl</option><option>Przez mojego tłumacza-przewodnika lub asystenta</option></select></label>
   <label><span class="lbl">Adres dostawy</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">Asystent, tłumacz lub zaufana osoba (opcjonalnie)</span><input type="text" name="trusted"></label>

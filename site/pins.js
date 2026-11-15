@@ -139,6 +139,24 @@ export const BOM_ADDONS = [
 ];
 
 // What compute runs which part of the haptic pipeline. Rough planning values, measure your own setup.
+// Sign-language screen: runs on the same Jetson as the listening hub. Shown on Open hardware and Accessibility.
+export const BOM_SIGN = [
+  { part: L('Compute (same hub)', 'Výpočetní jednotka (stejný hub)', 'Jednostka obliczeniowa (ten sam hub)'), ex: 'NVIDIA Jetson Orin Nano Super Developer Kit, 8 GB',
+    note: L('If you already have the listening hub, nothing extra: the sign-language player runs on it alongside speech-to-text', 'Pokud už máš poslechový hub, nic navíc: přehrávač znakového jazyka běží na něm vedle převodu řeči na text', 'Jeśli masz już hub nasłuchowy, nic więcej: odtwarzacz języka migowego działa na nim obok zamiany mowy na tekst'),
+    buy: [['NVIDIA', 'https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/'], SHOP.mouser('Jetson Orin Nano Super'), SHOP.botland('Jetson Orin Nano')] },
+  { part: L('Screen', 'Displej', 'Ekran'), ex: '10.1″ IPS HDMI touchscreen, 1280 × 800 (e.g. Waveshare 10.1″)',
+    note: L('Big enough to read hands and facial expression from across a table; touch to replay. Powered over USB', 'Dost velký, aby šly z druhé strany stolu přečíst ruce i mimika; dotykem přehraješ znovu. Napájení přes USB', 'Wystarczająco duży, by z drugiej strony stołu odczytać dłonie i mimikę; dotyk = powtórz. Zasilanie przez USB'),
+    buy: [SHOP.wave('10.1inch HDMI LCD'), SHOP.laska('10.1 HDMI display'), SHOP.botland('10.1 HDMI touch'), SHOP.ali('10.1 inch HDMI touch screen')] },
+  { part: L('Storage', 'Úložiště', 'Pamięć'), ex: 'M.2 2280 NVMe SSD, 256 GB',
+    note: L('Holds the pre-recorded sign-language clip library and models, so everything plays offline', 'Drží knihovnu předtočených klipů ve znakovém jazyce a modely, takže vše běží offline', 'Przechowuje bibliotekę nagranych klipów w języku migowym i modele, więc wszystko działa offline'),
+    buy: [SHOP.laska('NVMe 256GB'), SHOP.botland('SSD NVMe 256GB'), SHOP.mouser('NVMe SSD 256GB')] },
+  { part: L('Blackout power', 'Napájení při blackoutu', 'Zasilanie podczas blackoutu'), ex: '12 V LiFePO4, 20–50 Ah + DC cable to the Jetson barrel jack',
+    note: L('Jetson + screen draw about 12–30 W while on; the system is off until the band tells you to switch it on, so a 20 Ah pack lasts days. Check the dev kit input range upstream', 'Jetson + displej berou zhruba 12–30 W, když běží; systém je vypnutý, dokud ti náramek neřekne, ať ho zapneš, takže baterie 20 Ah vydrží dny. Vstupní rozsah dev kitu ověř upstream', 'Jetson + ekran pobierają ok. 12–30 W podczas pracy; system jest wyłączony, dopóki opaska nie da znać, żeby go włączyć, więc akumulator 20 Ah wystarczy na dni. Zakres napięcia wejściowego dev kitu sprawdź upstream'),
+    buy: [SHOP.laska('LiFePO4 12V'), SHOP.botland('LiFePO4 12V 20Ah'), SHOP.ali('LiFePO4 12V 20Ah')] },
+  { part: L('Power button', 'Tlačítko zapnutí', 'Przycisk zasilania'), ex: L('Large tactile latching button, 22–30 mm, on the Jetson power header', 'Velké hmatové aretační tlačítko 22–30 mm na power header Jetsonu', 'Duży dotykowy przycisk z zatrzaskiem 22–30 mm na złączu power Jetsona'),
+    note: L('One obvious button to switch the system on when the band vibrates. Mounted on the front of the stand', 'Jedno jasné tlačítko, kterým systém zapneš, když náramek zavibruje. Na přední straně stojanu', 'Jeden wyraźny przycisk do włączenia systemu, gdy opaska zawibruje. Na przodzie stojaka'),
+    buy: [SHOP.laska('tlačítko 22mm'), SHOP.botland('przycisk 22mm'), SHOP.ali('22mm push button latching')] },
+];
 export const COMPUTE = [
   { tier: L('Band only', 'Jen náramek', 'Tylko opaska'), hw: 'ESP32-S3 (XIAO ESP32S3 Sense)', gpu: L('none', 'žádné', 'brak'),
     does: L('Mesh messages as vibration; on-device sound recognition (siren, smoke alarm, doorbell, knock, own name) with a small TensorFlow Lite Micro / ESP-DL model', 'Zprávy z mesh jako vibrace; rozpoznání zvuků přímo v zařízení (siréna, požární hlásič, zvonek, klepání, vlastní jméno) malým modelem TensorFlow Lite Micro / ESP-DL', 'Wiadomości z mesh jako wibracje; rozpoznawanie dźwięków w urządzeniu (syrena, czujnik dymu, dzwonek, pukanie, własne imię) małym modelem TensorFlow Lite Micro / ESP-DL'), power: '≈ 0.3–0.5 W' },
