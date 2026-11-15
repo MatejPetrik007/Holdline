@@ -300,7 +300,7 @@ export function mountLab(root, lang) {
     const cw = 680 / 12, bx = 30, by = 170, bh = 150;
     const yy = (v) => by - (v / vmax) * bh;
     yr.innerHTML = vals.map((v, i) => `<g class="yb${i === m ? ' sel' : ''}${v < use ? ' short' : ''}" data-m="${i}"><rect x="${bx + i * cw}" y="${by - bh - 10}" width="${cw}" height="${bh + 40}" class="hit"/><rect x="${bx + i * cw + 8}" y="${yy(v)}" width="${cw - 16}" height="${by - yy(v)}" rx="4" class="bar"/><text x="${bx + i * cw + cw / 2}" y="${by + 18}" text-anchor="middle">${S.months[i].slice(0, 3)}</text><text x="${bx + i * cw + cw / 2}" y="${yy(v) - 5}" text-anchor="middle" class="v">${v.toFixed(1)}</text></g>`).join('') +
-      `<path d="M${bx} ${yy(use)}H${bx + 680}" class="useline"/><text x="${bx + 680}" y="${yy(use) - 6}" text-anchor="end" class="uselbl">${S.yearLegend[1]} ${use.toFixed(1)} Wh</text><text x="${bx}" y="14" class="axis">Wh / ${S.yearLegend[0].split(' ').slice(-1)[0]}</text>`;
+      `<path d="M${bx} ${yy(use)}H${bx + 680}" class="useline"/><path d="M${bx + 520} 10H${bx + 544}" class="useline"/><text x="${bx + 680}" y="14" text-anchor="end" class="uselbl">${S.yearLegend[1]} ${use.toFixed(1)} Wh</text><text x="${bx}" y="14" class="axis">Wh / ${S.yearLegend[0].split(' ').slice(-1)[0]}</text>`;
 
     // two-week simulation, hourly
     $('#s-simtitle').textContent = f(S.sim, { m: S.months[m] });
