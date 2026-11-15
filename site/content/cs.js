@@ -3,7 +3,7 @@ const DISCLAIMER = `<p><b>Upozornění:</b> toto je neoficiální komunitní bui
 export default {
   ui: {
     brand: 'LastLink',
-    nav: { home: 'Úvod', demo: 'Simulace blackoutu', hardware: 'Hardware', build: 'Sestavení FW', solar: 'Solár', openhw: 'Open hardware', access: 'Přístupnost', faq: 'Otázky a odpovědi', verify: 'Ověření', security: 'Bezpečnost', releases: 'Vydání' },
+    nav: { home: 'Úvod', demo: 'Simulace blackoutu', hardware: 'Hardware', build: 'Sestavení FW', solar: 'Solár', lab: 'Laboratoř', openhw: 'Open hardware', access: 'Přístupnost', faq: 'Otázky a odpovědi', verify: 'Ověření', security: 'Bezpečnost', releases: 'Vydání' },
     up: 'ověř upstream',
     copy: 'KOPÍROVAT', copied: 'ZKOPÍROVÁNO',
     pinCols: ['Součástka', 'Signál', 'Pin ESP32-S3', 'K čemu slouží'],
@@ -105,7 +105,7 @@ export default {
   <a class="card" href="#/access"><div class="feature-icon">⠿</div><span class="num">06</span><h3>Přístupné pro neslyšící a nevidomé</h3><p>Zaregistruj se pro doplňky jako Braillova klávesnice nebo haptický pásek na kůži. Jsou také open source, takže si je můžeš postavit i sám. →</p></a>
 </div>
 
-<div class="cta"><a class="btn accent" href="#/verify">Ověřit soubor firmwaru</a><a class="btn" href="#/build">Sestavit firmware sám</a></div>
+<div class="cta"><a class="btn accent" href="#/verify">Ověřit soubor firmwaru</a><a class="btn" href="#/build">Sestavit firmware sám</a><a class="btn" href="#/lab">Otevřít laboratoř: kalkulačky vysílání a soláru →</a></div>
 
 <div class="two">
   <div>
@@ -219,6 +219,7 @@ git rev-parse HEAD   # musí odpovídat upstream_commit v manifestu</code></pre>
 Baterie: 1 × 18650, 3000 mAh × 3,7 V ≈ 11 Wh → ≈ 4 dny úplně bez slunce<br>
 Léto, panel 2 W: 2 W × 3 sluneční hodiny × 0,7 ztráty ≈ 4,2 Wh za den ✓<br>
 Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓</div>
+<div class="callout"><p><b>Zkuste vlastní čísla:</b> <a href="#/lab#solar-lab">solární kalkulačka v laboratoři</a> navrhne panel a baterii pro libovolný měsíc a nasimuluje dva týdny počasí.</p></div>
 <p class="small">Čísla jsou hrubé plánovací hodnoty, ne měření konkrétní desky. Skutečná spotřeba závisí na roli (klient nebo router), překreslování displeje, Bluetooth, GPS a vysílacím výkonu. Před dimenzováním změř spotřebu USB měřákem.</p>
 
 <h2>Napájecí řetězec</h2>

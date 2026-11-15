@@ -1,12 +1,14 @@
-import { CONFIG } from './config.js?v=4';
-import { PINS, BOM, BOM_ADDONS, BOM_SIGN, COMPUTE } from './pins.js?v=4';
-import { mountDemo } from './demo.js?v=4';
-import en from './content/en.js?v=4';
-import cs from './content/cs.js?v=4';
-import pl from './content/pl.js?v=4';
+import { CONFIG } from './config.js?v=5';
+import { PINS, BOM, BOM_ADDONS, BOM_SIGN, COMPUTE } from './pins.js?v=5';
+import { mountDemo } from './demo.js?v=5';
+import { mountLab, labStrings } from './lab.js?v=5';
+import { EXTRA, mountEink, mountMesh, anchorize, buildIndex, mountPalette, reveal } from './extras.js?v=5';
+import en from './content/en.js?v=5';
+import cs from './content/cs.js?v=5';
+import pl from './content/pl.js?v=5';
 
 const LANGS = { en, cs, pl };
-const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'openhw', 'access', 'faq', 'verify', 'security', 'releases'];
+const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'lab', 'openhw', 'access', 'faq', 'verify', 'security', 'releases'];
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -166,18 +168,14 @@ function powerTable() {
 const DEVICE = `<svg class="device" viewBox="0 0 420 360" role="img" aria-label="E-Ink mesh node with solar panel">
   <defs><pattern id="cells" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#1f3b5c"/><path d="M0 0H22V22" fill="none" stroke="#5f86b3" stroke-width="1"/></pattern></defs>
   <g transform="translate(250 18) rotate(8)"><rect width="150" height="104" rx="6" fill="url(#cells)" stroke="var(--ink)" stroke-width="3"/><path d="M75 104v40" stroke="var(--ink)" stroke-width="3"/></g>
-  <g fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M78 70a26 26 0 0 1 0-36"/><path d="M64 82a44 44 0 0 1 0-60"/></g>
+  <g fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity=".8" class="arcs"><path d="M78 70a26 26 0 0 1 0-36"/><path d="M64 82a44 44 0 0 1 0-60"/></g>
   <rect x="90" y="20" width="8" height="90" rx="4" fill="var(--ink)"/>
   <rect x="40" y="100" width="300" height="230" rx="22" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/>
   <rect x="62" y="122" width="256" height="150" rx="6" fill="#e9e7df" stroke="var(--ink)" stroke-width="2"/>
-  <g font-family="ui-monospace, Menlo, monospace" fill="#16171a">
-    <text x="76" y="146" font-size="13" font-weight="700">MESH · 12 nodes</text><text x="250" y="146" font-size="12">☀ 87%</text>
-    <path d="M76 156H304" stroke="#16171a" stroke-width="1"/>
-    <text x="76" y="178" font-size="12">◂ Pavla: water ok at</text><text x="76" y="196" font-size="12">  the north hut.</text>
-    <text x="76" y="220" font-size="12">◂ Node 7: SNR 9.5 dB</text>
-    <text x="76" y="252" font-size="11" opacity=".6">EU_868 · LongFast · 3.98V</text>
-  </g>
-  <circle cx="100" cy="300" r="9" fill="var(--ink)"/><circle cx="280" cy="300" r="5" fill="var(--accent)"/>
+  <g font-family="ui-monospace, Menlo, monospace" fill="#16171a" class="eink-ghost"></g>
+  <g font-family="ui-monospace, Menlo, monospace" fill="#16171a" class="eink-text"></g>
+  <rect x="63" y="123" width="254" height="148" rx="5" class="eink-flash"/>
+  <circle cx="100" cy="300" r="9" fill="var(--ink)"/><circle cx="280" cy="300" r="5" fill="var(--accent)" class="led"/>
   <g fill="var(--muted)"><rect x="150" y="296" width="80" height="8" rx="4"/></g>
 </svg>`;
 
@@ -201,24 +199,52 @@ function fill(html) {
 // Absolute links to the public domain; relative while developing locally.
 const LOCAL = location.protocol === 'file:' || /^(localhost|127\.|\[::1\])/.test(location.hostname);
 const BASE = LOCAL || !CONFIG.siteUrl ? '' : CONFIG.siteUrl;
-let unmount = null;
+let unmounts = [];
+const labPage = () => { const L = labStrings(lang); return `<h1>${L.title}</h1><h2 id="packet">${L.pkt}</h2><h2 id="chirps">${L.chirp}</h2><h2 id="solar-lab">${L.sol}</h2>`; };
+const indexCache = {};
+const getIndex = () => (indexCache[lang] ||= buildIndex(T, ROUTES, fill, { lab: labPage() }));
+const openPalette = mountPalette({
+  getIndex,
+  getStrings: () => EXTRA[lang] || EXTRA.en,
+  go: (page, id) => {
+    const h = `#/${page}${id ? '#' + id : ''}`;
+    if (location.hash === h) render(true); else location.hash = h;
+  },
+});
+$('#search').addEventListener('click', openPalette);
+if (!/Mac|iP(hone|ad)/.test(navigator.platform || navigator.userAgent)) $('#search kbd').textContent = 'Ctrl K';
+
 function render(fromHash) {
+  const swap = () => paint(fromHash);
+  if (fromHash && document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(swap);
+  else swap();
+}
+function paint(fromHash) {
   const { page, anchor } = route();
-  if (unmount) { unmount(); unmount = null; }
+  unmounts.forEach((u) => u()); unmounts = [];
+  const X = EXTRA[lang] || EXTRA.en;
   document.documentElement.lang = lang;
   $$('#langs button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.lang === lang));
+  $('#search').setAttribute('aria-label', `${X.search} (⌘K)`);
+  $('#search .lbl').textContent = X.search;
   $('.brand').href = `${BASE}#/`;
   $('#nav').innerHTML = ROUTES.map((r) => `<a href="${BASE}#/${r}" ${r === page ? 'aria-current="page"' : ''}>${T.ui.nav[r]}</a>`).join('');
   $('#foot').innerHTML = fill(T.ui.footer);
   document.title = `${T.ui.nav[page]} · ${T.ui.brand}`;
-  $('#main').innerHTML = fill(T.pages[page]);
+  const main = $('#main');
+  if (page === 'lab') { main.innerHTML = ''; unmounts.push(mountLab(main, lang)); }
+  else main.innerHTML = fill(T.pages[page]);
+  anchorize(main, page);
   document.body.classList.remove('nav-open');
   wireCopy();
   wireBoard();
-  if (page === 'demo') unmount = mountDemo($('#sim'), T.ui.demo);
+  if (page === 'demo') unmounts.push(mountDemo($('#sim'), T.ui.demo));
+  if (page === 'home') unmounts.push(mountEink(lang), mountMesh());
   ({ verify: initVerify, releases: initReleases, faq: initFaq, access: initForms, openhw: initForms }[page] || (() => {}))();
-  if (anchor) document.getElementById(anchor)?.scrollIntoView();
+  const target = anchor && document.getElementById(anchor);
+  if (target) { if (target.matches('details')) target.open = true; target.scrollIntoView(); target.classList.add('flash-target'); }
   else if (fromHash) window.scrollTo(0, 0);
+  reveal(main);
 }
 
 function wireCopy() {

@@ -3,7 +3,7 @@ const DISCLAIMER = `<p><b>Zastrzeżenie:</b> to nieoficjalny, społecznościowy 
 export default {
   ui: {
     brand: 'LastLink',
-    nav: { home: 'Start', demo: 'Symulacja blackoutu', hardware: 'Sprzęt', build: 'Kompilacja', solar: 'Solar', openhw: 'Open hardware', access: 'Dostępność', faq: 'Pytania i odpowiedzi', verify: 'Weryfikacja', security: 'Bezpieczeństwo', releases: 'Wydania' },
+    nav: { home: 'Start', demo: 'Symulacja blackoutu', hardware: 'Sprzęt', build: 'Kompilacja', solar: 'Solar', lab: 'Laboratorium', openhw: 'Open hardware', access: 'Dostępność', faq: 'Pytania i odpowiedzi', verify: 'Weryfikacja', security: 'Bezpieczeństwo', releases: 'Wydania' },
     up: 'sprawdź upstream',
     copy: 'KOPIUJ', copied: 'SKOPIOWANO',
     pinCols: ['Element', 'Sygnał', 'Pin ESP32-S3', 'Do czego służy'],
@@ -105,7 +105,7 @@ export default {
   <a class="card" href="#/access"><div class="feature-icon">⠿</div><span class="num">06</span><h3>Dostępny dla osób głuchych i niewidomych</h3><p>Zarejestruj się po dodatki takie jak klawiatura brajlowska lub haptyczna opaska na skórę. Są również open source, więc możesz je zbudować sam. →</p></a>
 </div>
 
-<div class="cta"><a class="btn accent" href="#/verify">Zweryfikuj plik firmware'u</a><a class="btn" href="#/build">Skompiluj firmware sam</a></div>
+<div class="cta"><a class="btn accent" href="#/verify">Zweryfikuj plik firmware'u</a><a class="btn" href="#/build">Skompiluj firmware sam</a><a class="btn" href="#/lab">Otwórz laboratorium: kalkulatory nadawania i fotowoltaiki →</a></div>
 
 <div class="two">
   <div>
@@ -219,6 +219,7 @@ git rev-parse HEAD   # musi zgadzać się z upstream_commit w manifeście</code>
 Bateria: 1 × 18650, 3000 mAh × 3,7 V ≈ 11 Wh → ≈ 4 dni zupełnie bez słońca<br>
 Lato, panel 2 W: 2 W × 3 godziny słoneczne × 0,7 straty ≈ 4,2 Wh na dobę ✓<br>
 Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa ✓</div>
+<div class="callout"><p><b>Sprawdź własne liczby:</b> <a href="#/lab#solar-lab">kalkulator solarny w laboratorium</a> dobierze panel i akumulator na dowolny miesiąc i zasymuluje dwa tygodnie pogody.</p></div>
 <p class="small">Liczby to zgrubne wartości planistyczne, a nie pomiary konkretnej płytki. Rzeczywisty pobór zależy od roli (klient lub router), odświeżania ekranu, Bluetooth, GPS i mocy nadawania. Przed doborem zmierz pobór miernikiem USB.</p>
 
 <h2>Łańcuch zasilania</h2>

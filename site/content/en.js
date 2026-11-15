@@ -3,7 +3,7 @@ const DISCLAIMER = `<p><b>Disclaimer:</b> this is an unofficial community build 
 export default {
   ui: {
     brand: 'LastLink',
-    nav: { home: 'Home', demo: 'Blackout demo', hardware: 'Hardware', build: 'Build', solar: 'Solar', openhw: 'Open hardware', access: 'Accessibility', faq: 'Q&A', verify: 'Verify', security: 'Security', releases: 'Releases' },
+    nav: { home: 'Home', demo: 'Blackout demo', hardware: 'Hardware', build: 'Build', solar: 'Solar', lab: 'Lab', openhw: 'Open hardware', access: 'Accessibility', faq: 'Q&A', verify: 'Verify', security: 'Security', releases: 'Releases' },
     up: 'check upstream',
     copy: 'COPY', copied: 'COPIED',
     pinCols: ['Part', 'Signal', 'ESP32-S3 pin', 'What it does'],
@@ -105,7 +105,7 @@ export default {
   <a class="card" href="#/access"><div class="feature-icon">⠿</div><span class="num">06</span><h3>Accessible for deaf and blind people</h3><p>Register for add-ons such as a Braille keyboard or a haptic skin band. They are open source too, so you can also build them yourself. →</p></a>
 </div>
 
-<div class="cta"><a class="btn accent" href="#/verify">Verify a firmware file</a><a class="btn" href="#/build">Build the firmware yourself</a></div>
+<div class="cta"><a class="btn accent" href="#/verify">Verify a firmware file</a><a class="btn" href="#/build">Build the firmware yourself</a><a class="btn" href="#/lab">Open the Lab: airtime &amp; solar calculators →</a></div>
 
 <div class="two">
   <div>
@@ -219,6 +219,7 @@ git rev-parse HEAD   # must match upstream_commit in the manifest</code></pre></
 Battery: 1 × 18650, 3000 mAh × 3.7 V ≈ 11 Wh → ≈ 4 days without any sun<br>
 Summer, 2 W panel: 2 W × 3 sun-hours × 0.7 losses ≈ 4.2 Wh per day ✓<br>
 Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</div>
+<div class="callout"><p><b>Try your own numbers:</b> the <a href="#/lab#solar-lab">solar calculator in the Lab</a> sizes a panel and battery for any month and simulates two weeks of weather.</p></div>
 <p class="small">Numbers are rough planning values, not measurements of a specific board. Real draw depends on role (client or router), screen refreshes, Bluetooth, GPS and transmit power. Measure with a USB power meter before you size the system.</p>
 
 <h2>Power chain</h2>
