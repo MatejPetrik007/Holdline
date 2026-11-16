@@ -32,15 +32,12 @@ void holdlineAddApplets(InkHUD::InkHUD *inkhud)
 
 void holdlineUiChanged(uint8_t kind)
 {
-    if (kind == 1 && alertApplet) {
-        alertApplet->requestAutoshow();
-        alertApplet->requestUpdate(Drivers::EInk::UpdateTypes::FULL); // SPEC 5.4: full refresh for an alert
-    } else if (alertApplet)
-        alertApplet->requestUpdate();
+    if (alertApplet)
+        alertApplet->refresh(kind == 1);
     if (faqApplet)
-        faqApplet->requestUpdate();
+        faqApplet->refresh();
     if (askApplet)
-        askApplet->requestUpdate();
+        askApplet->refresh();
 }
 
 // ------------------------------------------------------------------ alert

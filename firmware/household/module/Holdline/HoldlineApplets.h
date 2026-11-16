@@ -18,6 +18,15 @@ namespace NicheGraphics::InkHUD
 class HoldlineAlertApplet : public Applet
 {
   public:
+    // Called by the module when something changed. bringToFront: show this screen now, with a full refresh.
+    void refresh(bool bringToFront = false)
+    {
+        if (bringToFront) {
+            requestAutoshow();
+            requestUpdate(Drivers::EInk::UpdateTypes::FULL); // SPEC 5.4: full refresh for an alert
+        } else
+            requestUpdate();
+    }
     void onActivate() override { setInputsSubscribed(BUTTON_LONG, true); }
     void onRender(bool full) override;
     void onButtonLongPress() override;
@@ -27,6 +36,15 @@ class HoldlineAlertApplet : public Applet
 class HoldlineFaqApplet : public Applet
 {
   public:
+    // Called by the module when something changed. bringToFront: show this screen now, with a full refresh.
+    void refresh(bool bringToFront = false)
+    {
+        if (bringToFront) {
+            requestAutoshow();
+            requestUpdate(Drivers::EInk::UpdateTypes::FULL); // SPEC 5.4: full refresh for an alert
+        } else
+            requestUpdate();
+    }
     void onActivate() override { setInputsSubscribed(BUTTON_LONG, true); }
     void onRender(bool full) override;
     void onButtonLongPress() override;
@@ -41,6 +59,15 @@ class HoldlineFaqApplet : public Applet
 class HoldlineAskApplet : public Applet
 {
   public:
+    // Called by the module when something changed. bringToFront: show this screen now, with a full refresh.
+    void refresh(bool bringToFront = false)
+    {
+        if (bringToFront) {
+            requestAutoshow();
+            requestUpdate(Drivers::EInk::UpdateTypes::FULL); // SPEC 5.4: full refresh for an alert
+        } else
+            requestUpdate();
+    }
     void onActivate() override { setInputsSubscribed(BUTTON_LONG, true); }
     void onBackground() override { setSelecting(false); }
     void onRender(bool full) override;
