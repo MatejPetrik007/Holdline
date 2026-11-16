@@ -27,6 +27,11 @@ export default {
       note: "Kolejność pinów jak w ESP32-S3-DevKitC-1 v1.1. Przed lutowaniem sprawdź nadruk na swojej płytce. Dostarczone węzły są już połączone; to dla tych, którzy budują lub naprawiają własne.",
     },
     demo: {
+      translate: "Automatyczne tłumaczenie", modes: ["Brak · oryginał PL", "Języki odbiorców", "Wszystkie języki"],
+      packets: "{n} B · {p} pakiety", autoTag: "auto",
+      trNote: "Tłumaczenie odbywa się w centrum przed wysłaniem: podczas blackoutu węzły nie mają internetu.",
+      nodeScreen: "Ekran węzła", nodeLang: "Język ekranu", nodeHint: "Najedź na węzeł lub go stuknij, aby zobaczyć jego ekran.",
+      langNames: { cs: "Čeština", pl: "Polski", en: "English" }, nodeOff: "wyłączony",
       who: "Centrum kryzysowe · Cieszyn", outgoing: "Wychodzący alert", fits: "{n} B · mieści się w jednym pakiecie",
       channelLine: "Kanał OLZA · AES-256 · EU868", preset: "Preset LongFast · hop limit",
       routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
@@ -51,7 +56,8 @@ export default {
         noCell: "Żadna stacja nieosiągalna · 0 mieszkańców powiadomionych",
         switching: "Przełączam na stację bazową Meshtastic…",
         resend: "──── ponowne wysłanie przez mesh ────",
-        tx: "TX alert id=0x4F1A · {b} B · hop_limit={h} · kanał OLZA",
+        translate: "Automatyczne tłumaczenie {from} → {to}",
+        tx: "TX alert id=0x4F1A · {b} B · {p} pkt · hop_limit={h} · kanał OLZA",
         ack: "niejawne ACK · {from} przekazał nasz pakiet",
         quiet: "{n}: {from} przekazał go pierwszy, milczy",
         rx: "{n} ({c}) rx skok {hop} · SNR {snr} dB · przekazanie za {ms} ms",
@@ -143,7 +149,8 @@ export default {
   <li><h3>Dalekie węzły idą pierwsze</h3><p>Czas oczekiwania zależy od siły sygnału: słaby sygnał oznacza, że węzeł jest daleko od nadawcy, więc czeka krócej. Dzięki temu wiadomość najszybciej rozchodzi się na zewnątrz.</p></li>
   <li><h3>Duplikaty są ignorowane</h3><p>Każdy pakiet ma ID. Węzeł, który już go widział, odrzuca kopie. Zwykły węzeł, który usłyszy sąsiada przekazującego pakiet przed swoją kolejką, milczy i oszczędza czas antenowy. Routery w wysokich punktach, tu Góra Zamkowa, przekazują zawsze.</p></li>
   <li><h3>Nadawca wie, że poszło</h3><p>Gdy centrum usłyszy swój pakiet przekazany dalej, traktuje to jako niejawne potwierdzenie.</p></li>
-  <li><h3>Tracisz węzeł, sieć zostaje</h3><p>Wyłącz na mapie router Góra Zamkowa i wyślij ponownie: węzeł Bulwary nad rzeką, który normalnie milczy, przenosi teraz alert do Czeskiego Cieszyna.</p></li>
+  <li><h3>Tracisz węzeł, sieć zostaje</h3><p>Wyłącz na mapie router Góra Zamkowa i wyślij ponownie: węzeł Bulwary nad rzeką, który normalnie milczy, przenosi teraz alert do Czeskiego Cieszyna. Jeśli zamiast tego wyłączysz router Těšín roof, alert i tak dotrze do wszystkich czeskich domów, południową drogą przez Bulwary i Dolní Žukov.</p></li>
+  <li><h3>Każdy ekran w języku właściciela</h3><p>Każdy węzeł ma własny język ekranu: czeski, polski lub angielski. W symulacji najedź na węzeł i zmień go. Centrum kryzysowe pisze alert raz i wybiera, jak zostanie przetłumaczony: tylko oryginał, automatycznie na języki używane przez odbiorców albo na wszystkie języki. Tłumaczenie odbywa się w centrum przed wysłaniem, bo podczas blackoutu węzły nie mają internetu. Jeśli język węzła nie został wysłany, węzeł pokazuje oryginał. Więcej języków to więcej bajtów: powyżej 233 B alert dzieli się na kilka pakietów.</p></li>
 </ol>
 
 <h2>Sieć komórkowa a mesh podczas blackoutu</h2>

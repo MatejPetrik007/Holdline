@@ -10,7 +10,6 @@ export const EXTRA = {
   en: {
     search: 'Search', searchPh: 'Search pages, sections and questions…', none: 'Nothing found.', keys: '↑ ↓ move · Enter open · Esc close',
     screens: [
-      ['MESH · 12 nodes', '☀ 87%', ['◂ Pavla: water ok at', '  the north hut.', '◂ Node 7: SNR 9.5 dB'], 'EU_868 · LongFast · 3.98V'],
       ['! ALERT · OLZA', '☀ 86%', ['Water + charging:', 'town hall, 10–18.', 'Bring a container.'], 'hop 2/3 · SNR 6.0 dB', true],
       ['NODES HEARD', '☀ 86%', ['Rynek      1.2 km  9dB', 'Góra Zam.  2.8 km  4dB', 'Bulwary    0.6 km 11dB'], '12 heard · 4 direct'],
       ['POWER', '☀ 91%', ['Solar   +312 mA', 'Load     -28 mA', 'Cell 4.05 V ▮▮▮▮▯'], '≈ 6 days without sun'],
@@ -19,7 +18,6 @@ export const EXTRA = {
   cs: {
     search: 'Hledat', searchPh: 'Hledat stránky, sekce a otázky…', none: 'Nic nenalezeno.', keys: '↑ ↓ pohyb · Enter otevřít · Esc zavřít',
     screens: [
-      ['SÍŤ · 12 uzlů', '☀ 87%', ['◂ Pavla: voda ok', '  u severní chaty.', '◂ Uzel 7: SNR 9.5 dB'], 'EU_868 · LongFast · 3.98V'],
       ['! VÝSTRAHA · OLZA', '☀ 86%', ['Voda + nabíjení:', 'radnice, 10–18.', 'Vezměte nádobu.'], 'hop 2/3 · SNR 6.0 dB', true],
       ['SLYŠENÉ UZLY', '☀ 86%', ['Rynek      1.2 km  9dB', 'Góra Zam.  2.8 km  4dB', 'Bulwary    0.6 km 11dB'], '12 slyšeno · 4 přímo'],
       ['NAPÁJENÍ', '☀ 91%', ['Solár   +312 mA', 'Odběr    -28 mA', 'Článek 4.05 V ▮▮▮▮▯'], '≈ 6 dní bez slunce'],
@@ -28,7 +26,6 @@ export const EXTRA = {
   pl: {
     search: 'Szukaj', searchPh: 'Szukaj stron, sekcji i pytań…', none: 'Nic nie znaleziono.', keys: '↑ ↓ ruch · Enter otwórz · Esc zamknij',
     screens: [
-      ['SIEĆ · 12 węzłów', '☀ 87%', ['◂ Pavla: woda ok', '  przy północnej chacie.', '◂ Węzeł 7: SNR 9.5 dB'], 'EU_868 · LongFast · 3.98V'],
       ['! ALERT · OLZA', '☀ 86%', ['Woda + ładowanie:', 'ratusz, 10–18.', 'Weź pojemnik.'], 'hop 2/3 · SNR 6.0 dB', true],
       ['SŁYSZANE WĘZŁY', '☀ 86%', ['Rynek      1.2 km  9dB', 'Góra Zam.  2.8 km  4dB', 'Bulwary    0.6 km 11dB'], '12 słyszanych · 4 bezp.'],
       ['ZASILANIE', '☀ 91%', ['Solar   +312 mA', 'Pobór    -28 mA', 'Ogniwo 4.05 V ▮▮▮▮▯'], '≈ 6 dni bez słońca'],
@@ -53,6 +50,7 @@ export function mountEink(lang) {
      <text x="76" y="252" font-size="11" opacity=".6">${esc(foot)}</text>`;
   let i = 0, timers = [];
   txt.innerHTML = draw(screens[0]);
+  svg.classList.toggle('alerting', !!screens[0][4]);
   const later = (ms, fn) => timers.push(setTimeout(fn, ms));
   const step = () => {
     if (document.hidden) { later(5200, step); return; }
@@ -75,7 +73,7 @@ export function mountEink(lang) {
     svg.classList.toggle('alerting', !!next[4]);
     later(next[4] ? 6500 : 4800, step);
   };
-  later(3800, step);
+  later(screens[0][4] ? 6500 : 3800, step);
   return () => timers.forEach(clearTimeout);
 }
 

@@ -16,8 +16,24 @@ function rng(seed) {
   };
 }
 
-const MSG_PL = 'Brak prądu do odwołania. Woda i ładowanie telefonów: Rynek, Ratusz, 10–18.';
-const MSG_CZ = 'Výpadek proudu. Voda a nabíjení telefonů: nám. ČSA, 10–18.';
+// The crisis centre writes the alert once, in Polish. Translations are made at the centre before
+// sending, because nodes have no internet in a blackout. Every node shows the alert in its own
+// display language; if that language was not sent, it shows the original.
+const ORIGINAL = 'pl';
+const LANGS = ['cs', 'pl', 'en'];
+const MSG = {
+  pl: 'Brak prądu do odwołania. Woda i ładowanie telefonów: Rynek i nám. ČSA, 10–18.',
+  cs: 'Výpadek proudu do odvolání. Voda a nabíjení telefonů: Rynek a nám. ČSA, 10–18.',
+  en: 'Power cut until further notice. Water and phone charging: Rynek and nám. ČSA, 10–18.',
+};
+const MAX_PAYLOAD = 233; // Meshtastic DATA_PAYLOAD_LEN, bytes per packet
+// Text drawn by the node itself on its E-Ink screen, in the node's display language.
+const DEV = {
+  cs: { alert: '! VÝSTRAHA · OLZA', idle: 'KANÁL OLZA', waiting: 'Zatím žádná zpráva.', orig: 'originál {l} · překlad nebyl odeslán' },
+  pl: { alert: '! ALERT · OLZA', idle: 'KANAŁ OLZA', waiting: 'Brak wiadomości.', orig: 'oryginał {l} · tłumaczenie nie zostało wysłane' },
+  en: { alert: '! ALERT · OLZA', idle: 'CHANNEL OLZA', waiting: 'No messages yet.', orig: 'original {l} · no translation was sent' },
+};
+const TR_MODES = ['orig', 'recipients', 'all'];
 
 export function mountDemo(root, S) {
   const N = S.nodes;
@@ -25,11 +41,14 @@ export function mountDemo(root, S) {
   <div class="sim">
     <aside class="sim-panel sim-console">
       <div><div class="sim-who">${S.who}</div><div class="sim-title">${S.outgoing}</div></div>
+      <label class="sim-tr">${S.translate}
+        <select data-b="tr">${S.modes.map((m, i) => `<option value="${TR_MODES[i]}"${i === 1 ? ' selected' : ''}>${escH(m)}</option>`).join('')}</select>
+      </label>
       <div class="sim-msg">
-        <div><div class="sim-lang">PL</div><span>${escH(MSG_PL)}</span></div>
-        <div><div class="sim-lang">CZ</div><span>${escH(MSG_CZ)}</span></div>
+        <div class="sim-msgs" data-k="msgs"></div>
         <div class="sim-meta"><span data-k="bytes"></span><span>${S.channelLine}</span><span>${S.preset} <b data-k="hl">3</b></span></div>
       </div>
+      <p class="sim-trnote">${S.trNote}</p>
       <div class="sim-route">
         <div class="sim-row"><span>${S.routeCell}</span><span class="sim-pill" data-k="pCell"></span></div>
         <div class="sim-row"><span>${S.routeMesh}</span><span class="sim-pill" data-k="pMesh"></span></div>
@@ -66,6 +85,19 @@ export function mountDemo(root, S) {
         <button type="button" data-b="restore">${S.restore}</button>
         <span class="sim-hint">${S.hint}</span>
       </div>
+      <div class="sim-node">
+        <div class="sim-node-head">
+          <span class="sim-node-k">${S.nodeScreen}</span>
+          <b data-k="nName"></b><span class="sim-node-meta" data-k="nMeta"></span>
+          <label>${S.nodeLang} <select data-b="nLang">${LANGS.map((l) => `<option value="${l}">${escH(S.langNames[l])}</option>`).join('')}</select></label>
+        </div>
+        <div class="sim-eink" data-k="eink" aria-live="polite">
+          <div class="sim-eink-top"><b data-k="eTitle"></b><span data-k="eRight"></span></div>
+          <div class="sim-eink-body" data-k="eBody"></div>
+          <div class="sim-eink-foot" data-k="eFoot"></div>
+        </div>
+        <span class="sim-hint">${S.nodeHint}</span>
+      </div>
     </div>
 
     <aside class="sim-panel sim-log">
@@ -89,9 +121,6 @@ export function mountDemo(root, S) {
   };
   const setPill = (k, cls, text) => { const p = K(k); p.className = 'sim-pill ' + cls; p.textContent = text; };
 
-  const bytes = new TextEncoder().encode(MSG_PL + '\n' + MSG_CZ).length;
-  K('bytes').textContent = f(S.fits, { n: bytes });
-
   const RANGE = { hq: 150, router: 300, client: 160 };
   const NODES = [
     { id: 'hq', name: N.hq, x: 600, y: 300, role: 'hq', c: 'PL' },
@@ -108,12 +137,13 @@ export function mountDemo(root, S) {
     { id: 'nam', name: 'nám. ČSA', x: 400, y: 200, role: 'client', c: 'CZ' },
     { id: 'chot', name: 'Chotěbuz', x: 340, y: 100, role: 'client', c: 'CZ' },
     { id: 'svib', name: 'Svibice', x: 230, y: 160, role: 'client', c: 'CZ' },
-    { id: 'mosty', name: 'Mosty', x: 190, y: 330, role: 'client', c: 'CZ' },
+    { id: 'mosty', name: 'Mosty', x: 205, y: 420, role: 'client', c: 'CZ' },
+    { id: 'zukov', name: 'Dolní Žukov', x: 420, y: 450, role: 'client', c: 'CZ' },
     { id: 'stan', name: 'Stanislavice', x: 300, y: 470, role: 'client', c: 'CZ' },
     { id: 'konak', name: 'Koňákov', x: 170, y: 560, role: 'client', c: 'CZ' },
   ];
   const byId = {};
-  NODES.forEach((n) => { byId[n.id] = n; n.off = false; });
+  NODES.forEach((n) => { byId[n.id] = n; n.off = false; n.lang = n.c === 'CZ' ? 'cs' : 'pl'; });
   const TOWERS = [
     { name: 'BTS Cieszyn', x: 700, y: 160 },
     { name: 'BTS Český Těšín', x: 290, y: 250 },
@@ -141,7 +171,7 @@ export function mountDemo(root, S) {
       { x: 620, y: 260, rx: 120, ry: 130, n: 120 }, { x: 400, y: 280, rx: 110, ry: 120, n: 100 },
       { x: 590, y: 90, rx: 40, ry: 30, n: 14 }, { x: 720, y: 115, rx: 40, ry: 30, n: 14 }, { x: 820, y: 285, rx: 40, ry: 30, n: 14 },
       { x: 800, y: 435, rx: 40, ry: 30, n: 14 }, { x: 660, y: 505, rx: 40, ry: 30, n: 14 }, { x: 340, y: 105, rx: 40, ry: 30, n: 14 },
-      { x: 230, y: 165, rx: 40, ry: 30, n: 14 }, { x: 190, y: 335, rx: 45, ry: 35, n: 18 }, { x: 300, y: 475, rx: 40, ry: 30, n: 14 },
+      { x: 230, y: 165, rx: 40, ry: 30, n: 14 }, { x: 205, y: 425, rx: 45, ry: 35, n: 18 }, { x: 420, y: 455, rx: 40, ry: 30, n: 14 }, { x: 300, y: 475, rx: 40, ry: 30, n: 14 },
       { x: 170, y: 560, rx: 35, ry: 25, n: 10 }, { x: 870, y: 520, rx: 45, ry: 30, n: 14 },
     ];
     clusters.forEach((c) => {
@@ -185,7 +215,9 @@ export function mountDemo(root, S) {
     mk('title', {}, g).textContent = isHq ? S.tipHq : f(S.tipNode, { name: n.name, c: n.c, role: n.role === 'router' ? S.router : S.household });
     n.g = g;
     if (!isHq) {
-      const toggle = () => { n.off = !n.off; setState(n, n.off ? 'off' : 'idle'); refreshLinks(); };
+      g.addEventListener('mouseenter', () => showNode(n));
+      g.addEventListener('focus', () => showNode(n));
+      const toggle = () => { n.off = !n.off; setState(n, n.off ? 'off' : 'idle'); refreshLinks(); renderOutgoing(); showNode(n); };
       g.addEventListener('click', toggle);
       g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
     }
@@ -240,22 +272,56 @@ export function mountDemo(root, S) {
   // ---------- managed flooding ----------
   const AIR = 700;
   let H = 3, seen = {}, reached = 0, maxHop = 0, txCount = 0, quietCount = 0, implicitAck = false, meshT0 = null, meshDone = true, R;
+  let sentLangs = null, packets = 1, sel = byId.nam;
+
+  // ---------- languages ----------
+  const payload = (langs) => langs.map((l) => `${l.toUpperCase()}: ${MSG[l]}`).join('\n');
+  function langsFor(mode) {
+    const extra = LANGS.filter((l) => l !== ORIGINAL && (mode === 'all' || (mode === 'recipients' && others.some((n) => !n.off && n.lang === l))));
+    return [ORIGINAL, ...extra];
+  }
+  function renderOutgoing() {
+    const langs = langsFor(B('tr').value);
+    const b = new TextEncoder().encode(payload(langs)).length;
+    const p = Math.ceil(b / MAX_PAYLOAD);
+    K('msgs').innerHTML = langs.map((l) => `<div><div class="sim-lang">${l.toUpperCase()}${l === ORIGINAL ? '' : ` · ${escH(S.autoTag)}`}</div><span>${escH(MSG[l])}</span></div>`).join('');
+    K('bytes').textContent = f(p === 1 ? S.fits : S.packets, { n: b, p });
+    return { langs, b, p };
+  }
+  function showNode(n) { if (n && n.role !== 'hq') { sel = n; drawScreen(); } }
+  function drawScreen() {
+    const n = sel, d = DEV[n.lang], got = !!(seen[n.id] && sentLangs);
+    K('nName').textContent = n.name;
+    K('nMeta').textContent = `${n.c} · ${n.role === 'router' ? S.router : S.household}`;
+    B('nLang').value = n.lang;
+    const e = K('eink');
+    e.classList.toggle('off', n.off); e.classList.toggle('alert', got && !n.off);
+    const put = (title, right, body, foot) => { K('eTitle').textContent = title; K('eRight').textContent = right; K('eBody').textContent = body; K('eFoot').textContent = foot; };
+    if (n.off) put(n.name, '', S.nodeOff, '');
+    else if (got) {
+      const shown = sentLangs.includes(n.lang) ? n.lang : ORIGINAL;
+      put(d.alert, `hop ${n.rxHop}`, MSG[shown], shown === n.lang ? `${shown.toUpperCase()} · SNR ${n.rxSnr} dB` : f(d.orig, { l: ORIGINAL.toUpperCase() }));
+    } else put(d.idle, '☀ 86%', d.waiting, 'EU_868 · LongFast');
+  }
 
   function updateStats() {
     K('s1').textContent = `${reached}/${others.length}`;
     K('s2').textContent = maxHop || '–';
-    K('s3').textContent = txCount;
+    K('s3').textContent = txCount * packets;
   }
   function startMesh(t) {
     mode = 'mesh'; meshDone = false;
     H = Number(B('hop').value); R = rng(7 + H);
+    const out = renderOutgoing(); sentLangs = out.langs; packets = out.p;
     seen = { hq: true }; reached = 0; maxHop = 0; txCount = 0; quietCount = 0; implicitAck = false; meshT0 = t;
     others.forEach((n) => setState(n, n.off ? 'off' : 'idle'));
     links.forEach((l) => l.el.classList.remove('hot'));
     setClock('21:31', S.phases.mesh); clockT0 = t;
     setPill('pMesh', 'busy', S.pills.sending);
     updateStats();
-    log('sys', f(S.log.tx, { b: bytes, h: H }));
+    if (sentLangs.length > 1) log('sys', f(S.log.translate, { from: ORIGINAL.toUpperCase(), to: sentLangs.slice(1).map((l) => l.toUpperCase()).join(', ') }));
+    log('sys', f(S.log.tx, { b: out.b, h: H, p: packets }));
+    drawScreen();
     transmit(HQ, H, t);
     at(t + 1, function check(tt) { if (events.length === 0) finishMesh(); else at(tt + 200, check); });
   }
@@ -286,6 +352,8 @@ export function mountDemo(root, S) {
     const hop = H - hl + 1; maxHop = Math.max(maxHop, hop);
     const d = dist(n, from), th = thr(n, from);
     const snr = (10 - 24 * (d / th)).toFixed(1);
+    n.rxHop = hop; n.rxSnr = snr;
+    if (n === sel) drawScreen();
     updateStats();
     if (hl > 0) {
       const delay = n.role === 'router' ? 120 : Math.round(380 + 1200 * (1 - d / th) + R() * 80);
@@ -316,13 +384,14 @@ export function mountDemo(root, S) {
   // ---------- story ----------
   const lightsOn = (on) => lights.forEach((l) => l.classList.toggle('off', !on));
   function resetVisual() {
-    clearSim(); logEl.textContent = ''; meshT0 = null; meshDone = true;
+    clearSim(); logEl.textContent = ''; meshT0 = null; meshDone = true; seen = {}; sentLangs = null;
     others.forEach((n) => setState(n, n.off ? 'off' : 'idle')); setState(HQ, 'idle');
     links.forEach((l) => l.el.classList.remove('hot'));
     TOWERS.forEach((t) => setTower(t, ''));
     for (let i = 0; i < 5; i++) K('s' + i).textContent = '–';
     setPill('pCell', 'wait', S.pills.waiting);
     setPill('pMesh', 'wait', S.pills.waiting);
+    drawScreen();
   }
   function cellFailed() {
     TOWERS.forEach((t) => setTower(t, 'dead failed'));
@@ -360,11 +429,14 @@ export function mountDemo(root, S) {
 
   B('replay').addEventListener('click', story);
   B('mesh').addEventListener('click', meshOnly);
-  B('restore').addEventListener('click', () => { others.forEach((n) => { n.off = false; setState(n, n.state === 'off' ? 'idle' : n.state); }); refreshLinks(); });
+  B('restore').addEventListener('click', () => { others.forEach((n) => { n.off = false; setState(n, n.state === 'off' ? 'idle' : n.state); }); refreshLinks(); renderOutgoing(); drawScreen(); });
+  B('tr').addEventListener('change', renderOutgoing);
+  B('nLang').addEventListener('change', (e) => { sel.lang = e.target.value; renderOutgoing(); drawScreen(); });
   B('speed').addEventListener('change', (e) => { speed = Number(e.target.value); });
   B('hop').addEventListener('change', (e) => { K('hl').textContent = e.target.value; });
 
   others.forEach((n) => setState(n, 'idle')); setState(HQ, 'idle');
+  renderOutgoing();
   story();
   raf = requestAnimationFrame(frame);
   return () => cancelAnimationFrame(raf);

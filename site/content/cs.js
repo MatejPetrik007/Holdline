@@ -27,6 +27,11 @@ export default {
       note: "Pořadí pinů odpovídá ESP32-S3-DevKitC-1 v1.1. Před pájením zkontroluj potisk své desky. Dodané uzly jsou už zapojené; tohle je pro ty, kdo si staví nebo opravují vlastní.",
     },
     demo: {
+      translate: "Automatický překlad", modes: ["Žádný · originál PL", "Jazyky příjemců", "Všechny jazyky"],
+      packets: "{n} B · {p} pakety", autoTag: "auto",
+      trNote: "Překládá se v centru před odesláním: uzly při blackoutu nemají internet.",
+      nodeScreen: "Displej uzlu", nodeLang: "Jazyk displeje", nodeHint: "Najeďte na uzel nebo na něj klepněte a uvidíte jeho displej.",
+      langNames: { cs: "Čeština", pl: "Polski", en: "English" }, nodeOff: "vypnuto",
       who: "Krizové centrum · Cieszyn", outgoing: "Odchozí varování", fits: "{n} B · vejde se do jednoho paketu",
       channelLine: "Kanál OLZA · AES-256 · EU868", preset: "Preset LongFast · hop limit",
       routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
@@ -51,7 +56,8 @@ export default {
         noCell: "Žádný vysílač nedostupný · 0 obyvatel varováno",
         switching: "Přepínám na základnovou stanici Meshtastic…",
         resend: "──── nové odeslání přes mesh ────",
-        tx: "TX varování id=0x4F1A · {b} B · hop_limit={h} · kanál OLZA",
+        translate: "Automatický překlad {from} → {to}",
+        tx: "TX varování id=0x4F1A · {b} B · {p} pkt · hop_limit={h} · kanál OLZA",
         ack: "implicitní ACK · {from} přeposlal náš paket",
         quiet: "{n}: {from} to přeposlal dřív, mlčí",
         rx: "{n} ({c}) rx skok {hop} · SNR {snr} dB · přeposlání za {ms} ms",
@@ -143,7 +149,8 @@ export default {
   <li><h3>Vzdálené uzly jdou první</h3><p>Čekání závisí na síle signálu: slabý signál znamená, že uzel je od odesílatele daleko, takže čeká kratší dobu. Tím se zpráva šíří ven nejrychleji.</p></li>
   <li><h3>Duplikáty se zahazují</h3><p>Každý paket má ID. Uzel, který ho už viděl, kopie zahodí. Běžný uzel, který slyší souseda přeposlat paket dřív, než na něj přijde řada, mlčí a šetří vysílací čas. Routery na vyvýšených místech, tady Góra Zamkowa, přeposílají vždy.</p></li>
   <li><h3>Odesílatel ví, že zpráva odešla</h3><p>Když centrum uslyší svůj paket přeposlaný, bere to jako implicitní potvrzení.</p></li>
-  <li><h3>Ztratíš uzel, síť zůstane</h3><p>Vypni na mapě router Góra Zamkowa a odešli znovu: uzel Bulwary u řeky, který normálně mlčí, teď přenese varování do Českého Těšína.</p></li>
+  <li><h3>Ztratíš uzel, síť zůstane</h3><p>Vypni na mapě router Góra Zamkowa a odešli znovu: uzel Bulwary u řeky, který normálně mlčí, teď přenese varování do Českého Těšína. Když místo toho vypneš router Těšín roof, varování přesto dojde do všech českých domácností, jižní cestou přes Bulwary a Dolní Žukov.</p></li>
+  <li><h3>Každý displej v jazyce svého majitele</h3><p>Každý uzel má vlastní jazyk displeje: češtinu, polštinu nebo angličtinu. V simulaci na uzel najeď a jazyk změň. Krizové centrum napíše varování jednou a zvolí, jak se přeloží: jen originál, automaticky do jazyků, které používají příjemci, nebo do všech jazyků. Překládá se v centru před odesláním, protože uzly při blackoutu nemají internet. Pokud jazyk uzlu odeslán nebyl, uzel ukáže originál. Víc jazyků znamená víc bajtů: nad 233 B se varování rozdělí do několika paketů.</p></li>
 </ol>
 
 <h2>Mobilní síť vs. mesh při blackoutu</h2>

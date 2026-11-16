@@ -27,6 +27,11 @@ export default {
       note: "Pin order follows ESP32-S3-DevKitC-1 v1.1. Check the silkscreen of your board before soldering. Assembled nodes are already wired; this is for people who build or repair their own.",
     },
     demo: {
+      translate: "Auto-translation", modes: ["None · original PL", "Recipients' languages", "All languages"],
+      packets: "{n} B · {p} packets", autoTag: "auto",
+      trNote: "Translated at the centre before sending: nodes have no internet in a blackout.",
+      nodeScreen: "Node screen", nodeLang: "Display language", nodeHint: "Hover over or tap a node to see its screen.",
+      langNames: { cs: "Čeština", pl: "Polski", en: "English" }, nodeOff: "switched off",
       who: "Crisis centre · Cieszyn", outgoing: "Outgoing alert", fits: "{n} B · fits in one packet",
       channelLine: "Channel OLZA · AES-256 · EU868", preset: "Preset LongFast · hop limit",
       routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
@@ -51,7 +56,8 @@ export default {
         noCell: "No cell site reachable · 0 residents notified",
         switching: "Switching to the Meshtastic base station…",
         resend: "──── resend via mesh ────",
-        tx: "TX alert id=0x4F1A · {b} B · hop_limit={h} · ch OLZA",
+        translate: "Auto-translated {from} → {to}",
+        tx: "TX alert id=0x4F1A · {b} B · {p} pkt · hop_limit={h} · ch OLZA",
         ack: "implicit ACK · heard {from} relay our packet",
         quiet: "{n}: heard {from} relay it first, stays quiet",
         rx: "{n} ({c}) rx hop {hop} · SNR {snr} dB · relay in {ms} ms",
@@ -143,7 +149,8 @@ export default {
   <li><h3>Far nodes go first</h3><p>The wait depends on signal strength: a weak signal means the node is far from the sender, so it waits less. That pushes the message outward fastest.</p></li>
   <li><h3>Duplicates are ignored</h3><p>Every packet has an ID. A node that has already seen it drops copies. A regular node that hears a neighbour relay the packet before its own turn stays quiet, which saves airtime. Routers on high points, like Góra Zamkowa here, always relay.</p></li>
   <li><h3>The sender knows it got out</h3><p>When the centre hears its own packet relayed, it counts that as an implicit acknowledgement.</p></li>
-  <li><h3>Lose a node, keep the network</h3><p>Knock out the Góra Zamkowa router on the map and resend: the Bulwary node by the river, which normally stays quiet, now carries the alert across to Český Těšín.</p></li>
+  <li><h3>Lose a node, keep the network</h3><p>Knock out the Góra Zamkowa router on the map and resend: the Bulwary node by the river, which normally stays quiet, now carries the alert across to Český Těšín. Switch off the Těšín roof router instead and the alert still reaches every Czech household, along the south through Bulwary and Dolní Žukov.</p></li>
+  <li><h3>Every screen in its owner's language</h3><p>Each node has its own display language: Czech, Polish or English. Hover over a node in the simulation and change it. The crisis centre writes the alert once and chooses how it is translated: original only, automatically into the languages its recipients use, or into all languages. Translation happens at the centre before sending, because nodes have no internet in a blackout. If a language was not sent, the node shows the original. More languages mean more bytes: past 233 B the alert is split into several packets.</p></li>
 </ol>
 
 <h2>Cell network vs mesh during a blackout</h2>
