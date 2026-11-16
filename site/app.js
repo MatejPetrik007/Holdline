@@ -1,14 +1,14 @@
-import { CONFIG } from './config.js?v=6';
-import { PINS, BOM, BOM_ADDONS, BOM_SIGN, COMPUTE } from './pins.js?v=6';
-import { mountDemo } from './demo.js?v=6';
-import { mountLab, labStrings } from './lab.js?v=6';
-import { EXTRA, mountEink, mountMesh, anchorize, buildIndex, mountPalette, reveal } from './extras.js?v=6';
-import en from './content/en.js?v=6';
-import cs from './content/cs.js?v=6';
-import pl from './content/pl.js?v=6';
+import { CONFIG } from './config.js?v=7';
+import { PINS, BOM, BOM_ADDONS, BOM_SIGN, COMPUTE } from './pins.js?v=7';
+import { mountDemo } from './demo.js?v=7';
+import { mountLab, labStrings } from './lab.js?v=7';
+import { EXTRA, mountEink, mountMesh, anchorize, buildIndex, mountPalette, reveal } from './extras.js?v=7';
+import en from './content/en.js?v=7';
+import cs from './content/cs.js?v=7';
+import pl from './content/pl.js?v=7';
 
 const LANGS = { en, cs, pl };
-const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'lab', 'openhw', 'access', 'faq', 'verify', 'security', 'releases'];
+const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'lab', 'openhw', 'access', 'form', 'faq', 'verify', 'security', 'releases'];
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -237,7 +237,7 @@ function paint(fromHash) {
   wireBoard();
   if (page === 'demo') unmounts.push(mountDemo($('#sim'), T.ui.demo));
   if (page === 'home') unmounts.push(mountEink(lang), mountMesh());
-  ({ verify: initVerify, releases: initReleases, faq: initFaq, access: initForms, openhw: initForms }[page] || (() => {}))();
+  ({ verify: initVerify, releases: initReleases, faq: initFaq, form: initForms }[page] || (() => {}))();
   const target = anchor && document.getElementById(anchor);
   if (target) { if (target.matches('details')) target.open = true; target.scrollIntoView(); target.classList.add('flash-target'); }
   else if (fromHash) window.scrollTo(0, 0);

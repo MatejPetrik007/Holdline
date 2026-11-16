@@ -3,7 +3,7 @@ const DISCLAIMER = `<p><b>Upozornění:</b> toto je neoficiální komunitní bui
 export default {
   ui: {
     brand: 'Holdline',
-    nav: { home: 'Úvod', demo: 'Simulace blackoutu', hardware: 'Hardware', build: 'Sestavení FW', solar: 'Solár', lab: 'Laboratoř', openhw: 'Open hardware', access: 'Přístupnost', faq: 'Otázky a odpovědi', verify: 'Ověření', security: 'Bezpečnost', releases: 'Vydání' },
+    nav: { home: 'Úvod', demo: 'Simulace blackoutu', hardware: 'Hardware', build: 'Sestavení FW', solar: 'Solár', lab: 'Laboratoř', openhw: 'Open hardware', access: 'Přístupnost', form: 'Formulář', faq: 'Otázky a odpovědi', verify: 'Ověření', security: 'Bezpečnost', releases: 'Vydání' },
     up: 'ověř upstream',
     copy: 'KOPÍROVAT', copied: 'ZKOPÍROVÁNO',
     pinCols: ['Součástka', 'Signál', 'Pin ESP32-S3', 'K čemu slouží'],
@@ -149,7 +149,7 @@ export default {
   <li><h3>Vzdálené uzly jdou první</h3><p>Čekání závisí na síle signálu: slabý signál znamená, že uzel je od odesílatele daleko, takže čeká kratší dobu. Tím se zpráva šíří ven nejrychleji.</p></li>
   <li><h3>Duplikáty se zahazují</h3><p>Každý paket má ID. Uzel, který ho už viděl, kopie zahodí. Běžný uzel, který slyší souseda přeposlat paket dřív, než na něj přijde řada, mlčí a šetří vysílací čas. Routery na vyvýšených místech, tady Góra Zamkowa, přeposílají vždy.</p></li>
   <li><h3>Odesílatel ví, že zpráva odešla</h3><p>Když centrum uslyší svůj paket přeposlaný, bere to jako implicitní potvrzení.</p></li>
-  <li><h3>Ztratíš uzel, síť zůstane</h3><p>Vypni na mapě router Góra Zamkowa a odešli znovu: uzel Bulwary u řeky, který normálně mlčí, teď přenese varování do Českého Těšína. Když místo toho vypneš router Těšín roof, varování přesto dojde do všech českých domácností, jižní cestou přes Bulwary a Dolní Žukov.</p></li>
+  <li><h3>Ztratíš uzel, síť zůstane</h3><p>Vypni na mapě router Góra Zamkowa a odešli znovu: uzel Bulwary u řeky, který normálně mlčí, teď přenese varování do Českého Těšína. Když místo toho vypneš router Těšín roof, třeba i spolu s Górou Zamkowou, varování přesto dojde na nám. ČSA přímo přes řeku routerem na Mostě Družby a na jih přes Bulwary a Dolní Žukov.</p></li>
   <li><h3>Každý displej v jazyce svého majitele</h3><p>Každý uzel má vlastní jazyk displeje: češtinu, polštinu nebo angličtinu. V simulaci na uzel najeď a jazyk změň. Krizové centrum napíše varování jednou a zvolí, jak se přeloží: jen originál, automaticky do jazyků, které používají příjemci, nebo do všech jazyků. Překládá se v centru před odesláním, protože uzly při blackoutu nemají internet. Pokud jazyk uzlu odeslán nebyl, uzel ukáže originál. Víc jazyků znamená víc bajtů: nad 233 B se varování rozdělí do několika paketů.</p></li>
 </ol>
 
@@ -245,7 +245,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 <p class="eyebrow">open hardware</p>
 <h1>Dojde složený. Otevřený, takže si ho můžeš postavit sám.</h1>
 <p class="lede">Každá domácnost dostane uzel od státu <b>kompletně složený, nahraný a otestovaný</b>. Nic nemusíš pájet. Schémata, zapojení pinů a seznam dílů jsou otevřené, aby si ho kdokoli, kdo chce, mohl postavit, opravit nebo vylepšit doma.</p>
-<div class="toc"><a href="#/openhw#box">Co dorazí</a><a href="#/openhw#paths">Tři cesty k uzlu</a><a href="#/openhw#pins">Který pin kam</a><a href="#/openhw#bom">Díly a kde koupit</a><a href="#/openhw#connect">Připojení vlastního uzlu</a><a href="#/openhw#sign">Znakový jazyk: díly</a><a href="#/openhw#selfhost">Postavím si sám: dej vědět</a></div>
+<div class="toc"><a href="#/openhw#box">Co dorazí</a><a href="#/openhw#paths">Tři cesty k uzlu</a><a href="#/openhw#pins">Který pin kam</a><a href="#/openhw#bom">Díly a kde koupit</a><a href="#/openhw#connect">Připojení vlastního uzlu</a><a href="#/openhw#sign">Znakový jazyk: díly</a><a href="#/form#build">Postavím si sám: dej vědět</a></div>
 
 <h2 id="box">Co dorazí v krabici</h2>
 <div class="two">
@@ -268,7 +268,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 <h2 id="paths">Tři cesty k uzlu</h2>
 <div class="grid">
   <div class="card"><span class="num">A · VÝCHOZÍ</span><h3>Dojde složený</h3><p>Nemusíš nic dělat: každá registrovaná adresa dostane složený uzel automaticky. Pájení není nikdy potřeba. Termíny doručení zveřejňujeme v <a href="#/faq#channel">kanálu jen pro čtení</a>.</p></div>
-  <a class="card" href="#/openhw#selfhost"><span class="num">B · VOLITELNĚ</span><h3>Postav si ho sám</h3><p>Chceš si ho zapájet sám? Dej nám vědět formulářem níže, ať ti stát žádný neposílá. Sady dílů jsou ve společném nákupu. →</p></a>
+  <a class="card" href="#/form#build"><span class="num">B · VOLITELNĚ</span><h3>Postav si ho sám</h3><p>Chceš si ho zapájet sám? Dej nám vědět formulářem níže, ať ti stát žádný neposílá. Sady dílů jsou ve společném nákupu. →</p></a>
   <a class="card" href="#/access"><span class="num">C</span><h3>Neslyšící, nevidomí, hluchoslepí</h3><p>Dojde složený s doplňky, které ti sedí. Hluchoslepí ho dostanou osobně i s nastavením. →</p></a>
 </div>
 
@@ -284,7 +284,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 <h2 id="sign">Znakový jazyk na displeji: díly a nákup</h2>
 <p>Pro neslyšící, jejichž prvním jazykem je znakový jazyk, umí hub ukázat zprávy z mesh <b>ve znakovém jazyce</b>. Běží na stejném <b>NVIDIA Jetson Orin Nano</b> jako živé titulky, takže pokud poslechový hub už máš, přidáváš jen displej, baterii a tlačítko. Systém je normálně vypnutý; když přijde zpráva, náramek zavibruje a ty víš, že ho máš zapnout. Jak to funguje: <a href="#/access#sign">Přístupnost → zprávy ve znakovém jazyce</a>.</p>
 {{BOM_SIGN}}
-<p class="small">Sady dílů pro znakový displej jsou ve společném nákupu: zaškrtni <b>Znakový displej</b> ve <a href="#/openhw#selfhost">formuláři pro vlastní stavbu</a>. Od státu ho dostaneš složený a nastavený přes <a href="#/access#register">registraci přístupnosti</a>.</p>
+<p class="small">Sady dílů pro znakový displej jsou ve společném nákupu: zaškrtni <b>Znakový displej</b> ve <a href="#/form#build">formuláři pro vlastní stavbu</a>. Od státu ho dostaneš složený a nastavený přes <a href="#/form#adapted">registraci přístupnosti</a>.</p>
 
 <h2 id="connect">Připojení vlastního uzlu</h2>
 <p class="small">Dodané uzly jsou už nastavené. Tyto kroky jsou jen pro uzly, které sis postavil sám.</p>
@@ -295,42 +295,13 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 </ol>
 
 <h2 id="selfhost">Postavím si sám: dej vědět</h2>
-<p>Vyplň jen tehdy, pokud si chceš postavit vlastní. Všichni ostatní dostanou složený uzel automaticky a nemusí dělat nic. Údaje jdou soukromě centrální autoritě a nikdy se nezveřejňují.</p>
-<div class="card">
-<form class="f reg" data-kind="self-build / opt-out of assembled delivery">
-  <div class="row2">
-    <label><span class="lbl">Jméno</span><input type="text" name="name" required autocomplete="name"></label>
-    <label><span class="lbl">E-mail</span><input type="email" name="email" required autocomplete="email"></label>
-  </div>
-  <div class="row2">
-    <label><span class="lbl">Země</span><select name="country"><option>Česko</option><option>Polsko</option><option>Slovensko</option><option>Jiná</option></select></label>
-    <label><span class="lbl">Město / region</span><input type="text" name="region"></label>
-  </div>
-  <label><span class="lbl">Adresa domácnosti (abychom našli tvoje doručení)</span><textarea name="address" rows="2" autocomplete="street-address" required></textarea></label>
-  <label><span class="lbl">Složený uzel od státu</span><select name="delivery"><option>Neposílejte: postavím si vlastní</option><option>Pošlete i tak: stavím další uzel navíc</option></select></label>
-  <fieldset><legend>Co si postavíš?</legend>
-    <label class="check"><input type="checkbox" name="node" checked> Mesh uzel (ESP32-S3 + E-Ink + solár)</label>
-    <label class="check"><input type="checkbox" name="braille"> Braillova klávesnice</label>
-    <label class="check"><input type="checkbox" name="haptic"> Haptický náramek Pro</label>
-    <label class="check"><input type="checkbox" name="hub"> Poslechový hub (řeč na text)</label>
-    <label class="check"><input type="checkbox" name="sign"> Znakový displej (zprávy ve znakovém jazyce)</label>
-  </fieldset>
-  <div class="row2">
-    <label><span class="lbl">Přidáš se ke společnému nákupu?</span><select name="groupbuy"><option value="yes">Ano, rezervujte mi sady dílů</option><option value="no">Ne, díly si koupím sám</option></select></label>
-    <label><span class="lbl">Počet sad</span><input type="number" name="qty" min="1" max="50" value="1"></label>
-  </div>
-  <label><span class="lbl">Zkušenosti</span><select name="experience"><option>První projekt s elektronikou</option><option>Umím pájet a nahrávat desky</option><option>Zkušený maker</option></select></label>
-  <label class="check"><input type="checkbox" name="consent" required> Souhlasím, že centrální autorita zpracuje tyto údaje, aby zrušila nebo upravila mé doručení a zorganizovala společný nákup.</label>
-  <button class="btn primary" type="submit">Odeslat</button>
-  <div class="form-msg" aria-live="polite"></div>
-</form>
-</div>`,
+<p>Chceš si postavit vlastní uzel nebo doplňky? Dej vědět v <a href="#/form#build">registračním formuláři</a>, aby ti stát uzel neposílal a mohl ti rezervovat sady dílů.</p>`,
 
     access: `
 <p class="eyebrow">přístupnost</p>
 <h1>Mesh zprávy pro neslyšící, nevidomé a hluchoslepé</h1>
 <p class="lede">Každý uzel dorazí složený. Pokud jsi neslyšící, nevidomý nebo hluchoslepý, stát ho dodá s doplňky, které ti sedí, nastavené a otestované. Hluchoslepí lidé ho dostanou <b>osobně</b> od instruktora, který komunikuje tak jako oni.</p>
-<div class="toc"><a href="#/access#who">Kdo dostane co</a><a href="#/access#deafblind">Jak to funguje pro hluchoslepé</a><a href="#/access#build">Haptický náramek Pro: postav si sám</a><a href="#/access#sign">Zprávy ve znakovém jazyce</a><a href="#/access#compute">Jaký počítač nebo GPU</a><a href="#/access#register">Registrace</a></div>
+<div class="toc"><a href="#/access#who">Kdo dostane co</a><a href="#/access#deafblind">Jak to funguje pro hluchoslepé</a><a href="#/access#build">Haptický náramek Pro: postav si sám</a><a href="#/access#sign">Zprávy ve znakovém jazyce</a><a href="#/access#compute">Jaký počítač nebo GPU</a><a href="#/form#adapted">Registrace</a></div>
 
 <h2 id="who">Kdo dostane co</h2>
 <div class="grid">
@@ -394,7 +365,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
       <li><b>Varování centrální autority</b> (povodeň, evakuace, úkryt, pitná voda, výpadek proudu, konec nebezpečí…): předtočená videa, která natáčejí neslyšící rodilí mluvčí s organizacemi neslyšících. Varování nese kód šablony; místo a čas se doplní textem a prstovou abecedou.</li>
       <li><b>Ostatní zprávy</b> uvidíš jako velký čitelný text. Strojový překlad volného textu do znakového jazyka zatím není dost spolehlivý na to, abychom ho používali na varování.</li>
       <li>Knihovnu videí aktualizuje centrální autorita <a href="#/verify">podepsaným vydáním</a>, stejně jako firmware.</li>
-      <li>Jazyk vybereš v <a href="#/access#register">registraci</a>.</li>
+      <li>Jazyk vybereš v <a href="#/form#adapted">registraci</a>.</li>
     </ul>
   </div>
 </div>
@@ -405,12 +376,20 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 {{COMPUTE}}
 <p class="small">Orientační hodnoty. Převod řeči na text: <a href="https://github.com/ggml-org/whisper.cpp" rel="noopener">whisper.cpp</a> nebo <a href="https://github.com/SYSTRAN/faster-whisper" rel="noopener">faster-whisper</a>, obojí open source a běží úplně offline. Hub potřebuje síť nebo velkou baterii; při blackoutu náramek sám dál doručuje zprávy z mesh i zvuková upozornění.</p>
 
-<div class="callout"><p><b>Raději si ho postavíš sám?</b> Použij <a href="#/openhw#selfhost">formulář pro vlastní stavbu</a>; sady dílů jsou ve společném nákupu.</p></div>
+<div class="callout"><p><b>Raději si ho postavíš sám?</b> Použij <a href="#/form#build">formulář pro vlastní stavbu</a>; sady dílů jsou ve společném nákupu.</p></div>
 
 <h2 id="register">Registrační formulář</h2>
-<p>Údaje jdou soukromě jen centrální autoritě. Nikdy se nezveřejňují a nezobrazují ostatním uživatelům.</p>
+<p>O upravený uzel s doplňky požádáš v <a href="#/form#adapted">registračním formuláři</a>. Je jeden pro všechno a údaje jdou soukromě jen centrální autoritě.</p>`,
+
+    form: `
+<p class="eyebrow">registrace</p>
+<h1>Registrační formulář</h1>
+<p class="lede">Běžný uzel dostane každá domácnost složený, aniž by cokoli vyplňovala. Tento jediný formulář vyplň, jen pokud kvůli zdravotnímu postižení potřebuješ upravenou verzi, nebo pokud si chceš uzel postavit sám. Údaje jdou soukromě centrální autoritě a nikdy se nezveřejňují.</p>
+<div class="callout" id="adapted"><p><b>Máš zdravotní postižení? Požádej o upravenou verzi.</b> Stát ti dodá uzel složený, s doplňky, které potřebuješ, už připojenými a nastavenými:</p>
+<ul><li>Braillova klávesnice</li><li>Haptický náramek Pro</li><li>Poslechový hub (řeč na text)</li><li>Znakový displej (zprávy ve znakovém jazyce)</li><li>Hmatové značky na krabičce a tlačítkách, stručný návod v Braillově písmu nebo jako audio</li></ul>
+<p class="small">Co který doplněk umí: <a href="#/access">Přístupnost</a>.</p></div>
 <div class="card">
-<form class="f reg" data-kind="accessibility registration">
+<form class="f reg" data-kind="registration">
   <div class="row2">
     <label><span class="lbl">Celé jméno</span><input type="text" name="name" required autocomplete="name"></label>
     <label><span class="lbl">Preferovaný jazyk</span><select name="lang"><option>Čeština</option><option>Polski</option><option>English</option></select></label>
@@ -419,7 +398,14 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
     <label><span class="lbl">E-mail</span><input type="email" name="email" autocomplete="email"></label>
     <label><span class="lbl">Telefon (pro SMS)</span><input type="tel" name="phone" autocomplete="tel"></label>
   </div>
+  <div class="row2">
+    <label><span class="lbl">Země</span><select name="country"><option>Česko</option><option>Polsko</option><option>Slovensko</option><option>Jiná</option></select></label>
+    <label><span class="lbl">Město / region</span><input type="text" name="region"></label>
+  </div>
+  <label><span class="lbl">Doručovací adresa</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">Jak tě máme kontaktovat?</span><select name="contact"><option>E-mail</option><option>SMS</option><option>Přes asistenta, tlumočníka nebo pečovatele</option><option>Přes mou organizaci neslyšících, nevidomých nebo hluchoslepých</option><option>Dopis v Braillově písmu</option></select></label>
+  <label><span class="lbl">Co potřebuješ?</span><select name="request"><option>Upravenou verzi: složený uzel s doplňky (zdravotní postižení)</option><option>Neposílejte: postavím si vlastní</option><option>Pošlete i tak: stavím další uzel navíc</option></select></label>
+  <h3 id="adapted-version">Upravená verze: jen při zdravotním postižení</h3>
   <fieldset><legend>Jsem</legend>
     <label class="check"><input type="checkbox" name="deaf"> Neslyšící nebo nedoslýchavý</label>
     <label class="check"><input type="checkbox" name="blind"> Nevidomý nebo slabozraký</label>
@@ -428,8 +414,9 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
   <fieldset><legend>Potřebuji doplňky</legend>
     <label class="check"><input type="checkbox" name="braille"> Braillova klávesnice</label>
     <label class="check"><input type="checkbox" name="haptic"> Haptický náramek Pro</label>
-    <label class="check"><input type="checkbox" name="hub"> Poslechový hub (živé titulky)</label>
+    <label class="check"><input type="checkbox" name="hub"> Poslechový hub (řeč na text)</label>
     <label class="check"><input type="checkbox" name="sign"> Znakový displej (zprávy ve znakovém jazyce)</label>
+    <label class="check"><input type="checkbox" name="tactile_marks"> Hmatové značky a stručný návod v Braillově písmu nebo jako audio</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Rozložení náramku</span><select name="band_layout"><option>Kruh na zápěstí (neslyšící)</option><option>Braillův znak na předloktí (hluchoslepí)</option><option>Nevím, rozhodneme při nastavení</option></select></label>
@@ -437,10 +424,22 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
   </div>
   <label><span class="lbl">Znakový jazyk na displeji</span><select name="sign_lang"><option>Netýká se</option><option>Český znakový jazyk (ČZJ)</option><option>Polský znakový jazyk (PJM)</option><option>Mezinárodní znakový systém</option></select></label>
   <label><span class="lbl">Hluchoslepí: jak s tebou má instruktor komunikovat?</span><select name="tactile"><option>Netýká se</option><option>Taktilní znakový jazyk</option><option>Lormova abeceda</option><option>Psaní do dlaně</option><option>Braillovo písmo</option><option>Přes mého tlumočníka nebo asistenta</option></select></label>
-  <label><span class="lbl">Doručovací adresa</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">Asistent, tlumočník nebo důvěryhodná osoba (nepovinné)</span><input type="text" name="trusted"></label>
+  <h3 id="build">Postavím si sám: jen pokud stavíš</h3>
+  <fieldset><legend>Co si postavíš?</legend>
+    <label class="check"><input type="checkbox" name="build_node" checked> Mesh uzel (ESP32-S3 + E-Ink + solár)</label>
+    <label class="check"><input type="checkbox" name="build_braille"> Braillova klávesnice</label>
+    <label class="check"><input type="checkbox" name="build_haptic"> Haptický náramek Pro</label>
+    <label class="check"><input type="checkbox" name="build_hub"> Poslechový hub (řeč na text)</label>
+    <label class="check"><input type="checkbox" name="build_sign"> Znakový displej (zprávy ve znakovém jazyce)</label>
+  </fieldset>
+  <div class="row2">
+    <label><span class="lbl">Přidáš se ke společnému nákupu?</span><select name="groupbuy"><option value="yes">Ano, rezervujte mi sady dílů</option><option value="no">Ne, díly si koupím sám</option></select></label>
+    <label><span class="lbl">Počet sad</span><input type="number" name="qty" min="1" max="50" value="1"></label>
+  </div>
+  <label><span class="lbl">Zkušenosti</span><select name="experience"><option>První projekt s elektronikou</option><option>Umím pájet a nahrávat desky</option><option>Zkušený maker</option></select></label>
   <label><span class="lbl">Něco dalšího, co bychom měli vědět?</span><textarea name="notes" rows="3"></textarea></label>
-  <label class="check"><input type="checkbox" name="consent" required> Souhlasím, že centrální autorita zpracuje tyto údaje, aby mi dodala zařízení a doplňky.</label>
+  <label class="check"><input type="checkbox" name="consent" required> Souhlasím, že centrální autorita zpracuje tyto údaje, aby mi dodala uzel a doplňky, upravila nebo zrušila mé doručení a zorganizovala společný nákup.</label>
   <button class="btn primary" type="submit">Odeslat registraci</button>
   <div class="form-msg" aria-live="polite"></div>
 </form>
@@ -461,7 +460,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
   <li>Umísti ho co nejvýš, panelem na jih.</li>
   <li>Stiskni tlačítko. Displej ukáže <code>MESH · n nodes</code>.</li>
 </ol></div></details>
-<details class="qa"><summary>Musím pájet?</summary><div><p><b>Ne.</b> Každý uzel dorazí kompletně složený. Pájení je jen pro ty, kdo se rozhodnou postavit si vlastní; proto jsou schémata a zapojení pinů zveřejněné. Pokud chceš, dej vědět <a href="#/openhw#selfhost">formulářem pro vlastní stavbu</a>, ať ti stát žádný neposílá.</p></div></details>
+<details class="qa"><summary>Musím pájet?</summary><div><p><b>Ne.</b> Každý uzel dorazí kompletně složený. Pájení je jen pro ty, kdo se rozhodnou postavit si vlastní; proto jsou schémata a zapojení pinů zveřejněné. Pokud chceš, dej vědět <a href="#/form#build">formulářem pro vlastní stavbu</a>, ať ti stát žádný neposílá.</p></div></details>
 <details class="qa"><summary>Chci si postavit vlastní. Jak ho sestavit krok za krokem?</summary><div>
 <ol>
   <li><b>Nejdřív test na stole.</b> Připoj DevKitC přes USB, nahraj firmware (viz <a href="#/build">Sestavení FW</a>) a ověř, že deska nabootuje, než cokoli zapojíš.</li>

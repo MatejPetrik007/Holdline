@@ -3,7 +3,7 @@ const DISCLAIMER = `<p><b>Disclaimer:</b> this is an unofficial community build 
 export default {
   ui: {
     brand: 'Holdline',
-    nav: { home: 'Home', demo: 'Blackout demo', hardware: 'Hardware', build: 'Build', solar: 'Solar', lab: 'Lab', openhw: 'Open hardware', access: 'Accessibility', faq: 'Q&A', verify: 'Verify', security: 'Security', releases: 'Releases' },
+    nav: { home: 'Home', demo: 'Blackout demo', hardware: 'Hardware', build: 'Build', solar: 'Solar', lab: 'Lab', openhw: 'Open hardware', access: 'Accessibility', form: 'Form', faq: 'Q&A', verify: 'Verify', security: 'Security', releases: 'Releases' },
     up: 'check upstream',
     copy: 'COPY', copied: 'COPIED',
     pinCols: ['Part', 'Signal', 'ESP32-S3 pin', 'What it does'],
@@ -149,7 +149,7 @@ export default {
   <li><h3>Far nodes go first</h3><p>The wait depends on signal strength: a weak signal means the node is far from the sender, so it waits less. That pushes the message outward fastest.</p></li>
   <li><h3>Duplicates are ignored</h3><p>Every packet has an ID. A node that has already seen it drops copies. A regular node that hears a neighbour relay the packet before its own turn stays quiet, which saves airtime. Routers on high points, like Góra Zamkowa here, always relay.</p></li>
   <li><h3>The sender knows it got out</h3><p>When the centre hears its own packet relayed, it counts that as an implicit acknowledgement.</p></li>
-  <li><h3>Lose a node, keep the network</h3><p>Knock out the Góra Zamkowa router on the map and resend: the Bulwary node by the river, which normally stays quiet, now carries the alert across to Český Těšín. Switch off the Těšín roof router instead and the alert still reaches every Czech household, along the south through Bulwary and Dolní Žukov.</p></li>
+  <li><h3>Lose a node, keep the network</h3><p>Knock out the Góra Zamkowa router on the map and resend: the Bulwary node by the river, which normally stays quiet, now carries the alert across to Český Těšín. Switch off the Těšín roof router instead, even together with Góra Zamkowa: the alert still reaches nám. ČSA straight across the river through the router on Most Družby, and the south through Bulwary and Dolní Žukov.</p></li>
   <li><h3>Every screen in its owner's language</h3><p>Each node has its own display language: Czech, Polish or English. Hover over a node in the simulation and change it. The crisis centre writes the alert once and chooses how it is translated: original only, automatically into the languages its recipients use, or into all languages. Translation happens at the centre before sending, because nodes have no internet in a blackout. If a language was not sent, the node shows the original. More languages mean more bytes: past 233 B the alert is split into several packets.</p></li>
 </ol>
 
@@ -245,7 +245,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 <p class="eyebrow">open hardware</p>
 <h1>Delivered assembled. Open, so you can build it yourself.</h1>
 <p class="lede">Every household receives a node <b>fully assembled, flashed and tested</b> by the state. You don't need to solder anything. The schematics, pinout and parts list are open so that anyone who wants to can build, repair or improve one at home.</p>
-<div class="toc"><a href="#/openhw#box">What arrives</a><a href="#/openhw#paths">Three ways to get a node</a><a href="#/openhw#pins">Which pin goes where</a><a href="#/openhw#bom">Parts and where to buy</a><a href="#/openhw#connect">Connect a self-built node</a><a href="#/openhw#sign">Sign language: parts</a><a href="#/openhw#selfhost">Build it yourself: tell us</a></div>
+<div class="toc"><a href="#/openhw#box">What arrives</a><a href="#/openhw#paths">Three ways to get a node</a><a href="#/openhw#pins">Which pin goes where</a><a href="#/openhw#bom">Parts and where to buy</a><a href="#/openhw#connect">Connect a self-built node</a><a href="#/openhw#sign">Sign language: parts</a><a href="#/form#build">Build it yourself: tell us</a></div>
 
 <h2 id="box">What arrives in the box</h2>
 <div class="two">
@@ -268,7 +268,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 <h2 id="paths">Three ways to get a node</h2>
 <div class="grid">
   <div class="card"><span class="num">A · DEFAULT</span><h3>Delivered assembled</h3><p>You don't need to do anything: every registered address receives an assembled node automatically. Soldering is never required. Delivery dates are published in the <a href="#/faq#channel">read-only channel</a>.</p></div>
-  <a class="card" href="#/openhw#selfhost"><span class="num">B · OPTIONAL</span><h3>Build it yourself</h3><p>Want to solder your own? Tell us with the form below, so the state doesn't send you one. Parts kits are available through the group purchase. →</p></a>
+  <a class="card" href="#/form#build"><span class="num">B · OPTIONAL</span><h3>Build it yourself</h3><p>Want to solder your own? Tell us with the form below, so the state doesn't send you one. Parts kits are available through the group purchase. →</p></a>
   <a class="card" href="#/access"><span class="num">C</span><h3>Deaf, blind or deafblind</h3><p>Delivered assembled with the add-ons that fit you. Deafblind people get an in-person handover and set-up. →</p></a>
 </div>
 
@@ -284,7 +284,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 <h2 id="sign">Sign-language screen: parts and where to buy</h2>
 <p>For Deaf people whose first language is a sign language, the hub can show mesh messages <b>in sign language</b>. It runs on the same <b>NVIDIA Jetson Orin Nano</b> as the live captions, so if you already have the listening hub you only add a screen, a battery and a button. The system is normally off; when a message arrives, the band vibrates and you know to switch it on. How it works: <a href="#/access#sign">Accessibility → messages in sign language</a>.</p>
 {{BOM_SIGN}}
-<p class="small">Sign-language screen kits are part of the group purchase: tick <b>Sign-language screen</b> in the <a href="#/openhw#selfhost">self-build form</a>. To get one assembled and set up by the state, use the <a href="#/access#register">accessibility registration</a>.</p>
+<p class="small">Sign-language screen kits are part of the group purchase: tick <b>Sign-language screen</b> in the <a href="#/form#build">self-build form</a>. To get one assembled and set up by the state, use the <a href="#/form#adapted">accessibility registration</a>.</p>
 
 <h2 id="connect">Connect a self-built node</h2>
 <p class="small">Delivered nodes are already configured. These steps are only for nodes you built yourself.</p>
@@ -295,42 +295,13 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 </ol>
 
 <h2 id="selfhost">Build it yourself: tell us</h2>
-<p>Only fill this in if you want to build your own. Everyone else receives an assembled node automatically and needs to do nothing. Your data goes privately to the central authority and is never published.</p>
-<div class="card">
-<form class="f reg" data-kind="self-build / opt-out of assembled delivery">
-  <div class="row2">
-    <label><span class="lbl">Name</span><input type="text" name="name" required autocomplete="name"></label>
-    <label><span class="lbl">E-mail</span><input type="email" name="email" required autocomplete="email"></label>
-  </div>
-  <div class="row2">
-    <label><span class="lbl">Country</span><select name="country"><option>Czechia</option><option>Poland</option><option>Slovakia</option><option>Other</option></select></label>
-    <label><span class="lbl">City / region</span><input type="text" name="region"></label>
-  </div>
-  <label><span class="lbl">Household address (so we can match your delivery)</span><textarea name="address" rows="2" autocomplete="street-address" required></textarea></label>
-  <label><span class="lbl">Assembled node from the state</span><select name="delivery"><option>Don't deliver one: I'll build my own</option><option>Deliver it anyway: I'm building an extra node</option></select></label>
-  <fieldset><legend>What will you build?</legend>
-    <label class="check"><input type="checkbox" name="node" checked> Mesh node (ESP32-S3 + E-Ink + solar)</label>
-    <label class="check"><input type="checkbox" name="braille"> Braille keyboard add-on</label>
-    <label class="check"><input type="checkbox" name="haptic"> Haptic band Pro</label>
-    <label class="check"><input type="checkbox" name="hub"> Listening hub (speech-to-text)</label>
-    <label class="check"><input type="checkbox" name="sign"> Sign-language screen (messages in sign language)</label>
-  </fieldset>
-  <div class="row2">
-    <label><span class="lbl">Join the group purchase?</span><select name="groupbuy"><option value="yes">Yes, reserve parts kits for me</option><option value="no">No, I'll buy the parts myself</option></select></label>
-    <label><span class="lbl">Number of kits</span><input type="number" name="qty" min="1" max="50" value="1"></label>
-  </div>
-  <label><span class="lbl">Experience</span><select name="experience"><option>First electronics project</option><option>I can solder and flash boards</option><option>Experienced maker</option></select></label>
-  <label class="check"><input type="checkbox" name="consent" required> I agree that the central authority processes this data to cancel or adjust my delivery and organise the group purchase.</label>
-  <button class="btn primary" type="submit">Send</button>
-  <div class="form-msg" aria-live="polite"></div>
-</form>
-</div>`,
+<p>Want to build your own node or add-ons? Tell us in the <a href="#/form#build">registration form</a>, so the state doesn't send you a node and can reserve parts kits for you.</p>`,
 
     access: `
 <p class="eyebrow">accessibility</p>
 <h1>Mesh messaging for deaf, blind and deafblind people</h1>
 <p class="lede">Every node arrives assembled. If you are deaf, blind or deafblind, the state supplies it with the add-ons that fit you, set up and tested. Deafblind people receive theirs <b>in person</b>, from an instructor who communicates the way they do.</p>
-<div class="toc"><a href="#/access#who">Who gets what</a><a href="#/access#deafblind">How it works for deafblind people</a><a href="#/access#build">Haptic band Pro: build it yourself</a><a href="#/access#sign">Messages in sign language</a><a href="#/access#compute">Which computer or GPU</a><a href="#/access#register">Registration</a></div>
+<div class="toc"><a href="#/access#who">Who gets what</a><a href="#/access#deafblind">How it works for deafblind people</a><a href="#/access#build">Haptic band Pro: build it yourself</a><a href="#/access#sign">Messages in sign language</a><a href="#/access#compute">Which computer or GPU</a><a href="#/form#adapted">Registration</a></div>
 
 <h2 id="who">Who gets what</h2>
 <div class="grid">
@@ -394,7 +365,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
       <li><b>Central-authority alerts</b> (flood, evacuation, shelter, drinking water, power outage, all clear…): pre-recorded videos made by Deaf native signers together with Deaf organisations. Each alert carries a template code; place and time are added as text and fingerspelling.</li>
       <li><b>Other messages</b> are shown as large, readable text. Machine translation of free text into sign language isn't reliable enough yet to use for alerts.</li>
       <li>The central authority updates the video library through a <a href="#/verify">signed release</a>, just like the firmware.</li>
-      <li>You choose the language in the <a href="#/access#register">registration</a>.</li>
+      <li>You choose the language in the <a href="#/form#adapted">registration</a>.</li>
     </ul>
   </div>
 </div>
@@ -405,12 +376,20 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
 {{COMPUTE}}
 <p class="small">Rough planning values. Speech-to-text: <a href="https://github.com/ggml-org/whisper.cpp" rel="noopener">whisper.cpp</a> or <a href="https://github.com/SYSTRAN/faster-whisper" rel="noopener">faster-whisper</a>, both open source and running fully offline. The hub needs mains power or a large battery; during a blackout the band alone still delivers mesh messages and sound alerts.</p>
 
-<div class="callout"><p><b>Prefer to build it yourself?</b> Use the <a href="#/openhw#selfhost">self-build form</a>; parts kits are in the group purchase.</p></div>
+<div class="callout"><p><b>Prefer to build it yourself?</b> Use the <a href="#/form#build">self-build form</a>; parts kits are in the group purchase.</p></div>
 
 <h2 id="register">Registration form</h2>
-<p>Your data goes privately to the central authority only. It is never published and never shown to other users.</p>
+<p>Register for an adapted node with add-ons in the <a href="#/form#adapted">registration form</a>. There is one form for everything, and your data goes privately to the central authority only.</p>`,
+
+    form: `
+<p class="eyebrow">registration</p>
+<h1>Registration form</h1>
+<p class="lede">Every household receives a standard node, assembled, without filling in anything. Use this one form only if you need an adapted version because of a disability, or if you want to build your own node. Your data goes privately to the central authority and is never published.</p>
+<div class="callout" id="adapted"><p><b>Have a disability? Ask for an adapted version.</b> The state delivers your node assembled, with the add-ons you need already connected and set up:</p>
+<ul><li>Braille keyboard</li><li>Haptic band Pro</li><li>Listening hub (speech-to-text)</li><li>Sign-language screen (messages in sign language)</li><li>Tactile markings on the case and buttons, quick guide in Braille or as audio</li></ul>
+<p class="small">What each add-on does: <a href="#/access">Accessibility</a>.</p></div>
 <div class="card">
-<form class="f reg" data-kind="accessibility registration">
+<form class="f reg" data-kind="registration">
   <div class="row2">
     <label><span class="lbl">Full name</span><input type="text" name="name" required autocomplete="name"></label>
     <label><span class="lbl">Preferred language</span><select name="lang"><option>English</option><option>Čeština</option><option>Polski</option></select></label>
@@ -419,7 +398,14 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
     <label><span class="lbl">E-mail</span><input type="email" name="email" autocomplete="email"></label>
     <label><span class="lbl">Phone (for SMS)</span><input type="tel" name="phone" autocomplete="tel"></label>
   </div>
+  <div class="row2">
+    <label><span class="lbl">Country</span><select name="country"><option>Czechia</option><option>Poland</option><option>Slovakia</option><option>Other</option></select></label>
+    <label><span class="lbl">City / region</span><input type="text" name="region"></label>
+  </div>
+  <label><span class="lbl">Delivery address</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">How should we contact you?</span><select name="contact"><option>E-mail</option><option>SMS / text message</option><option>Through a carer, interpreter or assistant</option><option>Through my organisation for deaf, blind or deafblind people</option><option>Letter in Braille</option></select></label>
+  <label><span class="lbl">What do you need?</span><select name="request"><option>Adapted version: assembled node with add-ons (disability)</option><option>Don't deliver one: I'll build my own</option><option>Deliver it anyway: I'm building an extra node</option></select></label>
+  <h3 id="adapted-version">Adapted version: only if you have a disability</h3>
   <fieldset><legend>I am</legend>
     <label class="check"><input type="checkbox" name="deaf"> Deaf or hard of hearing</label>
     <label class="check"><input type="checkbox" name="blind"> Blind or partially sighted</label>
@@ -428,8 +414,9 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
   <fieldset><legend>Add-ons I need</legend>
     <label class="check"><input type="checkbox" name="braille"> Braille keyboard</label>
     <label class="check"><input type="checkbox" name="haptic"> Haptic band Pro</label>
-    <label class="check"><input type="checkbox" name="hub"> Listening hub (live captions)</label>
+    <label class="check"><input type="checkbox" name="hub"> Listening hub (speech-to-text)</label>
     <label class="check"><input type="checkbox" name="sign"> Sign-language screen (messages in sign language)</label>
+    <label class="check"><input type="checkbox" name="tactile_marks"> Tactile markings and a quick guide in Braille or as audio</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Band layout</span><select name="band_layout"><option>Wrist ring (deaf)</option><option>Braille cell on the forearm (deafblind)</option><option>Not sure, decide at set-up</option></select></label>
@@ -437,10 +424,22 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
   </div>
   <label><span class="lbl">Sign language on the screen</span><select name="sign_lang"><option>Not applicable</option><option>Czech Sign Language (ČZJ)</option><option>Polish Sign Language (PJM)</option><option>International Sign</option></select></label>
   <label><span class="lbl">Deafblind: how should the instructor communicate with you?</span><select name="tactile"><option>Not applicable</option><option>Tactile sign language</option><option>Lorm</option><option>Print-on-palm</option><option>Braille</option><option>Through my interpreter or carer</option></select></label>
-  <label><span class="lbl">Delivery address</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">Carer, interpreter or trusted contact (optional)</span><input type="text" name="trusted"></label>
+  <h3 id="build">Build it yourself: only if you build</h3>
+  <fieldset><legend>What will you build?</legend>
+    <label class="check"><input type="checkbox" name="build_node" checked> Mesh node (ESP32-S3 + E-Ink + solar)</label>
+    <label class="check"><input type="checkbox" name="build_braille"> Braille keyboard add-on</label>
+    <label class="check"><input type="checkbox" name="build_haptic"> Haptic band Pro</label>
+    <label class="check"><input type="checkbox" name="build_hub"> Listening hub (speech-to-text)</label>
+    <label class="check"><input type="checkbox" name="build_sign"> Sign-language screen (messages in sign language)</label>
+  </fieldset>
+  <div class="row2">
+    <label><span class="lbl">Join the group purchase?</span><select name="groupbuy"><option value="yes">Yes, reserve parts kits for me</option><option value="no">No, I'll buy the parts myself</option></select></label>
+    <label><span class="lbl">Number of kits</span><input type="number" name="qty" min="1" max="50" value="1"></label>
+  </div>
+  <label><span class="lbl">Experience</span><select name="experience"><option>First electronics project</option><option>I can solder and flash boards</option><option>Experienced maker</option></select></label>
   <label><span class="lbl">Anything else we should know?</span><textarea name="notes" rows="3"></textarea></label>
-  <label class="check"><input type="checkbox" name="consent" required> I agree that the central authority processes this data to supply my device and add-ons.</label>
+  <label class="check"><input type="checkbox" name="consent" required> I agree that the central authority processes this data to supply my node and add-ons, adjust or cancel my delivery and organise the group purchase.</label>
   <button class="btn primary" type="submit">Send registration</button>
   <div class="form-msg" aria-live="polite"></div>
 </form>
@@ -461,7 +460,7 @@ Central-European winter (≈ 1 sun-hour): use a 5–6 W panel and 2 cells ✓</d
   <li>Mount it as high as you can, panel facing south.</li>
   <li>Press the button. The screen shows <code>MESH · n nodes</code>.</li>
 </ol></div></details>
-<details class="qa"><summary>Do I need to solder?</summary><div><p><b>No.</b> Every node is delivered fully assembled. Soldering is only for people who choose to build their own; that's why the schematics and pinout are published. If you want to, tell us with the <a href="#/openhw#selfhost">self-build form</a> so the state doesn't send you one.</p></div></details>
+<details class="qa"><summary>Do I need to solder?</summary><div><p><b>No.</b> Every node is delivered fully assembled. Soldering is only for people who choose to build their own; that's why the schematics and pinout are published. If you want to, tell us with the <a href="#/form#build">self-build form</a> so the state doesn't send you one.</p></div></details>
 <details class="qa"><summary>I want to build my own. How do I assemble it, step by step?</summary><div>
 <ol>
   <li><b>Test on the bench first.</b> Plug the DevKitC into USB, flash the firmware (see <a href="#/build">Build</a>) and confirm the board boots before wiring anything else.</li>

@@ -134,6 +134,7 @@ export function mountDemo(root, S) {
     { id: 'mniszt', name: 'Mnisztwo', x: 800, y: 430, role: 'client', c: 'PL' },
     { id: 'markl', name: 'Marklowice', x: 660, y: 500, role: 'client', c: 'PL' },
     { id: 'ctr', name: N.roof, x: 370, y: 320, role: 'router', c: 'CZ' },
+    { id: 'most', name: 'Most Družby', x: 475, y: 220, role: 'router', c: 'CZ' },
     { id: 'nam', name: 'nám. ČSA', x: 400, y: 200, role: 'client', c: 'CZ' },
     { id: 'chot', name: 'Chotěbuz', x: 340, y: 100, role: 'client', c: 'CZ' },
     { id: 'svib', name: 'Svibice', x: 230, y: 160, role: 'client', c: 'CZ' },

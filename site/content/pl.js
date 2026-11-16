@@ -3,7 +3,7 @@ const DISCLAIMER = `<p><b>Zastrzeżenie:</b> to nieoficjalny, społecznościowy 
 export default {
   ui: {
     brand: 'Holdline',
-    nav: { home: 'Start', demo: 'Symulacja blackoutu', hardware: 'Sprzęt', build: 'Kompilacja', solar: 'Solar', lab: 'Laboratorium', openhw: 'Open hardware', access: 'Dostępność', faq: 'Pytania i odpowiedzi', verify: 'Weryfikacja', security: 'Bezpieczeństwo', releases: 'Wydania' },
+    nav: { home: 'Start', demo: 'Symulacja blackoutu', hardware: 'Sprzęt', build: 'Kompilacja', solar: 'Solar', lab: 'Laboratorium', openhw: 'Open hardware', access: 'Dostępność', form: 'Formularz', faq: 'Pytania i odpowiedzi', verify: 'Weryfikacja', security: 'Bezpieczeństwo', releases: 'Wydania' },
     up: 'sprawdź upstream',
     copy: 'KOPIUJ', copied: 'SKOPIOWANO',
     pinCols: ['Element', 'Sygnał', 'Pin ESP32-S3', 'Do czego służy'],
@@ -149,7 +149,7 @@ export default {
   <li><h3>Dalekie węzły idą pierwsze</h3><p>Czas oczekiwania zależy od siły sygnału: słaby sygnał oznacza, że węzeł jest daleko od nadawcy, więc czeka krócej. Dzięki temu wiadomość najszybciej rozchodzi się na zewnątrz.</p></li>
   <li><h3>Duplikaty są ignorowane</h3><p>Każdy pakiet ma ID. Węzeł, który już go widział, odrzuca kopie. Zwykły węzeł, który usłyszy sąsiada przekazującego pakiet przed swoją kolejką, milczy i oszczędza czas antenowy. Routery w wysokich punktach, tu Góra Zamkowa, przekazują zawsze.</p></li>
   <li><h3>Nadawca wie, że poszło</h3><p>Gdy centrum usłyszy swój pakiet przekazany dalej, traktuje to jako niejawne potwierdzenie.</p></li>
-  <li><h3>Tracisz węzeł, sieć zostaje</h3><p>Wyłącz na mapie router Góra Zamkowa i wyślij ponownie: węzeł Bulwary nad rzeką, który normalnie milczy, przenosi teraz alert do Czeskiego Cieszyna. Jeśli zamiast tego wyłączysz router Těšín roof, alert i tak dotrze do wszystkich czeskich domów, południową drogą przez Bulwary i Dolní Žukov.</p></li>
+  <li><h3>Tracisz węzeł, sieć zostaje</h3><p>Wyłącz na mapie router Góra Zamkowa i wyślij ponownie: węzeł Bulwary nad rzeką, który normalnie milczy, przenosi teraz alert do Czeskiego Cieszyna. Jeśli zamiast tego wyłączysz router Těšín roof, nawet razem z Górą Zamkową, alert i tak dotrze na nám. ČSA prosto przez rzekę dzięki routerowi Most Družby na moście, a na południe przez Bulwary i Dolní Žukov.</p></li>
   <li><h3>Każdy ekran w języku właściciela</h3><p>Każdy węzeł ma własny język ekranu: czeski, polski lub angielski. W symulacji najedź na węzeł i zmień go. Centrum kryzysowe pisze alert raz i wybiera, jak zostanie przetłumaczony: tylko oryginał, automatycznie na języki używane przez odbiorców albo na wszystkie języki. Tłumaczenie odbywa się w centrum przed wysłaniem, bo podczas blackoutu węzły nie mają internetu. Jeśli język węzła nie został wysłany, węzeł pokazuje oryginał. Więcej języków to więcej bajtów: powyżej 233 B alert dzieli się na kilka pakietów.</p></li>
 </ol>
 
@@ -245,7 +245,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 <p class="eyebrow">open hardware</p>
 <h1>Przychodzi złożony. Otwarty, więc możesz zbudować go sam.</h1>
 <p class="lede">Każde gospodarstwo domowe dostaje od państwa węzeł <b>całkowicie złożony, wgrany i przetestowany</b>. Nie musisz niczego lutować. Schematy, pinout i lista części są otwarte, aby każdy, kto chce, mógł zbudować, naprawić lub ulepszyć węzeł w domu.</p>
-<div class="toc"><a href="#/openhw#box">Co przychodzi</a><a href="#/openhw#paths">Trzy drogi do węzła</a><a href="#/openhw#pins">Który pin gdzie</a><a href="#/openhw#bom">Części i gdzie kupić</a><a href="#/openhw#connect">Podłączenie własnego węzła</a><a href="#/openhw#sign">Język migowy: części</a><a href="#/openhw#selfhost">Zbuduję sam: daj znać</a></div>
+<div class="toc"><a href="#/openhw#box">Co przychodzi</a><a href="#/openhw#paths">Trzy drogi do węzła</a><a href="#/openhw#pins">Który pin gdzie</a><a href="#/openhw#bom">Części i gdzie kupić</a><a href="#/openhw#connect">Podłączenie własnego węzła</a><a href="#/openhw#sign">Język migowy: części</a><a href="#/form#build">Zbuduję sam: daj znać</a></div>
 
 <h2 id="box">Co przychodzi w pudełku</h2>
 <div class="two">
@@ -268,7 +268,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 <h2 id="paths">Trzy drogi do węzła</h2>
 <div class="grid">
   <div class="card"><span class="num">A · DOMYŚLNIE</span><h3>Przychodzi złożony</h3><p>Nie musisz nic robić: każdy zarejestrowany adres dostaje złożony węzeł automatycznie. Lutowanie nigdy nie jest wymagane. Terminy dostaw publikujemy w <a href="#/faq#channel">kanale tylko do odczytu</a>.</p></div>
-  <a class="card" href="#/openhw#selfhost"><span class="num">B · OPCJONALNIE</span><h3>Zbuduj go sam</h3><p>Chcesz zlutować własny? Daj nam znać formularzem poniżej, żeby państwo nie wysyłało ci węzła. Zestawy części są we wspólnym zakupie. →</p></a>
+  <a class="card" href="#/form#build"><span class="num">B · OPCJONALNIE</span><h3>Zbuduj go sam</h3><p>Chcesz zlutować własny? Daj nam znać formularzem poniżej, żeby państwo nie wysyłało ci węzła. Zestawy części są we wspólnym zakupie. →</p></a>
   <a class="card" href="#/access"><span class="num">C</span><h3>Osoby głuche, niewidome, głuchoniewidome</h3><p>Przychodzi złożony z dodatkami, które ci pasują. Osoby głuchoniewidome dostają go osobiście, razem z konfiguracją. →</p></a>
 </div>
 
@@ -284,7 +284,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 <h2 id="sign">Ekran z językiem migowym: części i gdzie kupić</h2>
 <p>Dla osób Głuchych, których pierwszym językiem jest język migowy, hub potrafi pokazać wiadomości z mesh <b>w języku migowym</b>. Działa na tym samym <b>NVIDIA Jetson Orin Nano</b> co napisy na żywo, więc jeśli masz już hub nasłuchowy, dokładasz tylko ekran, akumulator i przycisk. System jest normalnie wyłączony; gdy przychodzi wiadomość, opaska wibruje i wiesz, że trzeba go włączyć. Jak to działa: <a href="#/access#sign">Dostępność → wiadomości w języku migowym</a>.</p>
 {{BOM_SIGN}}
-<p class="small">Zestawy części do ekranu z językiem migowym są we wspólnym zakupie: zaznacz <b>Ekran z językiem migowym</b> w <a href="#/openhw#selfhost">formularzu własnej budowy</a>. Złożony i skonfigurowany od państwa dostaniesz przez <a href="#/access#register">rejestrację dostępności</a>.</p>
+<p class="small">Zestawy części do ekranu z językiem migowym są we wspólnym zakupie: zaznacz <b>Ekran z językiem migowym</b> w <a href="#/form#build">formularzu własnej budowy</a>. Złożony i skonfigurowany od państwa dostaniesz przez <a href="#/form#adapted">rejestrację dostępności</a>.</p>
 
 <h2 id="connect">Podłączenie własnego węzła</h2>
 <p class="small">Dostarczone węzły są już skonfigurowane. Te kroki dotyczą tylko węzłów zbudowanych samodzielnie.</p>
@@ -295,42 +295,13 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 </ol>
 
 <h2 id="selfhost">Zbuduję sam: daj znać</h2>
-<p>Wypełnij tylko, jeśli chcesz zbudować własny. Wszyscy inni dostają złożony węzeł automatycznie i nie muszą nic robić. Dane trafiają prywatnie do centralnego organu i nigdy nie są publikowane.</p>
-<div class="card">
-<form class="f reg" data-kind="self-build / opt-out of assembled delivery">
-  <div class="row2">
-    <label><span class="lbl">Imię i nazwisko</span><input type="text" name="name" required autocomplete="name"></label>
-    <label><span class="lbl">E-mail</span><input type="email" name="email" required autocomplete="email"></label>
-  </div>
-  <div class="row2">
-    <label><span class="lbl">Kraj</span><select name="country"><option>Polska</option><option>Czechy</option><option>Słowacja</option><option>Inny</option></select></label>
-    <label><span class="lbl">Miasto / region</span><input type="text" name="region"></label>
-  </div>
-  <label><span class="lbl">Adres gospodarstwa (żeby dopasować twoją dostawę)</span><textarea name="address" rows="2" autocomplete="street-address" required></textarea></label>
-  <label><span class="lbl">Złożony węzeł od państwa</span><select name="delivery"><option>Nie wysyłajcie: zbuduję własny</option><option>Wyślijcie mimo to: buduję dodatkowy węzeł</option></select></label>
-  <fieldset><legend>Co zbudujesz?</legend>
-    <label class="check"><input type="checkbox" name="node" checked> Węzeł mesh (ESP32-S3 + E-Ink + solar)</label>
-    <label class="check"><input type="checkbox" name="braille"> Klawiatura brajlowska</label>
-    <label class="check"><input type="checkbox" name="haptic"> Opaska haptyczna Pro</label>
-    <label class="check"><input type="checkbox" name="hub"> Hub nasłuchowy (mowa na tekst)</label>
-    <label class="check"><input type="checkbox" name="sign"> Ekran z językiem migowym (wiadomości w języku migowym)</label>
-  </fieldset>
-  <div class="row2">
-    <label><span class="lbl">Dołączasz do wspólnego zakupu?</span><select name="groupbuy"><option value="yes">Tak, zarezerwujcie mi zestawy części</option><option value="no">Nie, kupię części sam</option></select></label>
-    <label><span class="lbl">Liczba zestawów</span><input type="number" name="qty" min="1" max="50" value="1"></label>
-  </div>
-  <label><span class="lbl">Doświadczenie</span><select name="experience"><option>Pierwszy projekt elektroniczny</option><option>Umiem lutować i wgrywać płytki</option><option>Doświadczony maker</option></select></label>
-  <label class="check"><input type="checkbox" name="consent" required> Zgadzam się, aby centralny organ przetwarzał te dane w celu anulowania lub zmiany mojej dostawy i organizacji wspólnego zakupu.</label>
-  <button class="btn primary" type="submit">Wyślij</button>
-  <div class="form-msg" aria-live="polite"></div>
-</form>
-</div>`,
+<p>Chcesz zbudować własny węzeł lub dodatki? Daj znać w <a href="#/form#build">formularzu rejestracyjnym</a>, żeby państwo nie wysyłało ci węzła i mogło zarezerwować dla ciebie zestawy części.</p>`,
 
     access: `
 <p class="eyebrow">dostępność</p>
 <h1>Wiadomości mesh dla osób głuchych, niewidomych i głuchoniewidomych</h1>
 <p class="lede">Każdy węzeł przychodzi złożony. Jeśli jesteś osobą głuchą, niewidomą lub głuchoniewidomą, państwo dostarcza go z dodatkami, które ci pasują, skonfigurowany i przetestowany. Osoby głuchoniewidome dostają go <b>osobiście</b> od instruktora, który komunikuje się tak jak one.</p>
-<div class="toc"><a href="#/access#who">Kto dostaje co</a><a href="#/access#deafblind">Jak to działa dla osób głuchoniewidomych</a><a href="#/access#build">Opaska haptyczna Pro: zbuduj sam</a><a href="#/access#sign">Wiadomości w języku migowym</a><a href="#/access#compute">Jaki komputer lub GPU</a><a href="#/access#register">Rejestracja</a></div>
+<div class="toc"><a href="#/access#who">Kto dostaje co</a><a href="#/access#deafblind">Jak to działa dla osób głuchoniewidomych</a><a href="#/access#build">Opaska haptyczna Pro: zbuduj sam</a><a href="#/access#sign">Wiadomości w języku migowym</a><a href="#/access#compute">Jaki komputer lub GPU</a><a href="#/form#adapted">Rejestracja</a></div>
 
 <h2 id="who">Kto dostaje co</h2>
 <div class="grid">
@@ -394,7 +365,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
       <li><b>Ostrzeżenia centralnego organu</b> (powódź, ewakuacja, schronienie, woda pitna, brak prądu, koniec zagrożenia…): nagrane wcześniej filmy, które tworzą Głusi rodzimi użytkownicy języka migowego razem z organizacjami Głuchych. Ostrzeżenie niesie kod szablonu; miejsce i czas są dodawane tekstem i alfabetem palcowym.</li>
       <li><b>Pozostałe wiadomości</b> zobaczysz jako duży, czytelny tekst. Maszynowe tłumaczenie dowolnego tekstu na język migowy nie jest jeszcze na tyle niezawodne, żeby używać go do ostrzeżeń.</li>
       <li>Bibliotekę filmów centralny organ aktualizuje <a href="#/verify">podpisanym wydaniem</a>, tak jak firmware.</li>
-      <li>Język wybierasz w <a href="#/access#register">rejestracji</a>.</li>
+      <li>Język wybierasz w <a href="#/form#adapted">rejestracji</a>.</li>
     </ul>
   </div>
 </div>
@@ -405,12 +376,20 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
 {{COMPUTE}}
 <p class="small">Wartości orientacyjne. Mowa na tekst: <a href="https://github.com/ggml-org/whisper.cpp" rel="noopener">whisper.cpp</a> lub <a href="https://github.com/SYSTRAN/faster-whisper" rel="noopener">faster-whisper</a>, oba open source i działają całkowicie offline. Hub potrzebuje zasilania z sieci lub dużej baterii; podczas blackoutu sama opaska nadal dostarcza wiadomości z mesh i alerty dźwiękowe.</p>
 
-<div class="callout"><p><b>Wolisz zbudować sam?</b> Użyj <a href="#/openhw#selfhost">formularza samodzielnej budowy</a>; zestawy części są we wspólnym zakupie.</p></div>
+<div class="callout"><p><b>Wolisz zbudować sam?</b> Użyj <a href="#/form#build">formularza samodzielnej budowy</a>; zestawy części są we wspólnym zakupie.</p></div>
 
 <h2 id="register">Formularz rejestracyjny</h2>
-<p>Dane trafiają prywatnie tylko do centralnego organu. Nigdy nie są publikowane ani pokazywane innym użytkownikom.</p>
+<p>O dostosowany węzeł z dodatkami poprosisz w <a href="#/form#adapted">formularzu rejestracyjnym</a>. Jest jeden na wszystko, a dane trafiają prywatnie tylko do centralnego organu.</p>`,
+
+    form: `
+<p class="eyebrow">rejestracja</p>
+<h1>Formularz rejestracyjny</h1>
+<p class="lede">Każde gospodarstwo domowe dostaje standardowy węzeł, złożony, bez wypełniania czegokolwiek. Wypełnij ten jeden formularz tylko wtedy, gdy z powodu niepełnosprawności potrzebujesz wersji dostosowanej albo chcesz zbudować węzeł sam. Dane trafiają prywatnie do centralnego organu i nigdy nie są publikowane.</p>
+<div class="callout" id="adapted"><p><b>Masz niepełnosprawność? Poproś o wersję dostosowaną.</b> Państwo dostarczy ci węzeł złożony, z potrzebnymi dodatkami już podłączonymi i skonfigurowanymi:</p>
+<ul><li>Klawiatura brajlowska</li><li>Opaska haptyczna Pro</li><li>Hub nasłuchowy (mowa na tekst)</li><li>Ekran z językiem migowym (wiadomości w języku migowym)</li><li>Oznaczenia dotykowe na obudowie i przyciskach, krótka instrukcja w brajlu lub jako audio</li></ul>
+<p class="small">Co robi każdy dodatek: <a href="#/access">Dostępność</a>.</p></div>
 <div class="card">
-<form class="f reg" data-kind="accessibility registration">
+<form class="f reg" data-kind="registration">
   <div class="row2">
     <label><span class="lbl">Imię i nazwisko</span><input type="text" name="name" required autocomplete="name"></label>
     <label><span class="lbl">Preferowany język</span><select name="lang"><option>Polski</option><option>Čeština</option><option>English</option></select></label>
@@ -419,7 +398,14 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
     <label><span class="lbl">E-mail</span><input type="email" name="email" autocomplete="email"></label>
     <label><span class="lbl">Telefon (do SMS)</span><input type="tel" name="phone" autocomplete="tel"></label>
   </div>
+  <div class="row2">
+    <label><span class="lbl">Kraj</span><select name="country"><option>Polska</option><option>Czechy</option><option>Słowacja</option><option>Inny</option></select></label>
+    <label><span class="lbl">Miasto / region</span><input type="text" name="region"></label>
+  </div>
+  <label><span class="lbl">Adres dostawy</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">Jak mamy się z tobą kontaktować?</span><select name="contact"><option>E-mail</option><option>SMS</option><option>Przez asystenta, tłumacza lub opiekuna</option><option>Przez moją organizację osób głuchych, niewidomych lub głuchoniewidomych</option><option>List w brajlu</option></select></label>
+  <label><span class="lbl">Czego potrzebujesz?</span><select name="request"><option>Wersja dostosowana: złożony węzeł z dodatkami (niepełnosprawność)</option><option>Nie wysyłajcie: zbuduję własny</option><option>Wyślijcie mimo to: buduję dodatkowy węzeł</option></select></label>
+  <h3 id="adapted-version">Wersja dostosowana: tylko przy niepełnosprawności</h3>
   <fieldset><legend>Jestem osobą</legend>
     <label class="check"><input type="checkbox" name="deaf"> Głuchą lub słabosłyszącą</label>
     <label class="check"><input type="checkbox" name="blind"> Niewidomą lub słabowidzącą</label>
@@ -428,8 +414,9 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
   <fieldset><legend>Potrzebuję dodatków</legend>
     <label class="check"><input type="checkbox" name="braille"> Klawiatura brajlowska</label>
     <label class="check"><input type="checkbox" name="haptic"> Opaska haptyczna Pro</label>
-    <label class="check"><input type="checkbox" name="hub"> Hub nasłuchowy (napisy na żywo)</label>
+    <label class="check"><input type="checkbox" name="hub"> Hub nasłuchowy (mowa na tekst)</label>
     <label class="check"><input type="checkbox" name="sign"> Ekran z językiem migowym (wiadomości w języku migowym)</label>
+    <label class="check"><input type="checkbox" name="tactile_marks"> Oznaczenia dotykowe i krótka instrukcja w brajlu lub jako audio</label>
   </fieldset>
   <div class="row2">
     <label><span class="lbl">Układ opaski</span><select name="band_layout"><option>Pierścień na nadgarstku (osoby głuche)</option><option>Komórka brajla na przedramieniu (osoby głuchoniewidome)</option><option>Nie wiem, ustalimy przy konfiguracji</option></select></label>
@@ -437,10 +424,22 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
   </div>
   <label><span class="lbl">Język migowy na ekranie</span><select name="sign_lang"><option>Nie dotyczy</option><option>Polski język migowy (PJM)</option><option>Czeski język migowy (ČZJ)</option><option>International Sign</option></select></label>
   <label><span class="lbl">Osoby głuchoniewidome: jak instruktor ma się z tobą komunikować?</span><select name="tactile"><option>Nie dotyczy</option><option>Dotykowy język migowy</option><option>Alfabet Lorma</option><option>Pisanie na dłoni</option><option>Brajl</option><option>Przez mojego tłumacza-przewodnika lub asystenta</option></select></label>
-  <label><span class="lbl">Adres dostawy</span><textarea name="address" rows="3" autocomplete="street-address" required></textarea></label>
   <label><span class="lbl">Asystent, tłumacz lub zaufana osoba (opcjonalnie)</span><input type="text" name="trusted"></label>
+  <h3 id="build">Zbuduję sam: tylko jeśli budujesz</h3>
+  <fieldset><legend>Co zbudujesz?</legend>
+    <label class="check"><input type="checkbox" name="build_node" checked> Węzeł mesh (ESP32-S3 + E-Ink + solar)</label>
+    <label class="check"><input type="checkbox" name="build_braille"> Klawiatura brajlowska</label>
+    <label class="check"><input type="checkbox" name="build_haptic"> Opaska haptyczna Pro</label>
+    <label class="check"><input type="checkbox" name="build_hub"> Hub nasłuchowy (mowa na tekst)</label>
+    <label class="check"><input type="checkbox" name="build_sign"> Ekran z językiem migowym (wiadomości w języku migowym)</label>
+  </fieldset>
+  <div class="row2">
+    <label><span class="lbl">Dołączasz do wspólnego zakupu?</span><select name="groupbuy"><option value="yes">Tak, zarezerwujcie mi zestawy części</option><option value="no">Nie, kupię części sam</option></select></label>
+    <label><span class="lbl">Liczba zestawów</span><input type="number" name="qty" min="1" max="50" value="1"></label>
+  </div>
+  <label><span class="lbl">Doświadczenie</span><select name="experience"><option>Pierwszy projekt elektroniczny</option><option>Umiem lutować i wgrywać płytki</option><option>Doświadczony maker</option></select></label>
   <label><span class="lbl">Coś jeszcze, o czym powinniśmy wiedzieć?</span><textarea name="notes" rows="3"></textarea></label>
-  <label class="check"><input type="checkbox" name="consent" required> Zgadzam się, aby centralny organ przetwarzał te dane w celu dostarczenia mi urządzenia i dodatków.</label>
+  <label class="check"><input type="checkbox" name="consent" required> Zgadzam się, aby centralny organ przetwarzał te dane w celu dostarczenia mi węzła i dodatków, zmiany lub anulowania mojej dostawy i organizacji wspólnego zakupu.</label>
   <button class="btn primary" type="submit">Wyślij rejestrację</button>
   <div class="form-msg" aria-live="polite"></div>
 </form>
@@ -461,7 +460,7 @@ Zima w Europie Środkowej (≈ 1 godzina słoneczna): panel 5–6 W i 2 ogniwa �
   <li>Zamontuj go jak najwyżej, panelem na południe.</li>
   <li>Naciśnij przycisk. Ekran pokaże <code>MESH · n nodes</code>.</li>
 </ol></div></details>
-<details class="qa"><summary>Czy muszę lutować?</summary><div><p><b>Nie.</b> Każdy węzeł przychodzi całkowicie złożony. Lutowanie jest tylko dla tych, którzy zdecydują się zbudować własny; dlatego schematy i pinout są publiczne. Jeśli chcesz, daj znać <a href="#/openhw#selfhost">formularzem samodzielnej budowy</a>, żeby państwo nie wysyłało ci węzła.</p></div></details>
+<details class="qa"><summary>Czy muszę lutować?</summary><div><p><b>Nie.</b> Każdy węzeł przychodzi całkowicie złożony. Lutowanie jest tylko dla tych, którzy zdecydują się zbudować własny; dlatego schematy i pinout są publiczne. Jeśli chcesz, daj znać <a href="#/form#build">formularzem samodzielnej budowy</a>, żeby państwo nie wysyłało ci węzła.</p></div></details>
 <details class="qa"><summary>Chcę zbudować własny. Jak go złożyć krok po kroku?</summary><div>
 <ol>
   <li><b>Najpierw test na biurku.</b> Podłącz DevKitC przez USB, wgraj firmware (zob. <a href="#/build">Kompilacja</a>) i sprawdź, czy płytka startuje, zanim cokolwiek podłączysz.</li>
