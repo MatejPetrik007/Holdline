@@ -144,12 +144,12 @@ export default {
 
 <h2>Jak se zpráva šíří</h2>
 <ol class="steps">
-  <li><h3>Centrum vysílá jednou</h3><p>Jeho střešní uzel odvysílá šifrovaný paket s hop limitem, výchozí je 3. Přijme ho každý uzel v dosahu, ve městě typicky 1–5 km, z kopce mnohem dál.</p></li>
+  <li><h3>Centrum vysílá jednou</h3><p>Jeho střešní uzel odvysílá šifrovaný paket s hop limitem, výchozí je 3. Přijme ho každý uzel v dosahu, ve městě typicky 1–5 km, z kopce mnohem dál: při přímé viditelnosti zvládly spoje Meshtasticu přes 300 km. Tady střešní anténa centra dosáhne přes řeku přímo na nám. ČSA, jedním hopem.</p></li>
   <li><h3>Každý uzel ho přepošle jednou</h3><p>Tomu se říká <i>řízený flooding</i>. Uzel, který přijme nový paket, chvíli počká a pak ho odvysílá dál s hop limitem sníženým o jedna. Na nule končí.</p></li>
   <li><h3>Vzdálené uzly jdou první</h3><p>Čekání závisí na síle signálu: slabý signál znamená, že uzel je od odesílatele daleko, takže čeká kratší dobu. Tím se zpráva šíří ven nejrychleji.</p></li>
   <li><h3>Duplikáty se zahazují</h3><p>Každý paket má ID. Uzel, který ho už viděl, kopie zahodí. Běžný uzel, který slyší souseda přeposlat paket dřív, než na něj přijde řada, mlčí a šetří vysílací čas. Routery na vyvýšených místech, tady Góra Zamkowa, přeposílají vždy.</p></li>
   <li><h3>Odesílatel ví, že zpráva odešla</h3><p>Když centrum uslyší svůj paket přeposlaný, bere to jako implicitní potvrzení.</p></li>
-  <li><h3>Ztratíš uzel, síť zůstane</h3><p>Vypni na mapě router Góra Zamkowa a odešli znovu: uzel Bulwary u řeky, který normálně mlčí, teď přenese varování do Českého Těšína. Když místo toho vypneš router Těšín roof, třeba i spolu s Górou Zamkowou, varování přesto dojde na nám. ČSA přímo přes řeku routerem na Mostě Družby a na jih přes Bulwary a Dolní Žukov.</p></li>
+  <li><h3>Ztratíš uzel, síť zůstane</h3><p>Vypni na mapě router a odešli znovu. I když vypadne Těšín roof i Góra Zamkowa, centrum dosáhne na nám. ČSA přímo a Dolní Žukov pošle varování dál na jih. Uzly daleko od centra závisí na sousedech, takže chybějící uzel může někoho odříznout: vyzkoušej si to.</p></li>
   <li><h3>Každý displej v jazyce svého majitele</h3><p>Každý uzel má vlastní jazyk displeje: češtinu, polštinu nebo angličtinu. V simulaci na uzel najeď a jazyk změň. Krizové centrum napíše varování jednou a zvolí, jak se přeloží: jen originál, automaticky do jazyků, které používají příjemci, nebo do všech jazyků. Překládá se v centru před odesláním, protože uzly při blackoutu nemají internet. Pokud jazyk uzlu odeslán nebyl, uzel ukáže originál. Víc jazyků znamená víc bajtů: nad 233 B se varování rozdělí do několika paketů.</p></li>
 </ol>
 

@@ -144,12 +144,12 @@ export default {
 
 <h2>Jak rozchodzi się wiadomość</h2>
 <ol class="steps">
-  <li><h3>Centrum nadaje raz</h3><p>Jego węzeł na dachu nadaje zaszyfrowany pakiet z hop limitem, domyślnie 3. Odbiera go każdy węzeł w zasięgu, w mieście zwykle 1–5 km, ze wzgórza dużo dalej.</p></li>
+  <li><h3>Centrum nadaje raz</h3><p>Jego węzeł na dachu nadaje zaszyfrowany pakiet z hop limitem, domyślnie 3. Odbiera go każdy węzeł w zasięgu, w mieście zwykle 1–5 km, ze wzgórza dużo dalej: przy bezpośredniej widoczności łącza Meshtastic sięgały ponad 300 km. Tutaj antena na dachu centrum sięga przez rzekę bezpośrednio do nám. ČSA, jednym hopem.</p></li>
   <li><h3>Każdy węzeł przekazuje go raz</h3><p>To <i>sterowany flooding</i>. Węzeł, który odbierze nowy pakiet, czeka chwilę, a potem nadaje go dalej z hop limitem zmniejszonym o jeden. Na zerze się zatrzymuje.</p></li>
   <li><h3>Dalekie węzły idą pierwsze</h3><p>Czas oczekiwania zależy od siły sygnału: słaby sygnał oznacza, że węzeł jest daleko od nadawcy, więc czeka krócej. Dzięki temu wiadomość najszybciej rozchodzi się na zewnątrz.</p></li>
   <li><h3>Duplikaty są ignorowane</h3><p>Każdy pakiet ma ID. Węzeł, który już go widział, odrzuca kopie. Zwykły węzeł, który usłyszy sąsiada przekazującego pakiet przed swoją kolejką, milczy i oszczędza czas antenowy. Routery w wysokich punktach, tu Góra Zamkowa, przekazują zawsze.</p></li>
   <li><h3>Nadawca wie, że poszło</h3><p>Gdy centrum usłyszy swój pakiet przekazany dalej, traktuje to jako niejawne potwierdzenie.</p></li>
-  <li><h3>Tracisz węzeł, sieć zostaje</h3><p>Wyłącz na mapie router Góra Zamkowa i wyślij ponownie: węzeł Bulwary nad rzeką, który normalnie milczy, przenosi teraz alert do Czeskiego Cieszyna. Jeśli zamiast tego wyłączysz router Těšín roof, nawet razem z Górą Zamkową, alert i tak dotrze na nám. ČSA prosto przez rzekę dzięki routerowi Most Družby na moście, a na południe przez Bulwary i Dolní Žukov.</p></li>
+  <li><h3>Tracisz węzeł, sieć zostaje</h3><p>Wyłącz na mapie router i wyślij ponownie. Nawet gdy padną Těšín roof i Góra Zamkowa, centrum i tak sięga bezpośrednio do nám. ČSA, a Dolní Žukov przekazuje alert dalej na południe. Węzły daleko od centrum zależą od sąsiadów, więc brak jednego węzła może kogoś odciąć: sprawdź to.</p></li>
   <li><h3>Każdy ekran w języku właściciela</h3><p>Każdy węzeł ma własny język ekranu: czeski, polski lub angielski. W symulacji najedź na węzeł i zmień go. Centrum kryzysowe pisze alert raz i wybiera, jak zostanie przetłumaczony: tylko oryginał, automatycznie na języki używane przez odbiorców albo na wszystkie języki. Tłumaczenie odbywa się w centrum przed wysłaniem, bo podczas blackoutu węzły nie mają internetu. Jeśli język węzła nie został wysłany, węzeł pokazuje oryginał. Więcej języków to więcej bajtów: powyżej 233 B alert dzieli się na kilka pakietów.</p></li>
 </ol>
 

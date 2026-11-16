@@ -121,7 +121,7 @@ export function mountDemo(root, S) {
   };
   const setPill = (k, cls, text) => { const p = K(k); p.className = 'sim-pill ' + cls; p.textContent = text; };
 
-  const RANGE = { hq: 150, router: 300, client: 160 };
+  const RANGE = { hq: 300, router: 300, client: 160 };
   const NODES = [
     { id: 'hq', name: N.hq, x: 600, y: 300, role: 'hq', c: 'PL' },
     { id: 'castle', name: 'Góra Zamkowa', x: 540, y: 250, role: 'router', c: 'PL' },
@@ -134,12 +134,11 @@ export function mountDemo(root, S) {
     { id: 'mniszt', name: 'Mnisztwo', x: 800, y: 430, role: 'client', c: 'PL' },
     { id: 'markl', name: 'Marklowice', x: 660, y: 500, role: 'client', c: 'PL' },
     { id: 'ctr', name: N.roof, x: 370, y: 320, role: 'router', c: 'CZ' },
-    { id: 'most', name: 'Most Družby', x: 475, y: 220, role: 'router', c: 'CZ' },
     { id: 'nam', name: 'nám. ČSA', x: 400, y: 200, role: 'client', c: 'CZ' },
     { id: 'chot', name: 'Chotěbuz', x: 340, y: 100, role: 'client', c: 'CZ' },
     { id: 'svib', name: 'Svibice', x: 230, y: 160, role: 'client', c: 'CZ' },
     { id: 'mosty', name: 'Mosty', x: 205, y: 420, role: 'client', c: 'CZ' },
-    { id: 'zukov', name: 'Dolní Žukov', x: 420, y: 450, role: 'client', c: 'CZ' },
+    { id: 'zukov', name: 'Dolní Žukov', x: 430, y: 440, role: 'client', c: 'CZ' },
     { id: 'stan', name: 'Stanislavice', x: 300, y: 470, role: 'client', c: 'CZ' },
     { id: 'konak', name: 'Koňákov', x: 170, y: 560, role: 'client', c: 'CZ' },
   ];

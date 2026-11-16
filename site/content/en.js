@@ -144,12 +144,12 @@ export default {
 
 <h2>How a message propagates</h2>
 <ol class="steps">
-  <li><h3>The centre transmits once</h3><p>Its rooftop node broadcasts the encrypted packet with a hop limit, 3 by default. Every node in radio range, typically 1–5 km in town and much further from a hill, receives it.</p></li>
+  <li><h3>The centre transmits once</h3><p>Its rooftop node broadcasts the encrypted packet with a hop limit, 3 by default. Every node in radio range, typically 1–5 km in town and much further from a hill: with clear line of sight, Meshtastic links have spanned over 300 km. Here the centre's rooftop antenna reaches nám. ČSA across the river directly, in one hop.</p></li>
   <li><h3>Each node relays it once</h3><p>This is <i>managed flooding</i>. A node that receives a new packet waits a short moment and then rebroadcasts it with the hop limit lowered by one. At zero, it stops.</p></li>
   <li><h3>Far nodes go first</h3><p>The wait depends on signal strength: a weak signal means the node is far from the sender, so it waits less. That pushes the message outward fastest.</p></li>
   <li><h3>Duplicates are ignored</h3><p>Every packet has an ID. A node that has already seen it drops copies. A regular node that hears a neighbour relay the packet before its own turn stays quiet, which saves airtime. Routers on high points, like Góra Zamkowa here, always relay.</p></li>
   <li><h3>The sender knows it got out</h3><p>When the centre hears its own packet relayed, it counts that as an implicit acknowledgement.</p></li>
-  <li><h3>Lose a node, keep the network</h3><p>Knock out the Góra Zamkowa router on the map and resend: the Bulwary node by the river, which normally stays quiet, now carries the alert across to Český Těšín. Switch off the Těšín roof router instead, even together with Góra Zamkowa: the alert still reaches nám. ČSA straight across the river through the router on Most Družby, and the south through Bulwary and Dolní Žukov.</p></li>
+  <li><h3>Lose a node, keep the network</h3><p>Knock out a router on the map and resend. Even with Těšín roof and Góra Zamkowa both down, the centre still reaches nám. ČSA directly, and Dolní Žukov carries the alert on to the south. Nodes far from the centre depend on their neighbours, so a missing node can still cut someone off: try it.</p></li>
   <li><h3>Every screen in its owner's language</h3><p>Each node has its own display language: Czech, Polish or English. Hover over a node in the simulation and change it. The crisis centre writes the alert once and chooses how it is translated: original only, automatically into the languages its recipients use, or into all languages. Translation happens at the centre before sending, because nodes have no internet in a blackout. If a language was not sent, the node shows the original. More languages mean more bytes: past 233 B the alert is split into several packets.</p></li>
 </ol>
 
