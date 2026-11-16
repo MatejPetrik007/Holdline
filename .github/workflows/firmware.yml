@@ -1,0 +1,98 @@
+name: Firmware
+
+# Tests the Holdline core on the host and builds the public firmware for every target
+# board. The SHA-256 of each image is published in the job summary, so that anyone can
+# rebuild a commit and compare (SPEC 7.1).
+on:
+  push:
+    paths:
+      - "firmware/**"
+      - "tools/hl/**"
+      - "tools/hl-vectors.mjs"
+      - "site/pubkey.json"
+      - ".github/workflows/firmware.yml"
+  pull_request:
+    paths:
+      - "firmware/**"
+      - "tools/hl/**"
+      - "tools/hl-vectors.mjs"
+      - ".github/workflows/firmware.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firmware-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core:
+    name: Core tests (host)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Test vectors are up to date
+        run: node tools/hl-vectors.mjs --check
+      - name: Fetch pinned dependencies
+        run: firmware/household/fetch-deps.sh build/deps
+      - name: Build with AddressSanitizer and UBSan
+        run: |
+          cmake -S firmware/household/core -B build/core -DHL_DEPS="$PWD/build/deps" -DHL_SANITIZE=ON
+          cmake --build build/core -j"$(nproc)"
+      - name: Run tests and flooding simulator
+        run: ctest --test-dir build/core --output-on-failure
+
+  build:
+    name: Build ${{ matrix.board }}
+    runs-on: ubuntu-24.04
+    needs: core
+    strategy:
+      fail-fast: false
+      matrix:
+        board:
+          - heltec-wireless-paper
+          - heltec-vision-master-e213
+          - heltec-vision-master-e290
+          - lilygo-t5-s3-epaper
+          - diy-s3-eink
+    env:
+      HOLDLINE_VERSION: ${{ startsWith(github.ref, 'refs/tags/firmware-v') && github.ref_name || '0.0.0-dev' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: pio-${{ matrix.board }}-${{ hashFiles('firmware/household/UPSTREAM') }}
+          restore-keys: pio-${{ matrix.board }}-
+      - name: Install PlatformIO
+        run: pip install platformio
+      - name: Version string
+        run: echo "HOLDLINE_VERSION=${HOLDLINE_VERSION#firmware-v}" >> "$GITHUB_ENV"
+      - name: Build
+        run: firmware/household/build.sh "${{ matrix.board }}"
+      - name: Publish hash
+        run: |
+          {
+            echo "### ${{ matrix.board }}"
+            echo '```'
+            cat "build/out/${{ matrix.board }}/build-info.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: holdline-${{ matrix.board }}
+          path: build/out/${{ matrix.board }}/
+          if-no-files-found: error

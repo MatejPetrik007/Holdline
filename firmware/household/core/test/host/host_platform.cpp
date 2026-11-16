@@ -7,7 +7,7 @@
 
 namespace hl
 {
-void randomBytes(uint8_t *out, size_t n)
+bool randomBytes(uint8_t *out, size_t n)
 {
     while (n) {
         ssize_t r = getrandom(out, n, 0);
@@ -16,6 +16,7 @@ void randomBytes(uint8_t *out, size_t n)
         out += r;
         n -= (size_t)r;
     }
+    return true;
 }
 } // namespace hl
 

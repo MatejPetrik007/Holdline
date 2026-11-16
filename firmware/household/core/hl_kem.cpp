@@ -9,8 +9,8 @@ bool kemBegin(KemState &st, const uint8_t *seed)
     uint8_t rnd[96];
     if (seed)
         memcpy(rnd, seed, sizeof(rnd));
-    else
-        randomBytes(rnd, sizeof(rnd));
+    else if (!randomBytes(rnd, sizeof(rnd)))
+        return false; // never fall back to weak randomness for a key
     bool ok = mlkem768Keypair(rnd, st.mlkem_pub, st.mlkem_sec);
     memcpy(st.x_sec, rnd + 64, 32);
     x25519Public(st.x_sec, st.x_pub);

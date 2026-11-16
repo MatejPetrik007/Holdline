@@ -25,8 +25,17 @@ enum class Ui : uint8_t {
     QuestionTooSoon, // "%u min"
     NotProvisioned,
     Language,
+    AskTitle,     // "Ask the authority"
+    AskHint,      // how to use the one button
+    Back,
     Count
 };
+
+// Predefined questions a household can send with the unit's one button (SPEC 5.5).
+// The category number travels encrypted with the text; 0 means free text.
+constexpr uint8_t kQuestionCategories = 5;
+const char *categoryLabel(uint8_t category, const char *lang); // short, for the list; category 1..5
+const char *categoryQuestion(uint8_t category, const char *lang);
 // `lang` is "cs", "pl" or "en"; anything else falls back to English.
 const char *uiText(Ui id, const char *lang);
 

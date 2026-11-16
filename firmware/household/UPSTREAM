@@ -1,0 +1,21 @@
+# Pinned upstream sources of the Holdline public firmware.
+# Read by fetch-deps.sh and apply-overlay.sh. Change a pin only together with a full
+# test run (host tests + CI build of every board) and a new signed release.
+
+# meshtastic/firmware: the base the overlay applies to.
+MESHTASTIC_REPO=https://github.com/meshtastic/firmware
+MESHTASTIC_TAG=v2.8.2.4c89b69
+MESHTASTIC_COMMIT=4c89b6937cc5073fc71fa825dfcca7c9f18becee
+
+# meshtastic/Crypto: Ed25519, X25519, AES-GCM. The firmware gets it through upstream's
+# own lib_deps at this same commit; the host tests check it out here.
+CRYPTO_REPO=https://github.com/meshtastic/Crypto
+CRYPTO_COMMIT=1c817c2f27aa4593e07d0f7e13b3dbf8d980bcae
+
+# pq-code-package: ML-DSA-65 (FIPS 204) verification and ML-KEM-768 (FIPS 203).
+MLDSA_REPO=https://github.com/pq-code-package/mldsa-native
+MLDSA_TAG=v2.0.0
+MLDSA_COMMIT=834a90d5e846ffa1e1611bd24e160bb2e9b86d35
+MLKEM_REPO=https://github.com/pq-code-package/mlkem-native
+MLKEM_TAG=v2.0.0
+MLKEM_COMMIT=d1b2fe782888bdb761a50336012923180be7f502

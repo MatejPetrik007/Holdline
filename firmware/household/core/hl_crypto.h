@@ -33,5 +33,6 @@ bool mlkem768Decaps(const uint8_t ct[kMlkemCtLen], const uint8_t sec[kMlkemSecLe
 
 // Cryptographically secure random bytes. Provided by the platform, not by the
 // crypto backend: the unit uses the ESP32 hardware RNG, the host tests getrandom().
-void randomBytes(uint8_t *out, size_t n);
+// False when no secure randomness is available; callers must then abort.
+bool randomBytes(uint8_t *out, size_t n);
 } // namespace hl

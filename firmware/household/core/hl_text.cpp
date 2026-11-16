@@ -24,6 +24,24 @@ static const char *const kUi[(size_t)Ui::Count][kUiLangs] = {
     {"Další dotaz za %u min", "Kolejne pytanie za %u min", "Next question in %u min"},
     {"Jednotka není aktivována", "Urządzenie nie jest aktywowane", "Unit is not activated"},
     {"Jazyk: čeština", "Język: polski", "Language: English"},
+    {"Dotaz krizovému štábu", "Pytanie do sztabu kryzysowego", "Ask the crisis centre"},
+    {"krátce: další · dlouze: odeslat", "krótko: dalej · długo: wyślij", "short: next · long: send"},
+    {"Zpět", "Wstecz", "Back"},
+};
+
+static const char *const kCatLabel[kQuestionCategories][kUiLangs] = {
+    {"Zdravotní pomoc", "Pomoc medyczna", "Medical help"},
+    {"Voda a jídlo", "Woda i żywność", "Water and food"},
+    {"Elektřina a teplo", "Prąd i ogrzewanie", "Power and heating"},
+    {"Evakuace a úkryt", "Ewakuacja i schronienie", "Evacuation and shelter"},
+    {"Jiný dotaz", "Inne pytanie", "Other question"},
+};
+static const char *const kCatQuestion[kQuestionCategories][kUiLangs] = {
+    {"Potřebuji zdravotní pomoc. Kam se mám obrátit?", "Potrzebuję pomocy medycznej. Gdzie mam się zgłosić?", "I need medical help. Where should I go?"},
+    {"Kde je pitná voda a jídlo?", "Gdzie jest woda pitna i żywność?", "Where can I get drinking water and food?"},
+    {"Kdy bude obnovena elektřina a kde se lze ohřát?", "Kiedy wróci prąd i gdzie można się ogrzać?", "When will power be back and where can I get warm?"},
+    {"Mám se evakuovat? Kde je úkryt?", "Czy mam się ewakuować? Gdzie jest schronienie?", "Should I evacuate? Where is the shelter?"},
+    {"Mám jiný dotaz. Kde dostanu informace?", "Mam inne pytanie. Gdzie uzyskam informacje?", "I have another question. Where can I get information?"},
 };
 
 static size_t langIndex(const char *lang)
@@ -35,6 +53,9 @@ static size_t langIndex(const char *lang)
 }
 
 const char *uiText(Ui id, const char *lang) { return kUi[(size_t)id][langIndex(lang)]; }
+
+const char *categoryLabel(uint8_t c, const char *lang) { return (c >= 1 && c <= kQuestionCategories) ? kCatLabel[c - 1][langIndex(lang)] : ""; }
+const char *categoryQuestion(uint8_t c, const char *lang) { return (c >= 1 && c <= kQuestionCategories) ? kCatQuestion[c - 1][langIndex(lang)] : ""; }
 
 const char *nextUiLang(const char *lang) { return kUiLangCodes[(langIndex(lang) + 1) % kUiLangs]; }
 
