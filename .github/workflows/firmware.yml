@@ -75,10 +75,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.platformio
-          key: pio-${{ matrix.board }}-${{ hashFiles('firmware/household/UPSTREAM') }}
+          key: pio-${{ matrix.board }}-${{ hashFiles('firmware/household/UPSTREAM', 'firmware/household/requirements-build.txt') }}
           restore-keys: pio-${{ matrix.board }}-
-      - name: Install PlatformIO
-        run: pip install platformio
+      - name: Install the pinned build tools
+        run: PIP_CONSTRAINT=firmware/household/constraints-build.txt pip install -r firmware/household/requirements-build.txt
       - name: Version string
         run: echo "HOLDLINE_VERSION=${HOLDLINE_VERSION#firmware-v}" >> "$GITHUB_ENV"
       - name: Build

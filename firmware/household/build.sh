@@ -10,7 +10,8 @@
 #
 # Real root keys are pinned when firmware/household/keys/roots.json exists; otherwise the
 # build pins the throwaway development root and is not deployable.
-# Needs: git, node >= 20, python3, PlatformIO (pip install platformio).
+# Needs: git, node >= 20, python3 and the pinned build tools:
+#   PIP_CONSTRAINT=firmware/household/constraints-build.txt pip install -r firmware/household/requirements-build.txt
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo="$(cd "$here/../.." && pwd)"
@@ -19,6 +20,10 @@ build="${2:-$repo/build/firmware}"
 export HOLDLINE_VERSION="${HOLDLINE_VERSION:-0.0.0-dev}"
 # Reproducible builds: the embedded build time is the time of the Holdline commit.
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "$repo" log -1 --format=%ct)}"
+# Keep the Python environment pioarduino creates for itself on the pinned core version.
+export PIP_CONSTRAINT="${PIP_CONSTRAINT:-$here/constraints-build.txt}"
+export UV_CONSTRAINT="${UV_CONSTRAINT:-$here/constraints-build.txt}"
+export PLATFORMIO_SETTING_ENABLE_TELEMETRY=0
 
 if [ -f "$here/keys/roots.json" ]; then
   "$here/apply-overlay.sh" "$build"

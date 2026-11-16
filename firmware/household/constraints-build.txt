@@ -1,0 +1,5 @@
+# pioarduino creates its own Python environment during the build and installs a core
+# there. These constraints (via PIP_CONSTRAINT / UV_CONSTRAINT) keep that one on the
+# pinned version too; without them it picks a newer build the platform then rejects.
+pioarduino==6.2.0
+platformio==6.2.0

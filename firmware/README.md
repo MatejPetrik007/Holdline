@@ -59,7 +59,11 @@ This runs about 390 checks against the test vectors (codec, signatures, bulletin
 
 ## Build the firmware
 
-Needs the above plus Python 3 and PlatformIO (`pip install platformio`).
+Needs the above plus Python 3 and the pinned build tools:
+
+```bash
+PIP_CONSTRAINT=firmware/household/constraints-build.txt pip install -r firmware/household/requirements-build.txt
+```
 
 ```bash
 firmware/household/build.sh heltec-wireless-paper

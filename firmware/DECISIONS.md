@@ -48,6 +48,6 @@
 
 - **Hardware tests.** Nothing here has run on a board. The core is tested on a host; the Meshtastic module is compiled in CI only.
 - **Secure Boot V2 and flash encryption.** Burning eFuses is irreversible and is listed as the authority's decision. See [`README.md`](README.md), "Production units".
-- **Reproducible builds across machines.** The inputs are pinned (upstream commit, dependency commits, `SOURCE_DATE_EPOCH`) and CI publishes the hash of every image. That two machines produce the same hash has not been demonstrated yet, and the PlatformIO core version is not pinned.
+- **Reproducible builds across machines.** The inputs are pinned (upstream commit, dependency commits, `SOURCE_DATE_EPOCH`) and CI publishes the hash of every image. The build tools are pinned too (`household/requirements-build.txt`). That two machines produce the same hash has not been demonstrated yet.
 - **Real root keys.** `household/keys/roots.json` does not exist; builds pin the throwaway root and say so at boot.
 - **KEYS re-broadcast schedule** is the authority's choice; the unit accepts a bulletin whenever it arrives.
