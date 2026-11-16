@@ -8,9 +8,9 @@ An open-hardware, solar-powered [Meshtastic](https://meshtastic.org) LoRa node f
 - **Blackout demo**: an interactive simulation of an alert failing over the cell network and reaching every node through the mesh (Cieszyn / Český Těšín).
 - **Or build it at home** with a parts list (with shop links), an interactive pin diagram, a pin-by-pin wiring guide and a DIY firmware variant ([`hardware/`](hardware/), [`variants/diy_s3_eink/`](variants/diy_s3_eink/)).
 - **Runs off-grid on solar**: a 2–6 W panel plus one 18650 cell.
-- **Accessibility add-ons** for deaf, blind and deafblind people: a Braille keyboard and the state-supplied haptic band Pro (with sound recognition and an optional speech-to-text hub), both open hardware; deafblind people get an in-person handover ([`hardware/addons/`](hardware/addons/)). There is a registration form for supplied units and a self-build form for people who opt out of the assembled delivery.
+- **Accessibility add-ons** for deaf, blind and deafblind people: a Braille keyboard and the state-supplied haptic band Pro (with sound recognition and an optional speech-to-text hub), both open hardware; deafblind people get an in-person handover ([`hardware/addons/`](hardware/addons/)). One registration form (Form tab) covers adapted units for people with disabilities and self-build / group purchase.
 - **Central-authority Q&A**: people ask only the central authority, never each other. Questions are auto-translated into EN / CS / PL and published with the official answer in a read-only channel.
-- **Lab**: type a message to see its bytes, time on air, link budget and LoRa chirps for every preset; size a solar setup per month and simulate two weeks of weather.
+- **Lab** (on the Solar tab): type a message to see its bytes, time on air, link budget and LoRa chirps for every preset; size a solar setup per month and simulate two weeks of weather.
 - **Verifiable firmware**: SHA-256 manifests signed with ML-DSA-65 (FIPS 204) + Ed25519, verified entirely in the browser.
 
 > Unofficial community project. Not affiliated with or endorsed by the Meshtastic project. LoRa use is regulated; check your local rules.
@@ -32,12 +32,13 @@ Ed25519    d64075b2f78d0b1c72f3ff26b1d099e05dbf814e0b1bd990900e30b6a521a64c
 | `site/channel.json` | Read-only Q&A channel data (written by the workflow) |
 | `site/releases.json`, `site/releases/` | Signed releases (currently one **demo** release of random bytes) |
 | `site/demo.js` | Blackout simulation (cell network vs. Meshtastic managed flooding) |
-| `site/lab.js` | Lab page: LoRa packet/airtime calculator, chirp visualiser, solar autonomy simulator |
+| `site/lab.js` | Lab (bottom of the Solar tab): LoRa packet/airtime calculator, chirp visualiser, solar autonomy simulator |
 | `site/extras.js` | Living E-Ink hero, ambient mesh canvas, ⌘K search palette, heading anchors, scroll reveal |
 | `site/vendor/noble.js` | Bundled ML-DSA + Ed25519 verifier (`npm run vendor`) |
 | `tools/sign.mjs` | Key generation and release signing |
 | `tools/channel.mjs` | Translates questions and answers with Claude and updates the channel |
 | `hardware/` | Open-hardware docs: parts list, wiring, accessibility add-ons |
+| `firmware/` | Public household-unit firmware: [build specification](firmware/SPEC.md), protocol, overlay (in progress) |
 | `variants/diy_s3_eink/` | Firmware variant for the DIY board (copy into `meshtastic/firmware/variants/`) |
 
 ## How the Q&A channel works
@@ -51,7 +52,7 @@ Ed25519    d64075b2f78d0b1c72f3ff26b1d099e05dbf814e0b1bd990900e30b6a521a64c
 
 ## Registrations
 
-Accessibility registrations and self-build / group-purchase sign-ups contain personal data, so they are **never** posted publicly. They are sent by e-mail to the address in `site/config.js` (`authorityEmail`). Until that is set, the forms show the filled-in data for the visitor to keep.
+Registrations from the Form tab (adapted units and self-build / group purchase) contain personal data, so they are **never** posted publicly. They are sent by e-mail to the address in `site/config.js` (`authorityEmail`). Until that is set, the forms show the filled-in data for the visitor to keep.
 
 ## Signing a release
 

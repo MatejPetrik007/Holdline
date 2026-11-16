@@ -56,5 +56,5 @@ Status: reference design. Band firmware and enclosure files will be published he
 
 ## Get one
 
-- **Supplied (default)**: register on the website (Accessibility → registration form). Delivered assembled and set up; in person for deafblind people.
-- **Self-build / group purchase**: Open hardware → self-build form.
+- **Supplied (default)**: register on the website (Form tab → adapted version). Delivered assembled and set up; in person for deafblind people.
+- **Self-build / group purchase**: Form tab → build it yourself.
