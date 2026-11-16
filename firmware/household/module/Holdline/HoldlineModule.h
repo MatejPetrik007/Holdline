@@ -2,8 +2,7 @@
 #pragma once
 #include "Holdline.h"
 #include "concurrency/OSThread.h"
-#include "core/hl_manifest.h"
-#include "core/hl_unit.h"
+#include "core/hl_local.h"
 #include "mesh/SinglePortModule.h"
 
 #ifndef HOLDLINE_VERSION
@@ -13,7 +12,7 @@
 #define HOLDLINE_BOARD "unknown"
 #endif
 
-class HoldlineModule : public SinglePortModule, private concurrency::OSThread, private hl::Listener
+class HoldlineModule : public SinglePortModule, private concurrency::OSThread, private hl::Listener, private hl::LocalHost
 {
   public:
     HoldlineModule();
@@ -27,7 +26,7 @@ class HoldlineModule : public SinglePortModule, private concurrency::OSThread, p
 
     // Ask a predefined (category 1..5) or free-text (category 0) question. Returns the
     // result and, when rate limited, the wait in seconds.
-    hl::Result ask(const char *text, uint8_t category, uint32_t &waitSeconds);
+    hl::Result ask(const char *text, uint8_t category, uint32_t &waitSeconds) override;
     bool cycleLanguage();
     void noteSrc(RxSource src) { currentSrc_ = src; }
     bool sendingOwnQuestion() const { return sendingQuestion_; }
@@ -44,10 +43,22 @@ class HoldlineModule : public SinglePortModule, private concurrency::OSThread, p
     void onFaq(uint32_t faq_id, uint32_t question_id) override;
     void onKeysUpdated(uint32_t root_id, uint32_t serial) override;
 
+    // hl::LocalHost
+    uint32_t nodeNumber() override;
+    const char *version() override;
+    const char *board() override;
+    bool devKeys() override;
+    hl::Version firmwareFloor() override;
+    void configChanged() override;
+    void restartSoon() override;
+    void languageChanged() override;
+    hl::Result updateBegin(hl::Bytes manifest, hl::Bytes signature) override;
+    hl::Result updateWrite(hl::Bytes chunk) override;
+    hl::Result updateFinish() override;
+
     void applyLockedConfig();
     void sendPendingQuestion();
     void handleLocal(const meshtastic_MeshPacket &mp);
-    void reply(uint8_t op, hl::Result status, uint16_t seq, uint16_t total, const uint8_t *data, size_t n);
     void announceAlert();
 
     hl::Unit *unit_ = nullptr;
@@ -59,12 +70,7 @@ class HoldlineModule : public SinglePortModule, private concurrency::OSThread, p
     bool rebootPending_ = false;
     uint32_t rebootAt_ = 0;
 
-    // Local link (USB / paired phone): one upload buffer and one download buffer.
-    uint8_t *upload_ = nullptr;
-    size_t uploadLen_ = 0, uploadCap_ = 0;
-    uint16_t uploadNext_ = 0;
-    uint8_t *download_ = nullptr;
-    size_t downloadLen_ = 0;
+    hl::LocalLink *link_ = nullptr; // USB / paired phone
 };
 
 extern HoldlineModule *holdlineModule;

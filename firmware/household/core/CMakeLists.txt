@@ -22,7 +22,7 @@ set(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../..")
 set(CRYPTO "${HL_DEPS}/Crypto")
 
 add_library(holdline_core STATIC
-  hl_codec.cpp hl_kem.cpp hl_manifest.cpp hl_question.cpp hl_reasm.cpp hl_relay.cpp
+  hl_codec.cpp hl_kem.cpp hl_local.cpp hl_manifest.cpp hl_question.cpp hl_reasm.cpp hl_relay.cpp
   hl_sha256.cpp hl_text.cpp hl_trust.cpp hl_unit.cpp
   backend/hl_crypto_meshtastic.cpp backend/hl_mldsa.c backend/hl_mlkem.c
   # The same Crypto library sources the firmware links, built for the host.
@@ -50,6 +50,9 @@ set(VECTORS "${REPO_ROOT}/firmware/protocol/test-vectors/vectors.txt")
 add_executable(test_core test/test_core.cpp)
 target_link_libraries(test_core holdline_core Threads::Threads)
 add_test(NAME core COMMAND test_core ${VECTORS} ${REPO_ROOT})
+# A unit on stdin/stdout, for testing authority tooling without hardware (test/hl_unit_sim.cpp).
+add_executable(hl_unit_sim test/hl_unit_sim.cpp)
+target_link_libraries(hl_unit_sim holdline_core Threads::Threads)
 add_executable(test_sim test/test_sim.cpp)
 target_link_libraries(test_sim holdline_core Threads::Threads)
 add_test(NAME flooding_simulator COMMAND test_sim ${VECTORS} ${REPO_ROOT})

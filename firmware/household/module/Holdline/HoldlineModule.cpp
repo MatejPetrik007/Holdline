@@ -7,7 +7,6 @@
 // NOT YET TESTED ON HARDWARE.
 #include "HoldlineModule.h"
 #include "HoldlineApplets.h"
-#include "HoldlineLocal.h"
 #include "HoldlinePinnedKeys.h"
 #include "MeshService.h"
 #include "NodeDB.h"
@@ -23,7 +22,6 @@ namespace
 {
 const meshtastic_PortNum kPort = (meshtastic_PortNum)hl::kPortNum;
 constexpr uint8_t kHopLimit = 3; // SPEC 5.3: standard hop-limit handling; the authority's default
-constexpr size_t kUploadMax = 24 * 1024;
 
 inline hl::Bytes payloadOf(const meshtastic_MeshPacket &p) { return hl::Bytes(p.decoded.payload.bytes, p.decoded.payload.size); }
 inline bool isDecoded(const meshtastic_MeshPacket *p) { return p->which_payload_variant == meshtastic_MeshPacket_decoded_tag; }
@@ -124,6 +122,7 @@ HoldlineModule::HoldlineModule() : SinglePortModule("holdline", kPort), concurre
 {
     unit_ = new hl::Unit(holdline::storage(), holdline::platform(), *this);
     unit_->begin(holdline_pinned::kRoots, holdline_pinned::kRootCount);
+    link_ = new hl::LocalLink(*unit_, *this);
     LOG_INFO("Holdline %s on %s: %s, unit %08x, %u root(s), %u operational key(s)%s", HOLDLINE_VERSION, HOLDLINE_BOARD,
              unit_->provisioned() ? "provisioned" : "NOT PROVISIONED", (unsigned)unit_->unitId(), (unsigned)unit_->trust().rootCount(),
              (unsigned)unit_->trust().keyCount(), holdline_pinned::kDevKeys ? " [DEVELOPMENT KEYS - NOT FOR DEPLOYMENT]" : "");
@@ -226,7 +225,7 @@ void HoldlineModule::applyLockedConfig()
 ProcessMessage HoldlineModule::handleReceived(const meshtastic_MeshPacket &mp)
 {
     hl::Bytes payload = payloadOf(mp);
-    if (payload.size && payload.data[0] == holdline::kLocalMagic) {
+    if (payload.size && payload.data[0] == hl::kLocalMagic) {
         // Local link frames are accepted from the USB / phone API only, never from the radio.
         if (currentSrc_ == RX_SRC_USER && isToUs(&mp))
             handleLocal(mp);
@@ -291,13 +290,14 @@ hl::Result HoldlineModule::ask(const char *text, uint8_t category, uint32_t &wai
     uint32_t qid = 0;
     hl::Result r = unit_->ask(hl::Str{text, strlen(text)}, category, holdline::batteryPercent(), qid, waitSeconds);
     uiGeneration_++;
+    holdlineUiChanged(0);
     return r;
 }
 
 bool HoldlineModule::cycleLanguage()
 {
     bool ok = unit_->setLanguage(hl::nextUiLang(unit_->language()));
-    uiGeneration_++;
+    languageChanged();
     return ok;
 }
 
@@ -368,181 +368,40 @@ void HoldlineModule::onKeysUpdated(uint32_t root_id, uint32_t serial)
     uiGeneration_++;
 }
 
-// ------------------------------------------------------------------ local link (firmware/protocol/README.md, "Local link")
-void HoldlineModule::reply(uint8_t op, hl::Result status, uint16_t seq, uint16_t total, const uint8_t *data, size_t n)
+// ------------------------------------------------------------------ local link (core/hl_local.h)
+void HoldlineModule::handleLocal(const meshtastic_MeshPacket &mp)
 {
     meshtastic_MeshPacket *p = allocDataPacket();
     if (!p)
         return;
+    size_t n = link_->handle(payloadOf(mp), p->decoded.payload.bytes);
+    if (n == 0) {
+        packetPool.release(p);
+        return;
+    }
     p->from = nodeDB->getNodeNum();
     p->to = nodeDB->getNodeNum();
-    uint8_t *b = p->decoded.payload.bytes;
-    b[0] = holdline::kLocalMagic;
-    b[1] = (uint8_t)(op | 0x80);
-    b[2] = (uint8_t)status;
-    hl::wr16(b + 3, seq);
-    hl::wr16(b + 5, total);
-    if (n > holdline::kLocalReplyData)
-        n = holdline::kLocalReplyData;
-    if (n)
-        memcpy(b + 7, data, n);
-    p->decoded.payload.size = (pb_size_t)(7 + n);
+    p->decoded.payload.size = (pb_size_t)n;
     service->sendToPhone(p);
 }
 
-void HoldlineModule::handleLocal(const meshtastic_MeshPacket &mp)
+// hl::LocalHost
+uint32_t HoldlineModule::nodeNumber() { return nodeDB->getNodeNum(); }
+const char *HoldlineModule::version() { return HOLDLINE_VERSION; }
+const char *HoldlineModule::board() { return HOLDLINE_BOARD; }
+bool HoldlineModule::devKeys() { return holdline_pinned::kDevKeys; }
+hl::Version HoldlineModule::firmwareFloor() { return holdline::firmwareFloor(); }
+void HoldlineModule::configChanged() { applyLockedConfig(); }
+void HoldlineModule::restartSoon()
 {
-    using namespace holdline;
-    hl::Bytes in = payloadOf(mp);
-    if (in.size < kLocalHeader)
-        return;
-    const uint8_t op = in.data[1];
-    const uint16_t seq = hl::rd16(in.data + 2), total = hl::rd16(in.data + 4);
-    hl::Bytes data = in.from(kLocalHeader);
-    hl::Result r = hl::Result::Unsupported;
-    uint8_t out[kLocalReplyData];
-    size_t outLen = 0;
-    uint16_t outTotal = 0;
-    hl::Bytes up(upload_, uploadLen_);
-
-    switch (op) {
-    case kOpHello: {
-        out[0] = (uint8_t)((unit_->provisioned() ? 1 : 0) | (unit_->hasUnitKey() ? 2 : 0) | (unit_->isRouter() ? 8 : 0) | (holdline_pinned::kDevKeys ? 0x80 : 0));
-        hl::RadioConfig rc;
-        if (unit_->radioConfig(rc))
-            out[0] |= 4;
-        hl::wr32(out + 1, unit_->unitId());
-        hl::Version v;
-        hl::parseVersion(HOLDLINE_VERSION, strlen(HOLDLINE_VERSION), v);
-        hl::wr32(out + 5, hl::packVersion(v));
-        memcpy(out + 9, unit_->language(), 2);
-        hl::wr32(out + 11, nodeDB->getNodeNum());
-        hl::wr32(out + 15, hl::packVersion(holdline::firmwareFloor()));
-        size_t bl = strlen(HOLDLINE_BOARD);
-        memcpy(out + 19, HOLDLINE_BOARD, bl);
-        outLen = 19 + bl;
-        r = hl::Result::Ok;
-        break;
-    }
-    case kOpKemBegin:
-        r = unit_->kemBegin();
-        if (r == hl::Result::Ok) {
-            delete[] download_;
-            downloadLen_ = hl::kMlkemPubLen + 32;
-            download_ = new (std::nothrow) uint8_t[downloadLen_];
-            if (!download_) {
-                r = hl::Result::Internal;
-                break;
-            }
-            memcpy(download_, unit_->kem().mlkem_pub, hl::kMlkemPubLen);
-            memcpy(download_ + hl::kMlkemPubLen, unit_->kem().x_pub, 32);
-            outTotal = (uint16_t)((downloadLen_ + kLocalReplyData - 1) / kLocalReplyData);
-        }
-        break;
-    case kOpRead: {
-        size_t off = (size_t)seq * kLocalReplyData;
-        if (!download_ || off >= downloadLen_) {
-            r = hl::Result::Malformed;
-            break;
-        }
-        outLen = downloadLen_ - off > kLocalReplyData ? kLocalReplyData : downloadLen_ - off;
-        memcpy(out, download_ + off, outLen);
-        outTotal = (uint16_t)((downloadLen_ + kLocalReplyData - 1) / kLocalReplyData);
-        r = hl::Result::Ok;
-        break;
-    }
-    case kOpWrite:
-        if (seq == 0) {
-            delete[] upload_;
-            upload_ = nullptr;
-            uploadLen_ = 0;
-            uploadNext_ = 0;
-            uploadCap_ = (size_t)total * kLocalData;
-            if (total == 0 || uploadCap_ > kUploadMax) {
-                r = hl::Result::TooLarge;
-                break;
-            }
-            upload_ = new (std::nothrow) uint8_t[uploadCap_];
-        }
-        if (!upload_ || seq != uploadNext_ || uploadLen_ + data.size > uploadCap_) {
-            r = hl::Result::Malformed;
-            break;
-        }
-        memcpy(upload_ + uploadLen_, data.data, data.size);
-        uploadLen_ += data.size;
-        uploadNext_++;
-        r = hl::Result::Ok;
-        break;
-    case kOpKemFinish:
-        if (up.size != hl::kMlkemCtLen + 32 + 4) {
-            r = hl::Result::Malformed;
-            break;
-        }
-        r = unit_->kemFinish(up.data, up.data + hl::kMlkemCtLen, hl::rd32(up.data + hl::kMlkemCtLen + 32), out);
-        if (r == hl::Result::Ok)
-            outLen = hl::kKeyConfirmLen;
-        break;
-    case kOpBundle:
-        r = unit_->installBundle(up);
-        if (r == hl::Result::Ok)
-            applyLockedConfig();
-        break;
-    case kOpSealed:
-        r = unit_->onSealed(up);
-        break;
-    case kOpSetLang:
-        if (data.size == 2) {
-            char lang[3] = {(char)data.data[0], (char)data.data[1], 0};
-            r = unit_->setLanguage(lang) ? hl::Result::Ok : hl::Result::Malformed;
-            uiGeneration_++;
-        } else
-            r = hl::Result::Malformed;
-        break;
-    case kOpLock:
-        r = unit_->lock();
-        if (r == hl::Result::Ok) {
-            applyLockedConfig();
-            rebootPending_ = true; // the new channel and role take effect after a restart
-            rebootAt_ = holdline::platform().uptimeSeconds() + 3;
-        }
-        break;
-    case kOpAsk:
-        if (data.size >= 2 && data.size <= 1 + hl::kQuestionTextMax) {
-            char text[hl::kQuestionTextMax + 1];
-            memcpy(text, data.data + 1, data.size - 1);
-            text[data.size - 1] = 0;
-            uint32_t wait = 0;
-            r = ask(text, data.data[0], wait);
-            hl::wr32(out, wait);
-            outLen = 4;
-        } else
-            r = hl::Result::Malformed;
-        break;
-    case kOpUpdateBegin:
-        if (data.size == 4 && hl::rd32(data.data) < up.size)
-            r = holdline::updateBegin(hl::Bytes(up.data, hl::rd32(data.data)), up.from(hl::rd32(data.data)));
-        else
-            r = hl::Result::Malformed;
-        break;
-    case kOpUpdateData:
-        r = holdline::updateWrite(data);
-        break;
-    case kOpUpdateEnd:
-        r = holdline::updateFinish();
-        if (r == hl::Result::Ok) {
-            rebootPending_ = true;
-            rebootAt_ = holdline::platform().uptimeSeconds() + 3;
-        }
-        break;
-    default:
-        break;
-    }
-    if (op != kOpWrite && op != kOpRead && op != kOpUpdateData && op != kOpHello)
-        LOG_INFO("Holdline local op %02x: %s", op, hl::resultName(r));
-    if (op == kOpKemFinish || op == kOpBundle || op == kOpSealed || op == kOpUpdateBegin) { // the upload is consumed
-        delete[] upload_;
-        upload_ = nullptr;
-        uploadLen_ = 0;
-    }
-    reply(op, r, seq, outTotal, out, outLen);
+    rebootPending_ = true;
+    rebootAt_ = holdline::platform().uptimeSeconds() + 3;
 }
+void HoldlineModule::languageChanged()
+{
+    uiGeneration_++;
+    holdlineUiChanged(0);
+}
+hl::Result HoldlineModule::updateBegin(hl::Bytes manifest, hl::Bytes signature) { return holdline::updateBegin(manifest, signature); }
+hl::Result HoldlineModule::updateWrite(hl::Bytes chunk) { return holdline::updateWrite(chunk); }
+hl::Result HoldlineModule::updateFinish() { return holdline::updateFinish(); }
