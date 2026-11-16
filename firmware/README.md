@@ -69,19 +69,19 @@ PIP_CONSTRAINT=firmware/household/constraints-build.txt pip install -r firmware/
 firmware/household/build.sh heltec-wireless-paper
 ```
 
-Boards: `heltec-wireless-paper` (reference), `heltec-vision-master-e213`, `heltec-vision-master-e290`, `lilygo-t5-s3-epaper`, `diy-s3-eink`. The script checks out upstream Meshtastic at the commit pinned in [`household/UPSTREAM`](household/UPSTREAM), applies the overlay, builds, and prints the SHA-256 of `build/out/<board>/firmware.bin`. CI does the same for every push and shows the hashes in the run summary.
+Boards: `heltec-wireless-paper` (reference), `heltec-vision-master-e213`, `heltec-vision-master-e290`, `lilygo-t5-s3-epaper`, `diy-s3-eink`. The script checks out upstream Meshtastic at the commit pinned in [`household/UPSTREAM`](household/UPSTREAM), applies the overlay, builds, and prints the SHA-256 of `build/out/<board>/firmware.bin` (the image a release signs). CI does the same for every push and shows the hashes in the run summary.
 
 Without `household/keys/roots.json` the build pins the **throwaway development root** from the test vectors. Such a unit logs `DEVELOPMENT KEYS - NOT FOR DEPLOYMENT` at boot and must not be handed out: anyone can sign alerts for it. See [`household/keys/README.md`](household/keys/README.md).
 
 ## Flash
 
-A unit that is not provisioned yet is flashed like any Meshtastic ESP32-S3 board, with the merged image PlatformIO produces:
+`build/out/<board>/firmware.factory.bin` is the complete image for a unit that is not provisioned yet (bootloader, partition table, application). Write it at offset 0:
 
 ```bash
-cd build/firmware && pio run -e holdline-heltec-wireless-paper -t upload
+esptool.py --chip esp32s3 write_flash 0x0 build/out/heltec-wireless-paper/firmware.factory.bin
 ```
 
-A provisioned unit takes updates only through the signed update path of the local link ([`protocol/README.md`](protocol/README.md), section 5): the manifest and both signatures are verified, then the board, the version (no rollback, no reinstall) and finally the SHA-256 of the image as written.
+`firmware.bin` is the application alone. It is what a release manifest signs and what a provisioned unit takes through the signed update path of the local link ([`protocol/README.md`](protocol/README.md), section 5): the manifest and both signatures are verified, then the board, the version (no rollback, no reinstall) and finally the SHA-256 of the image as written.
 
 ## Verify a release
 

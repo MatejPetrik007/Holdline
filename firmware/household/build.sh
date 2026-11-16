@@ -36,7 +36,12 @@ fi
 
 out="$repo/build/out/$board"
 mkdir -p "$out"
-cp "$build/.pio/build/holdline-$board/firmware.bin" "$out/firmware.bin"
+# Upstream names the images firmware-<env>-<upstream version>.bin (application, what a signed
+# update carries) and ...factory.bin (bootloader + partitions + application, for a first flash).
+bdir="$build/.pio/build/holdline-$board"
+app="$(ls "$bdir"/firmware-holdline-"$board"-*.bin | grep -v '\.factory\.bin$' | head -1)"
+cp "$app" "$out/firmware.bin"
+cp "${app%.bin}.factory.bin" "$out/firmware.factory.bin"
 # shellcheck disable=SC1091
 source "$here/UPSTREAM"
 sha="$(sha256sum "$out/firmware.bin" | cut -d' ' -f1)"
@@ -49,5 +54,6 @@ source_date_epoch=$SOURCE_DATE_EPOCH
 platformio=$(pio --version)
 size=$(stat -c %s "$out/firmware.bin")
 sha256=$sha
+factory_sha256=$(sha256sum "$out/firmware.factory.bin" | cut -d' ' -f1)
 INFO
 cat "$out/build-info.txt"
