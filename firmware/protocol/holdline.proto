@@ -1,0 +1,163 @@
+// Holdline application protocol, version 1.
+//
+// Shared by the public household firmware and the authority firmware.
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Read firmware/protocol/README.md for the full wire format. In short:
+//
+//   * Every Holdline radio packet is the payload of one Meshtastic data packet
+//     on port HOLDLINE_PORTNUM (300). It starts with a fixed 14-byte binary
+//     header (not protobuf, so that a relay can classify a packet from its
+//     first bytes) followed by a chunk of at most 219 bytes.
+//   * The chunks of all parts, concatenated, are the "message".
+//       ALERT / FAQ / CANCEL:  message = body || ed25519_signature(64)
+//       KEYS / BUNDLE:         message = body || ed25519_signature(64) || mldsa65_signature(3309)
+//       QUESTION:              message = aes256gcm_ciphertext || tag(12)   (single part, see README)
+//   * "body" is one of the protobuf messages below, in proto3 wire encoding.
+//     Signatures cover the exact body bytes that were sent, so a verifier never
+//     has to re-encode. Unknown fields must be skipped.
+//
+// All timestamps are seconds since the Unix epoch, UTC.
+syntax = "proto3";
+
+package holdline.v1;
+
+// Packet types (header byte 1). Not a protobuf field; listed here so that
+// every implementation generates the same constants.
+enum PacketType {
+  PACKET_TYPE_UNSPECIFIED = 0;
+  ALERT = 1;
+  FAQ = 2;
+  QUESTION = 3;
+  CANCEL = 4;
+  KEYS = 5;
+  // Provisioning bundle. Root-signed like KEYS. Delivered over the wired
+  // provisioning link only; a unit never relays or accepts it from the radio.
+  BUNDLE = 6;
+}
+
+enum Severity {
+  SEVERITY_UNSPECIFIED = 0;
+  INFO = 1;
+  WARNING = 2;
+  DANGER = 3;
+}
+
+// One language version of a text. `lang` is a lower-case ISO 639-1 code
+// ("cs", "pl", "en"). New languages need no protocol change.
+message LangText {
+  string lang = 1;
+  string text = 2;
+}
+
+// Type ALERT. Signed by an operational alert key.
+message Alert {
+  Severity severity = 1;
+  fixed32 issued_at = 2;
+  fixed32 expires_at = 3;
+  // Selects a pre-recorded sign-language clip on the sign-language screen.
+  // 0 = none. Values fit in 16 bits.
+  uint32 template_code = 4;
+  // Language the operator wrote the alert in. Must be one of `texts`.
+  string original_lang = 5;
+  // 1 to 3 entries. The crisis centre chooses which languages are sent.
+  repeated LangText texts = 6;
+}
+
+message FaqEntry {
+  string lang = 1;
+  string question = 2;
+  string answer = 3;
+}
+
+// Type FAQ. Signed by an operational alert key.
+message Faq {
+  // Authority-wide identifier. Re-publishing the same faq_id with a newer
+  // published_at replaces the stored entry.
+  uint32 faq_id = 1;
+  // 0 = answers nobody in particular. Otherwise the 32-bit reference of the
+  // question this entry answers, which only the asking unit and the authority
+  // can compute (README, "Question reference"). It does not reveal the unit.
+  fixed32 answers_question_ref = 2;
+  fixed32 published_at = 3;
+  repeated FaqEntry entries = 4;
+}
+
+// Type CANCEL. Signed by the same operational key as the alert it cancels.
+message Cancel {
+  fixed32 cancels_msg_id = 1;
+  fixed32 issued_at = 2;
+}
+
+// Signature algorithm of an operational key. Reserved so that a compact
+// post-quantum signature can replace Ed25519 without a protocol version bump.
+enum KeyAlg {
+  KEY_ALG_UNSPECIFIED = 0;
+  ED25519 = 1;
+}
+
+message KeyEntry {
+  // Matches `key_id` in the packet header. Never 0.
+  uint32 key_id = 1;
+  // Matches `epoch` in the packet header.
+  uint32 epoch = 2;
+  fixed32 valid_from = 3;
+  fixed32 valid_to = 4;
+  KeyAlg alg = 5;
+  bytes public_key = 6;
+  // Region codes this key may alert, e.g. "CZ-0803", "PL-2403". Empty = any.
+  repeated string scope = 7;
+  // Meshtastic node numbers of this crisis centre's radios. Units accept
+  // QUESTION packets for relay, and send their own questions, only to these.
+  repeated fixed32 node_ids = 8;
+}
+
+// Type KEYS: the key bulletin. Signed by a root key with Ed25519 AND ML-DSA-65.
+// A unit keeps one bulletin per root and replaces it only with a higher serial.
+// Leaving a key out of a new bulletin revokes it.
+message Keys {
+  // Which pinned root signed this bulletin. Equals `key_id` in the header.
+  uint32 root_id = 1;
+  // Monotonic per root. Equals `epoch` in the header.
+  uint32 serial = 2;
+  fixed32 issued_at = 3;
+  repeated KeyEntry keys = 4;
+}
+
+message RootKey {
+  uint32 root_id = 1;
+  bytes ed25519 = 2;  // 32 bytes
+  bytes mldsa65 = 3;  // 1952 bytes
+}
+
+enum UnitRole {
+  HOUSEHOLD = 0;
+  // Authority relay router: always rebroadcasts permitted packets, has no
+  // screen UI and accepts no questions locally.
+  ROUTER = 1;
+}
+
+// Type BUNDLE: the provisioning bundle. Signed by a root pinned in the
+// firmware, with Ed25519 AND ML-DSA-65. Installed once, over the wired link.
+message Bundle {
+  uint32 root_id = 1;
+  uint32 serial = 2;
+  fixed32 issued_at = 3;
+  // Region codes of the units this bundle is for, most specific first.
+  repeated string regions = 4;
+  string channel_name = 5;
+  bytes channel_psk = 6;  // 32 bytes, AES-256
+  // meshtastic.Config.LoRaConfig.ModemPreset value.
+  uint32 modem_preset = 7;
+  // Meshtastic remote-admin public key (X25519, 32 bytes) of the authority.
+  bytes admin_key = 8;
+  // Additional trusted roots, e.g. the neighbouring country's root in the
+  // cross-border pilot area. Trusted because a pinned root signed this bundle.
+  repeated RootKey extra_roots = 9;
+  // Sealed KEYS messages (14-byte header + message), one per root.
+  repeated bytes keys = 10;
+  UnitRole role = 11;
+  // Question limits (SPEC 5.5). 0 = firmware default.
+  uint32 question_min_interval_s = 12;
+  uint32 question_max_per_day = 13;
+}
