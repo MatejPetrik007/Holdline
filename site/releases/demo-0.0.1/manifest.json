@@ -1,9 +1,9 @@
 {
-  "name": "meshtastic-esp32s3-eink",
+  "name": "holdline",
   "version": "0.0.1-demo",
   "board": "heltec-wireless-paper",
   "upstream_commit": "DEMO-not-a-real-build",
-  "built_at": "2026-11-14T14:14:51.952Z",
+  "built_at": "2026-11-16T11:52:17.163Z",
   "signature_algs": [
     "ML-DSA-65",
     "Ed25519"

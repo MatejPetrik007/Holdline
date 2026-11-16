@@ -2,7 +2,7 @@ const DISCLAIMER = `<p><b>Disclaimer:</b> this is an unofficial community build 
 
 export default {
   ui: {
-    brand: 'LastLink',
+    brand: 'Holdline',
     nav: { home: 'Home', demo: 'Blackout demo', hardware: 'Hardware', build: 'Build', solar: 'Solar', lab: 'Lab', openhw: 'Open hardware', access: 'Accessibility', faq: 'Q&A', verify: 'Verify', security: 'Security', releases: 'Releases' },
     up: 'check upstream',
     copy: 'COPY', copied: 'COPIED',

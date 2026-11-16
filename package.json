@@ -1,5 +1,5 @@
 {
-  "name": "meshtastic-esp32s3-eink",
+  "name": "holdline",
   "version": "1.0.0",
   "description": "Open-hardware solar Meshtastic E-Ink node: website, signing and channel tools",
   "scripts": {

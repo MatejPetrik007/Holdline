@@ -46,7 +46,7 @@ if (cmd === 'keygen') {
   const priv = JSON.parse(readFileSync(arg('key', join(root, 'keys', 'private.json')), 'utf8'));
   const data = readFileSync(bin);
   const manifest = {
-    name: 'meshtastic-esp32s3-eink',
+    name: 'holdline',
     version: arg('version', '0.0.0'),
     board: arg('board', 'unknown'),
     upstream_commit: arg('commit', 'unknown'),

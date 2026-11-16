@@ -2,7 +2,7 @@ const DISCLAIMER = `<p><b>Zastrzeżenie:</b> to nieoficjalny, społecznościowy 
 
 export default {
   ui: {
-    brand: 'LastLink',
+    brand: 'Holdline',
     nav: { home: 'Start', demo: 'Symulacja blackoutu', hardware: 'Sprzęt', build: 'Kompilacja', solar: 'Solar', lab: 'Laboratorium', openhw: 'Open hardware', access: 'Dostępność', faq: 'Pytania i odpowiedzi', verify: 'Weryfikacja', security: 'Bezpieczeństwo', releases: 'Wydania' },
     up: 'sprawdź upstream',
     copy: 'KOPIUJ', copied: 'SKOPIOWANO',

@@ -1,6 +1,6 @@
-# LastLink: Meshtastic E-Ink node, open hardware, off-grid, verifiable
+# Holdline: Meshtastic E-Ink node, open hardware, off-grid, verifiable
 
-**Website:** https://peterwolfframm.github.io/meshtastic-esp32s3-eink/ · available in English, Czech and Polish
+**Website:** https://matejpetrik007.github.io/Holdline/ · available in English, Czech and Polish
 
 An open-hardware, solar-powered [Meshtastic](https://meshtastic.org) LoRa node for ESP32-S3 boards with E-Ink displays:
 
@@ -20,8 +20,8 @@ An open-hardware, solar-powered [Meshtastic](https://meshtastic.org) LoRa node f
 Compare these with the fingerprints shown on the Verify page:
 
 ```
-ML-DSA-65  d1eb20c8d427e0bc3286cd9ae281f57d5b3e8a159ebf0a83a10f7fb960578610
-Ed25519    0d8d88541b61d4e0d73e3e4e622e90f44f4c3267b48928b846296d24d40d03e6
+ML-DSA-65  a8ebf66b47bc56dc272dc7175afea86c2ed63963e69519a0f68648e17a82c977
+Ed25519    d64075b2f78d0b1c72f3ff26b1d099e05dbf814e0b1bd990900e30b6a521a64c
 ```
 
 ## Repository layout

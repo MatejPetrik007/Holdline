@@ -2,7 +2,7 @@ const DISCLAIMER = `<p><b>Upozornění:</b> toto je neoficiální komunitní bui
 
 export default {
   ui: {
-    brand: 'LastLink',
+    brand: 'Holdline',
     nav: { home: 'Úvod', demo: 'Simulace blackoutu', hardware: 'Hardware', build: 'Sestavení FW', solar: 'Solár', lab: 'Laboratoř', openhw: 'Open hardware', access: 'Přístupnost', faq: 'Otázky a odpovědi', verify: 'Ověření', security: 'Bezpečnost', releases: 'Vydání' },
     up: 'ověř upstream',
     copy: 'KOPÍROVAT', copied: 'ZKOPÍROVÁNO',
