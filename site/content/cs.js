@@ -94,7 +94,7 @@ export default {
     <p class="lede">Open-hardware LoRa uzel s firmwarem <a href="https://meshtastic.org" rel="noopener">Meshtastic</a> a E-Ink displejem. Každá domácnost ho dostane od státu <b>kompletně složený</b>, takže pájení je jen volitelné: schémata jsou otevřená pro každého, kdo si chce postavit vlastní. Pokud jsi neslyšící, nevidomý nebo hluchoslepý, zaregistruj se pro doplňky jako Braillova klávesnice nebo haptický pásek na kůži. Každé vydání firmwaru si před nahráním ověříš přímo v prohlížeči.</p>
     <div class="cta">
       <a class="btn primary" href="#/demo">Podívej se, jak funguje při blackoutu →</a>
-      <a class="btn" href="#/openhw">Postav si ho sám</a>
+      <a class="btn" href="#/hardware#pins">Postav si ho sám</a>
       <a class="btn" href="#/faq">Otázky a zapojení pinů</a>
       <a class="btn" href="#/access">Registrace – přístupnost</a>
     </div>
@@ -107,11 +107,11 @@ export default {
   <div class="card"><div class="feature-icon">▤</div><span class="num">02</span><h3>Úsporný E-Ink displej</h3><p>E-Ink drží poslední obraz bez jakékoli spotřeby, takže uzel na baterii ukazuje zprávy a stav celé týdny. Konfigurace pinů je v <a href="https://github.com/meshtastic/firmware" rel="noopener">repozitáři firmwaru</a>.</p></div>
   <div class="card"><div class="feature-icon">✓</div><span class="num">03</span><h3>Ověřitelný firmware</h3><p>Každé vydání má manifest s SHA-256 hashi, podepsaný postkvantovým <b>ML-DSA-65 (FIPS 204)</b> a Ed25519. Platný podpis dokazuje pravost od vydavatele; není to schválení žádnou autoritou.</p></div>
   <a class="card" href="#/solar"><div class="feature-icon">☀</div><span class="num">04</span><h3>Běží na slunce</h3><p>Dnešní malé solární panely uzel bez problému napájí mimo síť. Panel 2–6 W a jeden článek 18650 ho udrží v chodu i v noci a za zataženo. →</p></a>
-  <a class="card" href="#/openhw"><div class="feature-icon">⚒</div><span class="num">05</span><h3>Dojde složený, otevřený ke stavbě</h3><p>Uzel dorazí připravený: zapojíš solární panel a umístíš ho. Schéma, zapojení pinů a seznam dílů jsou otevřené, pokud si chceš postavit vlastní. →</p></a>
+  <a class="card" href="#/hardware#pins"><div class="feature-icon">⚒</div><span class="num">05</span><h3>Dojde složený, otevřený ke stavbě</h3><p>Uzel dorazí připravený: zapojíš solární panel a umístíš ho. Schéma, zapojení pinů a seznam dílů jsou otevřené, pokud si chceš postavit vlastní. →</p></a>
   <a class="card" href="#/access"><div class="feature-icon">⠿</div><span class="num">06</span><h3>Přístupné pro neslyšící a nevidomé</h3><p>Zaregistruj se pro doplňky jako Braillova klávesnice nebo haptický pásek na kůži. Jsou také open source, takže si je můžeš postavit i sám. →</p></a>
 </div>
 
-<div class="cta"><a class="btn accent" href="#/verify">Ověřit soubor firmwaru</a><a class="btn" href="#/build">Sestavit firmware sám</a><a class="btn" href="#/lab">Otevřít laboratoř: kalkulačky vysílání a soláru →</a></div>
+<div class="cta"><a class="btn accent" href="#/verify">Ověřit soubor firmwaru</a><a class="btn" href="#/build">Sestavit firmware sám</a><a class="btn" href="#/solar#lab">Otevřít laboratoř: kalkulačky vysílání a soláru →</a></div>
 
 <div class="two">
   <div>
@@ -159,35 +159,89 @@ export default {
 <tr><td>Centrální bod selhání</td><td>Vysílače, páteř, jádro sítě</td><td><b>Žádný</b>, každý uzel je relé</td></tr>
 <tr><td>Přes hranici PL–CZ</td><td>Oddělení operátoři i varovné systémy</td><td><b>Jeden společný kanál</b> na obou březích</td></tr>
 <tr><td>Kapacita</td><td>Hlas, data, video</td><td>Jen krátký text, asi 200 bajtů na zprávu, sdílený vysílací čas</td></tr>
-<tr><td>Příprava</td><td>Už je v každé kapse</td><td>Uzly musí být rozmístěné, nabité a v kanálu ještě před blackoutem: proto každá domácnost jeden <a href="#/openhw">dostane složený</a></td></tr>
+<tr><td>Příprava</td><td>Už je v každé kapse</td><td>Uzly musí být rozmístěné, nabité a v kanálu ještě před blackoutem: proto každá domácnost jeden <a href="#/hardware#pins">dostane složený</a></td></tr>
 </tbody></table></div>
 <p class="small">Mesh nenahrazuje sirény, rozhlas ani pochůzky dům od domu. Přidává kanál, který přežije, když ostatní vypadnou. Neslyšící a hluchoslepí obyvatelé dostanou stejné varování jako vibrace přes <a href="#/access">haptický náramek</a>. Simulace zjednodušuje dosah a časování a ignoruje kolize paketů; polohy uzlů jsou ilustrační.</p>`,
     hardware: `
-<p class="eyebrow">hardware</p>
-<h1>Desky ESP32-S3 s E-Ink displejem</h1>
-<p class="lede">Tento build cílí na desky ESP32-S3 s E-Ink (e-paper) displejem, takže uzel ukazuje zprávy a telemetrii a skoro nic nespotřebuje. Chceš si to zapojit sám? Viz <a href="#/openhw">open-hardware DIY sestava</a>.</p>
+<p class="eyebrow">open hardware</p>
+<h1>Dojde složený. Otevřený, takže si ho můžeš postavit sám.</h1>
+<p class="lede">Každá domácnost dostane uzel od státu <b>kompletně složený, nahraný a otestovaný</b>. Nic nemusíš pájet. Schémata, zapojení pinů a seznam dílů jsou otevřené, aby si ho kdokoli, kdo chce, mohl postavit, opravit nebo vylepšit doma.</p>
+<div class="toc"><a href="#/hardware#box">Co dorazí</a><a href="#/hardware#paths">Tři cesty k uzlu</a><a href="#/hardware#boards">Podporované desky</a><a href="#/hardware#pins">Který pin kam</a><a href="#/hardware#bom">Díly a kde koupit</a><a href="#/hardware#connect">Připojení vlastního uzlu</a><a href="#/hardware#sign">Znakový jazyk: díly</a><a href="#/form#build">Postavím si sám: dej vědět</a></div>
+
+<h2 id="box">Co dorazí v krabici</h2>
+<div class="two">
+  <div>
+    <ul>
+      <li><b>Složený uzel</b> v odolné krabičce IP65: deska, LoRa rádio, E-Ink displej, baterie, nabíječka a regulátor, vše zapojené, zapájené, nahrané <a href="#/verify">ověřeným firmwarem</a> a nastavené na region <code>EU_868</code> a kanál sítě.</li>
+      <li><b>Anténa</b> (šroubovací SMA).</li>
+      <li><b>Solární panel</b> s konektorem, který nejde zapojit obráceně.</li>
+      <li><b>Držák</b> a tištěný rychlý návod (na požádání v Braillově písmu nebo velkým písmem).</li>
+    </ul>
+  </div>
+  <ol class="steps">
+    <li><h3>Našroubuj anténu</h3><p>Jako první.</p></li>
+    <li><h3>Zapoj solární panel</h3><p>Jediné spojení, které děláš sám. Bez nářadí.</p></li>
+    <li><h3>Umísti ho vysoko, panelem na jih</h3><p>Parapet, balkon nebo střecha. Výška je nejdůležitější.</p></li>
+    <li><h3>Stiskni tlačítko</h3><p>Displej ukáže <code>MESH · n nodes</code>. Hotovo.</p></li>
+  </ol>
+</div>
+
+<h2 id="paths">Tři cesty k uzlu</h2>
+<div class="grid">
+  <div class="card"><span class="num">A · VÝCHOZÍ</span><h3>Dojde složený</h3><p>Nemusíš nic dělat: každá registrovaná adresa dostane složený uzel automaticky. Pájení není nikdy potřeba. Termíny doručení zveřejňujeme v <a href="#/faq#channel">kanálu jen pro čtení</a>.</p></div>
+  <a class="card" href="#/form#build"><span class="num">B · VOLITELNĚ</span><h3>Postav si ho sám</h3><p>Chceš si ho zapájet sám? Dej nám vědět formulářem níže, ať ti stát žádný neposílá. Sady dílů jsou ve společném nákupu. →</p></a>
+  <a class="card" href="#/access"><span class="num">C</span><h3>Neslyšící, nevidomí, hluchoslepí</h3><p>Dojde složený s doplňky, které ti sedí. Hluchoslepí ho dostanou osobně i s nastavením. →</p></a>
+</div>
+
+<h2 id="boards">Desky ESP32-S3 s E-Ink displejem</h2>
+<p>Tento build cílí na desky ESP32-S3 s E-Ink (e-paper) displejem, takže uzel ukazuje zprávy a telemetrii a skoro nic nespotřebuje. Chceš si to zapojit sám? Viz <a href="#/hardware#pins">open-hardware DIY sestava</a>.</p>
 <div class="callout warn"><p><b>Specifikace si nevymýšlíme.</b> Velikosti displejů, rádiové čipy, mapování pinů a seznam podporovaných desek žijí upstream a mění se. Každou položku {{UP}} si před nákupem nebo nahráním ověř v <a href="https://github.com/meshtastic/firmware" rel="noopener">repozitáři firmwaru</a> (definice desek, <code>platformio.ini</code>) a na <a href="https://meshtastic.org/docs/hardware/devices/" rel="noopener">meshtastic.org</a>.</p></div>
 
-<h2>Kandidátní desky</h2>
+<h3>Kandidátní desky</h3>
 <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Deska</th><th>Env</th><th>Displej</th><th>LoRa rádio</th><th>Stav</th></tr></thead><tbody>
 <tr><td><b>Heltec Wireless Paper</b></td><td><code>heltec-wireless-paper</code></td><td>{{UP}}</td><td>{{UP}}</td><td>kandidát · referenční deska webu</td></tr>
 <tr><td><b>Heltec Vision Master E213</b></td><td><code>heltec-vision-master-e213</code></td><td>{{UP}}</td><td>{{UP}}</td><td>kandidát</td></tr>
 <tr><td><b>Heltec Vision Master E290</b></td><td><code>heltec-vision-master-e290</code></td><td>{{UP}}</td><td>{{UP}}</td><td>kandidát</td></tr>
 <tr><td><b>LilyGO T5 S3 E-Paper</b></td><td><code>lilygo-t5-s3-epaper</code></td><td>{{UP}}</td><td>{{UP}}</td><td>kandidát</td></tr>
-<tr><td><b>DIY: ESP32-S3-DevKitC-1 + SX1262 + e-paper</b></td><td><code>diy-s3-eink</code> (toto repo)</td><td>2,13″ / 2,9″ SPI</td><td>modul SX1262</td><td>open hardware · <a href="#/openhw">návod</a></td></tr>
+<tr><td><b>DIY: ESP32-S3-DevKitC-1 + SX1262 + e-paper</b></td><td><code>diy-s3-eink</code> (toto repo)</td><td>2,13″ / 2,9″ SPI</td><td>modul SX1262</td><td>open hardware · <a href="#/hardware#pins">návod</a></td></tr>
 </tbody></table></div>
 
-<h2 id="pins">Heltec Wireless Paper: který pin je k čemu</h2>
+<h3 id="heltec-pins">Heltec Wireless Paper: který pin je k čemu</h3>
 <p>Vše je už zapojené na desce. Mapa pomáhá při ladění, připojení doplňků a čtení variant souboru. Zdroj: <code>variants/heltec_wireless_paper/variant.h</code> {{UP}}.</p>
 {{PINS_HELTEC}}
 <p class="small">Volné GPIO pro doplňky (Braillova klávesnice, haptický pásek) závisí na revizi desky. Před připojením čehokoli zkontroluj potisk konektoru na desce a variant soubor.</p>
 
-<h2>Jak si desku ověřit sám</h2>
+<h3>Jak si desku ověřit sám</h3>
 <ol>
   <li>Otevři <a href="https://github.com/meshtastic/firmware" rel="noopener">repo firmwaru</a> a v <code>platformio.ini</code> hledej sekce <code>[env:…]</code> odpovídající tvé desce.</li>
   <li>Ve složce <code>variants/</code> zkontroluj definice displeje a pinů pro svou desku.</li>
   <li>Porovnej s <a href="https://meshtastic.org/docs/hardware/devices/" rel="noopener">oficiální dokumentací hardwaru</a> (podporovaná zařízení a regionální frekvence).</li>
-</ol>`,
+</ol>
+
+<h2 id="pins">Který pin kam</h2>
+<p>Potřebuješ jen, když si uzel stavíš nebo opravuješ sám. Dodané uzly jsou zapojené přesně takhle.</p>
+{{BOARD}}
+<p>Celé tabulky: <a href="#/faq#wiring">Otázky a odpovědi → zapojení</a> · Heltec Wireless Paper (deska v dodaném uzlu): <a href="#/hardware#heltec-pins">Hardware → piny</a>.</p>
+
+<h2 id="bom">Díly a kde je koupit</h2>
+{{BOM}}
+<p>Návrhové soubory: <code>hardware/</code> a <code>variants/diy_s3_eink/</code> v <a href="{{REPO}}">repozitáři</a>. Licence hardwaru CERN-OHL-S-2.0, firmware GPL-3.0 (jako upstream). Díly pro doplňky přístupnosti: <a href="#/access#build">Přístupnost → postav si sám</a>.</p>
+
+<h2 id="sign">Znakový jazyk na displeji: díly a nákup</h2>
+<p>Pro neslyšící, jejichž prvním jazykem je znakový jazyk, umí hub ukázat zprávy z mesh <b>ve znakovém jazyce</b>. Běží na stejném <b>NVIDIA Jetson Orin Nano</b> jako živé titulky, takže pokud poslechový hub už máš, přidáváš jen displej, baterii a tlačítko. Systém je normálně vypnutý; když přijde zpráva, náramek zavibruje a ty víš, že ho máš zapnout. Jak to funguje: <a href="#/access#sign">Přístupnost → zprávy ve znakovém jazyce</a>.</p>
+{{BOM_SIGN}}
+<p class="small">Sady dílů pro znakový displej jsou ve společném nákupu: zaškrtni <b>Znakový displej</b> ve <a href="#/form#build">formuláři pro vlastní stavbu</a>. Od státu ho dostaneš složený a nastavený přes <a href="#/form#adapted">registraci přístupnosti</a>.</p>
+
+<h2 id="connect">Připojení vlastního uzlu</h2>
+<p class="small">Dodané uzly jsou už nastavené. Tyto kroky jsou jen pro uzly, které sis postavil sám.</p>
+<ol class="steps">
+  <li><h3>Nastav region</h3><p>V aplikaci Meshtastic nebo v CLI nastav LoRa region <code>EU_868</code> pro Česko a Polsko (jiné země: ověř upstream).</p><pre><code>meshtastic --set lora.region EU_868</code></pre></li>
+  <li><h3>Přidej kanál sítě</h3><p>Centrální autorita zveřejňuje URL / QR kód kanálu v <a href="#/faq#channel">kanálu jen pro čtení</a>.</p><pre><code>meshtastic --seturl "&lt;URL kanálu z kanálu jen pro čtení&gt;"</code></pre></li>
+  <li><h3>Ověř, že jsi v síti</h3><p>Během pár minut by se v seznamu uzlů měli objevit sousedé. Nikdo? Dej anténu výš, zkontroluj region a přečti si <a href="#/faq">otázky a odpovědi</a>.</p></li>
+</ol>
+
+<h2 id="selfhost">Postavím si sám: dej vědět</h2>
+<p>Chceš si postavit vlastní uzel nebo doplňky? Dej vědět v <a href="#/form#build">registračním formuláři</a>, aby ti stát uzel neposílal a mohl ti rezervovat sady dílů.</p>`,
 
     build: `
 <p class="eyebrow">sestavení</p>
@@ -226,7 +280,7 @@ git rev-parse HEAD   # musí odpovídat upstream_commit v manifestu</code></pre>
 Baterie: 1 × 18650, 3000 mAh × 3,7 V ≈ 11 Wh → ≈ 4 dny úplně bez slunce<br>
 Léto, panel 2 W: 2 W × 3 sluneční hodiny × 0,7 ztráty ≈ 4,2 Wh za den ✓<br>
 Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓</div>
-<div class="callout"><p><b>Zkuste vlastní čísla:</b> <a href="#/lab#solar-lab">solární kalkulačka v laboratoři</a> navrhne panel a baterii pro libovolný měsíc a nasimuluje dva týdny počasí.</p></div>
+<div class="callout"><p><b>Zkuste vlastní čísla:</b> <a href="#/solar#solar-lab">solární kalkulačka v laboratoři</a> navrhne panel a baterii pro libovolný měsíc a nasimuluje dva týdny počasí.</p></div>
 <p class="small">Čísla jsou hrubé plánovací hodnoty, ne měření konkrétní desky. Skutečná spotřeba závisí na roli (klient nebo router), překreslování displeje, Bluetooth, GPS a vysílacím výkonu. Před dimenzováním změř spotřebu USB měřákem.</p>
 
 <h2>Napájecí řetězec</h2>
@@ -241,61 +295,6 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
   <li>Pro solární klienty zapni ve firmwaru úsporné režimy {{UP}}.</li>
 </ul>`,
 
-    openhw: `
-<p class="eyebrow">open hardware</p>
-<h1>Dojde složený. Otevřený, takže si ho můžeš postavit sám.</h1>
-<p class="lede">Každá domácnost dostane uzel od státu <b>kompletně složený, nahraný a otestovaný</b>. Nic nemusíš pájet. Schémata, zapojení pinů a seznam dílů jsou otevřené, aby si ho kdokoli, kdo chce, mohl postavit, opravit nebo vylepšit doma.</p>
-<div class="toc"><a href="#/openhw#box">Co dorazí</a><a href="#/openhw#paths">Tři cesty k uzlu</a><a href="#/openhw#pins">Který pin kam</a><a href="#/openhw#bom">Díly a kde koupit</a><a href="#/openhw#connect">Připojení vlastního uzlu</a><a href="#/openhw#sign">Znakový jazyk: díly</a><a href="#/form#build">Postavím si sám: dej vědět</a></div>
-
-<h2 id="box">Co dorazí v krabici</h2>
-<div class="two">
-  <div>
-    <ul>
-      <li><b>Složený uzel</b> v odolné krabičce IP65: deska, LoRa rádio, E-Ink displej, baterie, nabíječka a regulátor, vše zapojené, zapájené, nahrané <a href="#/verify">ověřeným firmwarem</a> a nastavené na region <code>EU_868</code> a kanál sítě.</li>
-      <li><b>Anténa</b> (šroubovací SMA).</li>
-      <li><b>Solární panel</b> s konektorem, který nejde zapojit obráceně.</li>
-      <li><b>Držák</b> a tištěný rychlý návod (na požádání v Braillově písmu nebo velkým písmem).</li>
-    </ul>
-  </div>
-  <ol class="steps">
-    <li><h3>Našroubuj anténu</h3><p>Jako první.</p></li>
-    <li><h3>Zapoj solární panel</h3><p>Jediné spojení, které děláš sám. Bez nářadí.</p></li>
-    <li><h3>Umísti ho vysoko, panelem na jih</h3><p>Parapet, balkon nebo střecha. Výška je nejdůležitější.</p></li>
-    <li><h3>Stiskni tlačítko</h3><p>Displej ukáže <code>MESH · n nodes</code>. Hotovo.</p></li>
-  </ol>
-</div>
-
-<h2 id="paths">Tři cesty k uzlu</h2>
-<div class="grid">
-  <div class="card"><span class="num">A · VÝCHOZÍ</span><h3>Dojde složený</h3><p>Nemusíš nic dělat: každá registrovaná adresa dostane složený uzel automaticky. Pájení není nikdy potřeba. Termíny doručení zveřejňujeme v <a href="#/faq#channel">kanálu jen pro čtení</a>.</p></div>
-  <a class="card" href="#/form#build"><span class="num">B · VOLITELNĚ</span><h3>Postav si ho sám</h3><p>Chceš si ho zapájet sám? Dej nám vědět formulářem níže, ať ti stát žádný neposílá. Sady dílů jsou ve společném nákupu. →</p></a>
-  <a class="card" href="#/access"><span class="num">C</span><h3>Neslyšící, nevidomí, hluchoslepí</h3><p>Dojde složený s doplňky, které ti sedí. Hluchoslepí ho dostanou osobně i s nastavením. →</p></a>
-</div>
-
-<h2 id="pins">Který pin kam</h2>
-<p>Potřebuješ jen, když si uzel stavíš nebo opravuješ sám. Dodané uzly jsou zapojené přesně takhle.</p>
-{{BOARD}}
-<p>Celé tabulky: <a href="#/faq#wiring">Otázky a odpovědi → zapojení</a> · Heltec Wireless Paper (deska v dodaném uzlu): <a href="#/hardware#pins">Hardware → piny</a>.</p>
-
-<h2 id="bom">Díly a kde je koupit</h2>
-{{BOM}}
-<p>Návrhové soubory: <code>hardware/</code> a <code>variants/diy_s3_eink/</code> v <a href="{{REPO}}">repozitáři</a>. Licence hardwaru CERN-OHL-S-2.0, firmware GPL-3.0 (jako upstream). Díly pro doplňky přístupnosti: <a href="#/access#build">Přístupnost → postav si sám</a>.</p>
-
-<h2 id="sign">Znakový jazyk na displeji: díly a nákup</h2>
-<p>Pro neslyšící, jejichž prvním jazykem je znakový jazyk, umí hub ukázat zprávy z mesh <b>ve znakovém jazyce</b>. Běží na stejném <b>NVIDIA Jetson Orin Nano</b> jako živé titulky, takže pokud poslechový hub už máš, přidáváš jen displej, baterii a tlačítko. Systém je normálně vypnutý; když přijde zpráva, náramek zavibruje a ty víš, že ho máš zapnout. Jak to funguje: <a href="#/access#sign">Přístupnost → zprávy ve znakovém jazyce</a>.</p>
-{{BOM_SIGN}}
-<p class="small">Sady dílů pro znakový displej jsou ve společném nákupu: zaškrtni <b>Znakový displej</b> ve <a href="#/form#build">formuláři pro vlastní stavbu</a>. Od státu ho dostaneš složený a nastavený přes <a href="#/form#adapted">registraci přístupnosti</a>.</p>
-
-<h2 id="connect">Připojení vlastního uzlu</h2>
-<p class="small">Dodané uzly jsou už nastavené. Tyto kroky jsou jen pro uzly, které sis postavil sám.</p>
-<ol class="steps">
-  <li><h3>Nastav region</h3><p>V aplikaci Meshtastic nebo v CLI nastav LoRa region <code>EU_868</code> pro Česko a Polsko (jiné země: ověř upstream).</p><pre><code>meshtastic --set lora.region EU_868</code></pre></li>
-  <li><h3>Přidej kanál sítě</h3><p>Centrální autorita zveřejňuje URL / QR kód kanálu v <a href="#/faq#channel">kanálu jen pro čtení</a>.</p><pre><code>meshtastic --seturl "&lt;URL kanálu z kanálu jen pro čtení&gt;"</code></pre></li>
-  <li><h3>Ověř, že jsi v síti</h3><p>Během pár minut by se v seznamu uzlů měli objevit sousedé. Nikdo? Dej anténu výš, zkontroluj region a přečti si <a href="#/faq">otázky a odpovědi</a>.</p></li>
-</ol>
-
-<h2 id="selfhost">Postavím si sám: dej vědět</h2>
-<p>Chceš si postavit vlastní uzel nebo doplňky? Dej vědět v <a href="#/form#build">registračním formuláři</a>, aby ti stát uzel neposílal a mohl ti rezervovat sady dílů.</p>`,
 
     access: `
 <p class="eyebrow">přístupnost</p>
@@ -369,7 +368,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
     </ul>
   </div>
 </div>
-<div class="callout warn"><p><b>Stav: referenční návrh.</b> Žádné video nevznikne bez neslyšících rodilých mluvčích; avatar je nenahradí. Varování na náramku a na E-Ink dorazí vždy, i když systém nezapneš. Díly a nákup: <a href="#/openhw#sign">Open hardware → znakový jazyk</a>.</p></div>
+<div class="callout warn"><p><b>Stav: referenční návrh.</b> Žádné video nevznikne bez neslyšících rodilých mluvčích; avatar je nenahradí. Varování na náramku a na E-Ink dorazí vždy, i když systém nezapneš. Díly a nákup: <a href="#/hardware#sign">Open hardware → znakový jazyk</a>.</p></div>
 
 <h2 id="compute">Jaký počítač nebo GPU to utáhne</h2>
 <p>Rozpoznávání zvuků běží přímo v náramku bez GPU, takže funguje i při blackoutu. Převod řeči na text potřebuje víc výkonu: to je volitelný poslechový hub. Hub od státu je Jetson Orin Nano; tabulka ukazuje, co dalšího stačí, když si ho postavíš sám.</p>
@@ -471,11 +470,11 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
   <li><b>Přidej napájení:</b> panel → nabíječka → baterie → regulátor 3,3 V → pin 3V3. Přidej dělič baterie 100k/100k na GPIO1.</li>
   <li><b>Do krabičky:</b> IP65, kabelová průchodka pro panel, anténa venku, co nejvýš.</li>
 </ol>
-<p>Díly a kde je koupit: <a href="#/openhw#bom">Open hardware → díly</a>.</p></div></details>
+<p>Díly a kde je koupit: <a href="#/hardware#bom">Open hardware → díly</a>.</p></div></details>
 <details class="qa"><summary>Můžu místo SX1262 použít SX1276 / RFM95?</summary><div><p>Meshtastic podporuje víc rádií, ale sada pinů se liší (DIO0 místo BUSY/DIO1) a variantu je nutné upravit. SX1262 doporučujeme kvůli nižší spotřebě a lepší citlivosti. Podporu rádií ověř upstream {{UP}}.</p></div></details>
 <details class="qa"><summary>Jakou frekvenci použít v Česku a Polsku?</summary><div><p>Pásmo EU 868 MHz, region <code>EU_868</code> v Meshtasticu. Dodané uzly jsou už nastavené. Když stavíš vlastní, kup verzi rádia a antény na 868 MHz. Jiné země: ověř místní pravidla a seznam regionů upstream {{UP}}.</p></div></details>
 <details class="qa"><summary>Displej zůstává prázdný. Co teď?</summary><div><p>Dodaný uzel: zkontroluj solární konektor a nech baterii pár hodin nabíjet na denním světle, pak se zeptej v <a href="#/faq#ask">otázkách</a>. Vlastní stavba: zkontroluj zapojení BUSY a RST, ověř, že model displeje ve variantě odpovídá tvému panelu (2,13″ a 2,9″ mají jiné ovladače), a změř 3,3 V na modulu. Na deskách Heltec se displej napájí přes Vext (GPIO45, LOW = zap.).</p></div></details>
-<details class="qa"><summary>Jak připojím uzel do sítě?</summary><div><p>Dodané uzly jsou už připojené. Vlastní stavba: nastav region a pak použij URL kanálu zveřejněnou v kanálu jen pro čtení. Krok za krokem: <a href="#/openhw#connect">Open hardware → Připojení</a>.</p></div></details>
+<details class="qa"><summary>Jak připojím uzel do sítě?</summary><div><p>Dodané uzly jsou už připojené. Vlastní stavba: nastav region a pak použij URL kanálu zveřejněnou v kanálu jen pro čtení. Krok za krokem: <a href="#/hardware#connect">Open hardware → Připojení</a>.</p></div></details>
 <details class="qa"><summary>Jak poznám, že je firmware pravý?</summary><div><p>Použij stránku <a href="#/verify">Ověření</a>: zkontroluje hash SHA-256 a podpisy ML-DSA-65 + Ed25519 v prohlížeči, pak porovnej otisk klíče s tím v README na GitHubu.</p></div></details>
 <details class="qa"><summary>Můžu si Braillovu klávesnici nebo haptický náramek připojit sám?</summary><div><p>Ano. Oba doplňky jsou open hardware: klávesnice používá I²C na GPIO17/18, haptický náramek Pro sériový modul na GPIO15/16. Viz <a href="#/access#build">Přístupnost → postav si sám</a>.</p></div></details>
 <details class="qa"><summary>Co mesh dělá při blackoutu?</summary><div><p>Doručuje zprávy dál, i když mobilní vysílače utichnou. Podívej se na <a href="#/demo">simulaci blackoutu</a>.</p></div></details>
@@ -488,7 +487,7 @@ Středoevropská zima (≈ 1 sluneční hodina): panel 5–6 W a 2 články ✓<
 <div class="callout warn"><p><b>Než zapneš napájení:</b> anténa připojená · rádio i displej na <b>3,3 V</b>, nikdy 5 V · zkontroluj společnou zem GND · nenapájej pin 3V3 z regulátoru, když je zapojené USB, pokud deska nemá ochranu (při nahrávání odpoj baterii).</p></div>
 <h3>Zapojení napájení</h3>
 {{POWER_CHAIN}}
-<p>Piny Heltec Wireless Paper: <a href="#/hardware#pins">Hardware → piny</a>.</p>
+<p>Piny Heltec Wireless Paper: <a href="#/hardware#heltec-pins">Hardware → piny</a>.</p>
 
 <h2 id="ask">Zeptej se centrální autority</h2>
 <div class="two">

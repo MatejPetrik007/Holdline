@@ -136,10 +136,10 @@ export function mountLab(root, lang) {
   const presetOpts = PRESETS.map(([n], i) => `<option value="${i}" ${n === 'LongFast' ? 'selected' : ''}>${n}${n === 'LongFast' ? ` (${S.def})` : ''}</option>`).join('');
   const thisMonth = new Date().getMonth();
   root.innerHTML = `
-<p class="eyebrow">${S.eyebrow}</p>
-<h1>${S.title}</h1>
-<p class="lede">${S.lede}</p>
-<div class="toc"><a href="#/lab#packet">${S.toc[0]}</a><a href="#/lab#chirps">${S.toc[1]}</a><a href="#/lab#solar-lab">${S.toc[2]}</a></div>
+<p class="eyebrow" style="margin-top:48px">${S.eyebrow}</p>
+<h2 id="lab">${S.title}</h2>
+<p>${S.lede}</p>
+<div class="toc"><a href="#/solar#packet">${S.toc[0]}</a><a href="#/solar#chirps">${S.toc[1]}</a><a href="#/solar#solar-lab">${S.toc[2]}</a></div>
 
 <h2 id="packet">${S.pkt}</h2>
 <div class="lab card">

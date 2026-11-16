@@ -1,14 +1,14 @@
-import { CONFIG } from './config.js?v=7';
-import { PINS, BOM, BOM_ADDONS, BOM_SIGN, COMPUTE } from './pins.js?v=7';
-import { mountDemo } from './demo.js?v=7';
-import { mountLab, labStrings } from './lab.js?v=7';
-import { EXTRA, mountEink, mountMesh, anchorize, buildIndex, mountPalette, reveal } from './extras.js?v=7';
-import en from './content/en.js?v=7';
-import cs from './content/cs.js?v=7';
-import pl from './content/pl.js?v=7';
+import { CONFIG } from './config.js?v=8';
+import { PINS, BOM, BOM_ADDONS, BOM_SIGN, COMPUTE } from './pins.js?v=8';
+import { mountDemo } from './demo.js?v=8';
+import { mountLab, labStrings } from './lab.js?v=8';
+import { EXTRA, mountEink, mountMesh, anchorize, buildIndex, mountPalette, reveal } from './extras.js?v=8';
+import en from './content/en.js?v=8';
+import cs from './content/cs.js?v=8';
+import pl from './content/pl.js?v=8';
 
 const LANGS = { en, cs, pl };
-const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'lab', 'openhw', 'access', 'form', 'faq', 'verify', 'security', 'releases'];
+const ROUTES = ['home', 'demo', 'hardware', 'build', 'solar', 'access', 'form', 'faq', 'verify', 'security', 'releases'];
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -52,6 +52,9 @@ $('#menu').addEventListener('click', () => document.body.classList.toggle('nav-o
 // ---------- routing ----------
 function route() {
   const [path, anchor] = location.hash.replace(/^#\/?/, '').split('#');
+  // Old tabs merged into other pages: Lab lives under Solar, Open hardware under Hardware.
+  const moved = { lab: ['solar', 'lab'], openhw: ['hardware', ''] }[path];
+  if (moved) return { page: moved[0], anchor: anchor || moved[1] || undefined };
   return { page: ROUTES.includes(path) ? path : 'home', anchor };
 }
 window.addEventListener('hashchange', () => render(true));
@@ -197,9 +200,9 @@ function fill(html) {
 
 // ---------- render ----------
 let unmounts = [];
-const labPage = () => { const L = labStrings(lang); return `<h1>${L.title}</h1><h2 id="packet">${L.pkt}</h2><h2 id="chirps">${L.chirp}</h2><h2 id="solar-lab">${L.sol}</h2>`; };
+const labPage = () => { const L = labStrings(lang); return `<h2 id="lab">${L.title}</h2><h2 id="packet">${L.pkt}</h2><h2 id="chirps">${L.chirp}</h2><h2 id="solar-lab">${L.sol}</h2>`; };
 const indexCache = {};
-const getIndex = () => (indexCache[lang] ||= buildIndex(T, ROUTES, fill, { lab: labPage() }));
+const getIndex = () => (indexCache[lang] ||= buildIndex(T, ROUTES, fill, { solar: fill(T.pages.solar) + labPage() }));
 const openPalette = mountPalette({
   getIndex,
   getStrings: () => EXTRA[lang] || EXTRA.en,
@@ -229,7 +232,7 @@ function paint(fromHash) {
   $('#foot').innerHTML = fill(T.ui.footer);
   document.title = `${T.ui.nav[page]} · ${T.ui.brand}`;
   const main = $('#main');
-  if (page === 'lab') { main.innerHTML = ''; unmounts.push(mountLab(main, lang)); }
+  if (page === 'solar') { main.innerHTML = fill(T.pages.solar) + '<section class="lab-root"></section>'; unmounts.push(mountLab($('.lab-root', main), lang)); }
   else main.innerHTML = fill(T.pages[page]);
   anchorize(main, page);
   document.body.classList.remove('nav-open');
