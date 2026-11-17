@@ -1,0 +1,5 @@
+# Build tools of the Holdline firmware, pinned (reproducible builds, SPEC 7.1).
+# ESP32 targets build with pioarduino, a fork of PlatformIO Core, exactly as upstream
+# Meshtastic does (github.com/meshtastic/gh-action-firmware). Install with:
+#   PIP_CONSTRAINT=firmware/household/constraints-build.txt pip install -r firmware/household/requirements-build.txt
+pioarduino==6.2.0

@@ -1,0 +1,133 @@
+diff --git a/bin/platformio-custom.py b/bin/platformio-custom.py
+index 8e4868f..861a8ea 100644
+--- a/bin/platformio-custom.py
++++ b/bin/platformio-custom.py
+@@ -1,6 +1,7 @@
+ #!/usr/bin/env python3
+ # trunk-ignore-all(ruff/F821)
+ # trunk-ignore-all(flake8/F821): For SConstruct imports
++import os
+ import sys
+ from os.path import basename, isabs, isfile, join, realpath
+ import shutil
+@@ -411,6 +412,9 @@ for pref in userPrefs:
+ # Calculate unix epoch for current day (midnight)
+ current_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+ build_epoch = int(current_date.timestamp())
++# Holdline: reproducible builds pin the embedded build time (https://reproducible-builds.org/specs/source-date-epoch/).
++if os.environ.get("SOURCE_DATE_EPOCH"):
++    build_epoch = int(os.environ["SOURCE_DATE_EPOCH"])
+ 
+ flags = [
+         "-DAPP_VERSION=" + verObj["long"],
+diff --git a/src/mesh/FloodingRouter.cpp b/src/mesh/FloodingRouter.cpp
+index 9140dea..8cbee4f 100644
+--- a/src/mesh/FloodingRouter.cpp
++++ b/src/mesh/FloodingRouter.cpp
+@@ -1,4 +1,7 @@
+ #include "FloodingRouter.h"
++#ifdef HOLDLINE
++#include "modules/optional/Holdline/Holdline.h"
++#endif
+ #include "MeshTypes.h"
+ #include "NodeDB.h"
+ #include "configuration.h"
+@@ -146,6 +149,11 @@ bool FloodingRouter::roleAllowsCancelingDupe(const meshtastic_MeshPacket *p)
+ 
+ void FloodingRouter::perhapsCancelDupe(const meshtastic_MeshPacket *p)
+ {
++#ifdef HOLDLINE
++    // Holdline: keep the pending rebroadcast until enough other rebroadcasts were heard (hl::kCancelAfterDupes).
++    if (!holdlineMayCancelDupe(p))
++        return;
++#endif
+     if (p->transport_mechanism == meshtastic_MeshPacket_TransportMechanism_TRANSPORT_LORA && roleAllowsCancelingDupe(p)) {
+         // cancel rebroadcast of this message *if* there was already one, unless we're a router!
+         // But only LoRa packets should be able to trigger this.
+diff --git a/src/mesh/MeshModule.cpp b/src/mesh/MeshModule.cpp
+index 0186c4d..9bc37cb 100644
+--- a/src/mesh/MeshModule.cpp
++++ b/src/mesh/MeshModule.cpp
+@@ -1,4 +1,7 @@
+ #include "MeshModule.h"
++#ifdef HOLDLINE
++#include "modules/optional/Holdline/Holdline.h"
++#endif
+ #include "AckProof.h"
+ #include "Channels.h"
+ #include "MeshService.h"
+@@ -115,6 +118,11 @@ meshtastic_MeshPacket *MeshModule::allocErrorResponse(meshtastic_Routing_Error e
+ 
+ void MeshModule::callModules(meshtastic_MeshPacket &mp, RxSource src)
+ {
++#ifdef HOLDLINE
++    // Holdline delivery filter (SPEC 5.2): foreign traffic reaches neither the modules nor the phone.
++    if (!holdlineDeliverAllowed(mp, src))
++        return;
++#endif
+     // LOG_DEBUG("In call modules");
+     bool moduleFound = false;
+ 
+diff --git a/src/mesh/NextHopRouter.cpp b/src/mesh/NextHopRouter.cpp
+index 2c5ee8d..efe2192 100644
+--- a/src/mesh/NextHopRouter.cpp
++++ b/src/mesh/NextHopRouter.cpp
+@@ -1,4 +1,7 @@
+ #include "NextHopRouter.h"
++#ifdef HOLDLINE
++#include "modules/optional/Holdline/Holdline.h"
++#endif
+ #include "Default.h"
+ #include "MeshTypes.h"
+ #include "Throttle.h"
+@@ -264,6 +267,11 @@ bool NextHopRouter::perhapsRebroadcast(const meshtastic_MeshPacket *p)
+     // Allow rebroadcast if hop_limit > 0 OR if we're exhausting hops (which sets hop_limit = 0 but still needs one relay)
+     if (!isToUs(p) && !isFromUs(p) && (p->hop_limit > 0 || exhaustHops)) {
+         if (p->id != 0) {
++#ifdef HOLDLINE
++            // Holdline relay policy (SPEC 5.3): authority packets and questions to the authority, nothing else.
++            if (!holdlineRelayAllowed(p))
++                return false;
++#endif
+             if (isRebroadcaster()) {
+                 // NOTE: this is a self-identity match (is the addressed next_hop OUR last byte?), so it
+                 // cannot be hardened with resolveLastByte() - a remote node that legitimately shares our
+diff --git a/src/mesh/Router.cpp b/src/mesh/Router.cpp
+index 0f5e531..9e26244 100644
+--- a/src/mesh/Router.cpp
++++ b/src/mesh/Router.cpp
+@@ -1,4 +1,7 @@
+ #include "Router.h"
++#ifdef HOLDLINE
++#include "modules/optional/Holdline/Holdline.h"
++#endif
+ #include "AdminKeys.h"
+ #include "Channels.h"
+ #include "CryptoEngine.h"
+@@ -481,6 +484,14 @@ ErrorCode Router::send(meshtastic_MeshPacket *p)
+         return meshtastic_Routing_Error_BAD_REQUEST;
+     } // should have already been handled by sendLocal
+ 
++#ifdef HOLDLINE
++    // Holdline send-path filter (SPEC 5.2): a unit originates nothing but questions to the authority.
++    if (!holdlineSendAllowed(p)) {
++        packetPool.release(p);
++        return meshtastic_Routing_Error_NOT_AUTHORIZED;
++    }
++#endif
++
+     // Abort sending if we are violating the duty cycle
+     float effectiveDutyCycle = getEffectiveDutyCycle();
+     if (!config.lora.override_duty_cycle && effectiveDutyCycle < 100) {
+@@ -1136,6 +1147,11 @@ static bool signedDataFits(meshtastic_Data *d)
+ #if !(MESHTASTIC_EXCLUDE_PKI)
+ bool wouldEncryptWithPKC(const meshtastic_MeshPacket *p, ChannelIndex chIndex, bool haveDestKey)
+ {
++#ifdef HOLDLINE
++    // Holdline packets stay channel-encrypted so that relays can read their header (SPEC 5.3).
++    if (holdlineIsOwnPort(p))
++        return false;
++#endif
+     // First, only PKC encrypt packets we are originating
+     return isFromUs(p) &&
+ #if ARCH_PORTDUINO

@@ -38,7 +38,7 @@ Ed25519    d64075b2f78d0b1c72f3ff26b1d099e05dbf814e0b1bd990900e30b6a521a64c
 | `tools/sign.mjs` | Key generation and release signing |
 | `tools/channel.mjs` | Translates questions and answers with Claude and updates the channel |
 | `hardware/` | Open-hardware docs: parts list, wiring, accessibility add-ons |
-| `firmware/` | Public household-unit firmware: [build specification](firmware/SPEC.md), protocol, overlay (in progress) |
+| `firmware/` | Public household-unit firmware: [specification](firmware/SPEC.md), [protocol and test vectors](firmware/protocol/), unit engine with host tests, Meshtastic overlay. Builds in CI; [not yet run on hardware](firmware/README.md) |
 | `variants/diy_s3_eink/` | Firmware variant for the DIY board (copy into `meshtastic/firmware/variants/`) |
 
 ## How the Q&A channel works
