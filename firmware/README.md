@@ -55,7 +55,7 @@ cmake --build build/core -j
 ctest --test-dir build/core --output-on-failure
 ```
 
-This runs about 390 checks against the test vectors (codec, signatures, bulletins and revocation, forged parts, relay policy and rate limits, questions, key agreement, the signed demo release from `site/releases/`) and the flooding simulator on the website demo's topology. `build/core/hl_unit_sim` is a unit on stdin/stdout for testing other tooling; its commands are at the top of [`household/core/test/hl_unit_sim.cpp`](household/core/test/hl_unit_sim.cpp).
+This runs about 640 checks against the test vectors (codec, signatures, bulletins and revocation, forged parts, relay policy and rate limits, questions, key agreement, the provisioning protocol of the local link, the signed demo release from `site/releases/`) and the flooding simulator on the website demo's topology. `build/core/hl_unit_sim` is a unit on stdin/stdout for testing other tooling; its commands are at the top of [`household/core/test/hl_unit_sim.cpp`](household/core/test/hl_unit_sim.cpp).
 
 ## Build the firmware
 

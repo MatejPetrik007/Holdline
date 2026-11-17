@@ -6,6 +6,7 @@
 // Everything is checked against firmware/protocol/test-vectors/vectors.txt, which the
 // JavaScript reference codec generates: two independent implementations, same bytes.
 #include "test_util.h"
+#include "../hl_local.h"
 
 using namespace hl;
 
@@ -720,6 +721,211 @@ static void testStackUse()
     free(stack);
 }
 
+// ------------------------------------------------------------------ the local link (provisioning over USB)
+extern "C" int hl_mlkem_enc_derand(uint8_t *ct, uint8_t *ss, const uint8_t *pk, const uint8_t *coins);
+
+namespace
+{
+struct TestHost : LocalHost {
+    Unit *unit = nullptr;
+    int restarts = 0, configs = 0, langs = 0;
+    uint32_t nodeNumber() override { return 0x51a70001; }
+    const char *version() override { return "1.4.2"; }
+    const char *board() override { return "test-board"; }
+    bool devKeys() override { return true; }
+    Version firmwareFloor() override
+    {
+        Version v;
+        parseVersion("1.4.0", 5, v);
+        return v;
+    }
+    void configChanged() override { configs++; }
+    void restartSoon() override { restarts++; }
+    void languageChanged() override { langs++; }
+    Result ask(const char *text, uint8_t category, uint32_t &wait) override
+    {
+        uint32_t qid;
+        return unit->ask(Str{text, strlen(text)}, category, kBatteryUnknown, qid, wait);
+    }
+    Result updateBegin(Bytes, Bytes) override { return Result::Unsupported; }
+    Result updateWrite(Bytes) override { return Result::Unsupported; }
+    Result updateFinish() override { return Result::Unsupported; }
+};
+
+struct LocalReplyT {
+    Result status;
+    uint16_t total;
+    std::vector<uint8_t> data;
+};
+
+LocalReplyT localCall(LocalLink &link, uint8_t op, uint16_t seq = 0, uint16_t total = 0, const std::vector<uint8_t> &data = {})
+{
+    std::vector<uint8_t> req(kLocalHeader + data.size());
+    req[0] = kLocalMagic;
+    req[1] = op;
+    wr16(req.data() + 2, seq);
+    wr16(req.data() + 4, total);
+    if (!data.empty())
+        memcpy(req.data() + kLocalHeader, data.data(), data.size());
+    uint8_t reply[kMaxPayload];
+    size_t n = link.handle(B(req), reply);
+    LocalReplyT r{Result::Internal, 0, {}};
+    CHECK(n >= kLocalReplyHeader && reply[0] == kLocalMagic && reply[1] == (op | 0x80) && rd16(reply + 3) == seq);
+    if (n >= kLocalReplyHeader) {
+        r.status = (Result)reply[2];
+        r.total = rd16(reply + 5);
+        r.data.assign(reply + kLocalReplyHeader, reply + n);
+    }
+    return r;
+}
+
+Result localUpload(LocalLink &link, const std::vector<uint8_t> &blob)
+{
+    uint16_t total = (uint16_t)((blob.size() + kLocalData - 1) / kLocalData);
+    for (uint16_t i = 0; i < total; i++) {
+        size_t off = (size_t)i * kLocalData, n = blob.size() - off < kLocalData ? blob.size() - off : kLocalData;
+        Result r = localCall(link, kOpWrite, i, total, std::vector<uint8_t>(blob.begin() + off, blob.begin() + off + n)).status;
+        if (r != Result::Ok)
+            return r;
+    }
+    return Result::Ok;
+}
+} // namespace
+
+static void testLocalLink()
+{
+    Fixture f;
+    f.platform.rtc = V.num("now");
+    TestHost host;
+    host.unit = f.unit;
+    LocalLink link(*f.unit, host);
+    uint8_t reply[kMaxPayload];
+
+    // Only requests are answered: radio packets, replies and stubs are not local-link requests.
+    auto alert = V.bytes("alerts.pl_only.packets.0");
+    CHECK_EQ(link.handle(B(alert), reply), 0);
+    const uint8_t replyFrame[] = {kLocalMagic, kOpHello | 0x80, 0, 0, 0, 0, 0};
+    CHECK_EQ(link.handle(Bytes(replyFrame, sizeof(replyFrame)), reply), 0);
+    CHECK_EQ(link.handle(Bytes(replyFrame, 3), reply), 0);
+
+    LocalReplyT r = localCall(link, kOpHello);
+    CHECK(r.status == Result::Ok);
+    CHECK_EQ(r.data[0], kHelloDevKeys); // nothing provisioned yet; a development build says so
+    CHECK_EQ(rd32(r.data.data() + 11), 0x51a70001u);
+    Version v;
+    parseVersion("1.4.2", 5, v);
+    CHECK_EQ(rd32(r.data.data() + 5), packVersion(v));
+    CHECK(std::string((char *)r.data.data() + 19, r.data.size() - 19) == "test-board");
+
+    // Uploads: in order, bounded, and a bundle is only installed when it verifies.
+    CHECK(localCall(link, kOpWrite, 1, 3, {1, 2, 3}).status == Result::Malformed); // does not start at chunk 0
+    CHECK(localCall(link, kOpWrite, 0, 200, {1}).status == Result::TooLarge);      // 200 * 227 B > 24 KiB
+    CHECK(localCall(link, kOpBundle).status == Result::Malformed);                 // nothing uploaded
+    auto bundle = V.bytes("bundle.sealed");
+    auto bad = bundle;
+    bad[300] ^= 1;
+    CHECK(localUpload(link, bad) == Result::Ok);
+    CHECK(localCall(link, kOpBundle).status == Result::BadSignature);
+    CHECK_EQ(host.configs, 0);
+    CHECK(localCall(link, kOpLock).status == Result::NotProvisioned);
+    CHECK(localUpload(link, bundle) == Result::Ok);
+    CHECK(localCall(link, kOpBundle).status == Result::Ok);
+    CHECK_EQ(host.configs, 1);
+    CHECK(localCall(link, kOpBundle).status == Result::Malformed); // the upload was consumed
+    CHECK(localCall(link, kOpLock).status == Result::NotProvisioned); // a household needs its key first
+
+    // Key agreement with fresh randomness on the unit; this test plays the station.
+    r = localCall(link, kOpKemBegin);
+    CHECK(r.status == Result::Ok);
+    CHECK_EQ(r.total, (kMlkemPubLen + 32 + kLocalReplyData - 1) / kLocalReplyData);
+    std::vector<uint8_t> pub;
+    for (uint16_t i = 0; i < r.total; i++) {
+        LocalReplyT c = localCall(link, kOpRead, i);
+        CHECK(c.status == Result::Ok);
+        pub.insert(pub.end(), c.data.begin(), c.data.end());
+    }
+    CHECK_EQ(pub.size(), kMlkemPubLen + 32);
+    CHECK(localCall(link, kOpRead, r.total).status == Result::Malformed);
+    std::vector<uint8_t> up(kMlkemCtLen + 32 + 4), stationSecret = V.bytes("kem.unit_x25519_secret");
+    uint8_t ikm[64], coins[32] = {7}, stationPub[32];
+    CHECK(hl_mlkem_enc_derand(up.data(), ikm, pub.data(), coins) == 0);
+    x25519Public(stationSecret.data(), stationPub);
+    CHECK(x25519Shared(stationSecret.data(), pub.data() + kMlkemPubLen, ikm + 32));
+    memcpy(up.data() + kMlkemCtLen, stationPub, 32);
+    const uint32_t unitId = 0x0badc0de;
+    wr32(up.data() + kMlkemCtLen + 32, unitId);
+    // The station's side of the derivation, written out independently of hl_kem.cpp.
+    uint8_t salt[32], key[32], mac[32], info[24];
+    Sha256 sh;
+    sh.update((const uint8_t *)"HLv1 unit-key", 13);
+    sh.update(pub.data(), pub.size());
+    sh.update(up.data(), kMlkemCtLen + 32);
+    sh.finish(salt);
+    memcpy(info, "holdline unit key v1", 20);
+    wr32(info + 20, unitId);
+    hkdfSha256(Bytes(ikm, 64), Bytes(salt, 32), Bytes(info, 24), key, 32);
+    HmacSha256 hm(key, 32);
+    hm.update((const uint8_t *)"HLv1-kc", 7);
+    hm.update(salt, 32);
+    hm.finish(mac);
+
+    CHECK(localCall(link, kOpKemFinish).status == Result::Malformed); // nothing uploaded
+    auto shortUp = up;
+    shortUp.pop_back();
+    CHECK(localUpload(link, shortUp) == Result::Ok);
+    CHECK(localCall(link, kOpKemFinish).status == Result::Malformed);
+    CHECK(localUpload(link, up) == Result::Ok);
+    r = localCall(link, kOpKemFinish);
+    CHECK(r.status == Result::Ok);
+    CHECK_EQ(r.data.size(), kKeyConfirmLen);
+    CHECK(memcmp(r.data.data(), mac, kKeyConfirmLen) == 0); // unit and station hold the same key
+    CHECK(localCall(link, kOpKemFinish).status == Result::Malformed); // one-shot: the ephemeral keys are gone
+
+    CHECK(localCall(link, kOpSetLang, 0, 0, {'P', '1'}).status == Result::Malformed);
+    CHECK(localCall(link, kOpSetLang, 0, 0, {'p', 'l'}).status == Result::Ok);
+    CHECK_EQ(host.langs, 2);
+    CHECK(localCall(link, kOpAsk, 0, 0, {1, 'x'}).status == Result::NotProvisioned); // not locked yet
+    CHECK(localCall(link, kOpLock).status == Result::Ok);
+    CHECK_EQ(host.restarts, 1);
+    CHECK_EQ(host.configs, 2);
+    r = localCall(link, kOpHello);
+    CHECK_EQ(r.data[0], kHelloProvisioned | kHelloHasKey | kHelloHasBundle | kHelloDevKeys);
+    CHECK_EQ(rd32(r.data.data() + 1), unitId);
+    CHECK(r.data[9] == 'p' && r.data[10] == 'l');
+
+    // Locked: no new key agreement, no second lock; questions work and are rate limited.
+    CHECK(localCall(link, kOpKemBegin).status == Result::NotAuthorized);
+    CHECK(localCall(link, kOpLock).status == Result::Duplicate);
+    CHECK(localCall(link, kOpAsk, 0, 0, {}).status == Result::Malformed);
+    r = localCall(link, kOpAsk, 0, 0, {3, 'K', 'd', 'y', '?'});
+    CHECK(r.status == Result::Ok);
+    r = localCall(link, kOpAsk, 0, 0, {3, 'K', 'd', 'e', '?'});
+    CHECK(r.status == Result::RateLimited);
+    CHECK(rd32(r.data.data()) > 0 && rd32(r.data.data()) <= 600);
+    // The question that went out decrypts with the key the "station" derived.
+    uint8_t out[kMaxPayload], pt[kMaxPayload], nonce[12] = {0};
+    size_t n = 0;
+    uint32_t to = 0, qid = 0;
+    CHECK(f.unit->nextOutgoing(out, n, to, qid));
+    wr32(nonce, unitId);
+    wr32(nonce + 4, qid);
+    nonce[11] = 1;
+    size_t ct = n - kHeaderLen - kGcmTagLen;
+    CHECK(aes256GcmOpen(key, nonce, Bytes(out, kHeaderLen), Bytes(out + kHeaderLen, ct), out + n - kGcmTagLen, pt));
+    CHECK(std::string((char *)pt, ct) == std::string("pl\x03\xff", 4) + "Kdy?");
+
+    // A key bulletin shipped with an update goes in through SEALED; an old one is refused.
+    auto next = V.bytes("keys.pl_next.sealed"), old = V.bytes("keys.pl_old.sealed");
+    CHECK(localUpload(link, next) == Result::Ok);
+    CHECK(localCall(link, kOpSealed).status == Result::Ok);
+    CHECK(localUpload(link, old) == Result::Ok);
+    CHECK(localCall(link, kOpSealed).status == Result::Rollback);
+    // Updates are the host's business; unknown operations are refused, never ignored silently.
+    CHECK(localCall(link, kOpUpdateData, 0, 0, {1, 2, 3}).status == Result::Unsupported);
+    CHECK(localCall(link, 0x7f).status == Result::Unsupported);
+    CHECK_EQ(host.restarts, 1);
+}
+
 int main(int argc, char **argv)
 {
     if (argc < 3) {
@@ -741,5 +947,6 @@ int main(int argc, char **argv)
     RUN(testRelayPolicy);
     RUN(testManifest);
     RUN(testStackUse);
+    RUN(testLocalLink);
     return finish();
 }

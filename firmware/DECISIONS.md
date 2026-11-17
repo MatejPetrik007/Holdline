@@ -48,6 +48,6 @@
 
 - **Hardware tests.** Nothing here has run on a board. The core is tested on a host; the Meshtastic module is compiled in CI only.
 - **Secure Boot V2 and flash encryption.** Burning eFuses is irreversible and is listed as the authority's decision. See [`README.md`](README.md), "Production units".
-- **Reproducible builds across machines.** The inputs are pinned (upstream commit, dependency commits, `SOURCE_DATE_EPOCH`) and CI publishes the hash of every image. The build tools are pinned too (`household/requirements-build.txt`). That two machines produce the same hash has not been demonstrated yet.
+- **Reproducible builds: shown on CI only.** The inputs are pinned (upstream commit, dependency commits, build tools in `household/requirements-build.txt`, `SOURCE_DATE_EPOCH`). Two independent CI builds of commit `69c231c`, on different days and runners, produced byte-identical images for all five boards. Both ran on the same runner image and the same absolute paths; a rebuild on a different operating system or in a different directory has not been compared yet.
 - **Real root keys.** `household/keys/roots.json` does not exist; builds pin the throwaway root and say so at boot.
 - **KEYS re-broadcast schedule** is the authority's choice; the unit accepts a bulletin whenever it arrives.
