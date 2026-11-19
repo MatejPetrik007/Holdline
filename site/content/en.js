@@ -37,18 +37,18 @@ export default {
       routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
       mapLabel: "Map of Cieszyn and Český Těšín with mesh radio nodes on both sides of the Olza river",
       riverLabel: "Olza · border",
-      legend: ["mesh node · got alert", "mesh node · not yet", "rooftop router", "cell tower"],
+      legend: ["household · got alert", "household · waiting", "high-site router", "cell tower"],
       replay: "Replay story", resend: "Resend via mesh", hopLimit: "Hop limit", speed: "Speed", speeds: ["Slow", "Normal", "Fast"],
-      restore: "Restore all nodes", hint: "Click a node to knock it out, then resend.", base: "base station",
-      statsLabel: "Delivery summary", stats: ["Cell network", "Mesh reached", "Max hops", "Transmissions", "Time to deliver"],
+      restore: "Restore all nodes", hint: "Click a router or a named house to switch it off, then resend.", base: "base station",
+      statsLabel: "Delivery summary", stats: ["Cell network", "Households reached", "Max hops", "Transmissions", "Time to deliver"],
       nodes: { hq: "Crisis centre", hospital: "Hospital", roof: "Těšín roof" },
       tipHq: "Crisis centre base station (Cieszyn)", tipNode: "{name} ({c}) · {role} · click to switch off / on",
-      router: "rooftop router", household: "household node",
+      router: "high-site router (ROUTER)", household: "household node (CLIENT_MUTE)",
       pills: { waiting: "waiting", sending: "sending", failed: "failed", delivered: "{r}/{t} delivered" },
       phases: { normal: "GRID NORMAL", blackout: "BLACKOUT · BOTH BANKS", drained: "TOWER BATTERIES DRAINED", cell: "ALERT VIA CELL NETWORK", mesh: "MESHTASTIC · MANAGED FLOODING", done: "ALERT DELIVERED OVER MESH" },
       log: {
         grid: "Grid normal · 3 cell sites on mains power",
-        meshReady: "Mesh: {n} nodes on battery/solar, channel OLZA",
+        meshReady: "Mesh: {r} high-site routers + {n} household nodes on battery/solar, channel OLZA",
         lost: "Grid power lost in Cieszyn and Český Těšín",
         battery: "Cell sites switched to backup batteries",
         depleted: "{t}: battery depleted, site offline",
@@ -62,9 +62,10 @@ export default {
         quiet: "{n}: heard {from} relay it first, stays quiet",
         rx: "{n} ({c}) rx hop {hop} · SNR {snr} dB · relay in {ms} ms",
         rxLimit: "{n} ({c}) rx hop {hop} · SNR {snr} dB · hop limit 0, not relayed",
-        all: "Delivered to all {t} nodes · {tx} transmissions · {q} stayed quiet",
-        missed: "Not reached: {list}", offCount: " ({n} switched off)",
-        tip: "Tip: raise the hop limit or restore a router, then resend.",
+        rxHomes: "{k} households heard {from} directly · hop {hop} · CLIENT_MUTE, no relay",
+        all: "All {t} households reached · only {tx} transmissions · no household had to relay",
+        missed: "Not reached: {n} households · named: {list}", offCount: " ({n} switched off)",
+        tip: "Tip: switch the router back on, or add a second high site covering the same streets, then resend.",
       },
     },
     verify: {
@@ -130,7 +131,7 @@ export default {
     demo: `
 <p class="eyebrow">simulation · Cieszyn (PL) / Český Těšín (CZ)</p>
 <h1>Blackout on the Olza</h1>
-<p class="lede">The power is out on both banks of the river. Cell towers last a few hours on battery, then go silent. A crisis centre in Cieszyn needs to tell residents in both countries where to find water and charging. Watch the same alert fail over the phone network, then reach every household node through a Meshtastic mesh, hop by hop.</p>
+<p class="lede">The power is out on both banks of the river. Cell towers last a few hours on battery, then go silent. A crisis centre in Cieszyn needs to tell about 300 households in both countries where to find water and charging. Watch the same alert fail over the phone network, then reach every home through three radios on high points: a hill, a tall roof and a water tower.</p>
 <div id="sim"></div>
 
 <div class="two">
@@ -144,24 +145,24 @@ export default {
 
 <h2>How a message propagates</h2>
 <ol class="steps">
-  <li><h3>The centre transmits once</h3><p>Its rooftop node broadcasts the encrypted packet with a hop limit, 3 by default. Every node in radio range, typically 1–5 km in town and much further from a hill: with clear line of sight, Meshtastic links have spanned over 300 km. Here the centre's rooftop antenna reaches nám. ČSA across the river directly, in one hop.</p></li>
-  <li><h3>Each node relays it once</h3><p>This is <i>managed flooding</i>. A node that receives a new packet waits a short moment and then rebroadcasts it with the hop limit lowered by one. At zero, it stops.</p></li>
-  <li><h3>Far nodes go first</h3><p>The wait depends on signal strength: a weak signal means the node is far from the sender, so it waits less. That pushes the message outward fastest.</p></li>
-  <li><h3>Duplicates are ignored</h3><p>Every packet has an ID. A node that has already seen it drops copies. A regular node that hears a neighbour relay the packet before its own turn stays quiet, which saves airtime. Routers on high points, like Góra Zamkowa here, always relay.</p></li>
+  <li><h3>The centre transmits once</h3><p>Its rooftop node broadcasts the encrypted packet with a hop limit, 3 by default. Every node in radio range hears it at the same moment, typically 1–5 km in town and much further from a hill: with clear line of sight, Meshtastic links have spanned over 300 km. Here the centre reaches all three high sites, and the homes around it, directly.</p></li>
+  <li><h3>High sites relay, homes listen</h3><p>The routers on Góra Zamkowa, the Těšín roof and the Mnisztwo water tower rebroadcast the packet once. From up there one antenna covers a whole district, so every household hears it directly. That is two hops at most, whether the town has 30 homes or 3,000.</p></li>
+  <li><h3>Households don't relay</h3><p>Household nodes run in the <code>CLIENT_MUTE</code> role: they receive and show the alert but never rebroadcast it. If hundreds of homes repeated every packet, they would fill the shared channel and messages would collide. Only a few well-placed sites relay, so the airtime stays free for replies.</p></li>
+  <li><h3>Duplicates are ignored</h3><p>Every packet has an ID. A node that has already seen it drops copies, so a home that hears both the centre and a router shows the alert once. The hop limit (7 at most) caps how many times a packet is relayed; it does not count houses.</p></li>
   <li><h3>The sender knows it got out</h3><p>When the centre hears its own packet relayed, it counts that as an implicit acknowledgement.</p></li>
-  <li><h3>Lose a node, keep the network</h3><p>Knock out a router on the map and resend. Even with Těšín roof and Góra Zamkowa both down, the centre still reaches nám. ČSA directly, and Dolní Žukov carries the alert on to the south. Nodes far from the centre depend on their neighbours, so a missing node can still cut someone off: try it.</p></li>
+  <li><h3>Plan for losing a site</h3><p>Switch off the Těšín roof and resend: Koňákov and part of Mosty are cut off, because no other high site covers them. Switch off Góra Zamkowa instead and nobody is lost, because the centre and the water tower overlap it. In a real municipality every street should sit inside at least two circles.</p></li>
   <li><h3>Every screen in its owner's language</h3><p>Each node has its own display language: Czech, Polish or English. Hover over a node in the simulation and change it. The crisis centre writes the alert once and chooses how it is translated: original only, automatically into the languages its recipients use, or into all languages. Translation happens at the centre before sending, because nodes have no internet in a blackout. If a language was not sent, the node shows the original. More languages mean more bytes: past 233 B the alert is split into several packets.</p></li>
 </ol>
 
 <h2>Cell network vs mesh during a blackout</h2>
 <div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Cell network</th><th>Meshtastic mesh</th></tr></thead><tbody>
 <tr><td>Needs grid power</td><td>Yes, batteries last hours</td><td><b>No</b>, battery and solar for days</td></tr>
-<tr><td>Central point of failure</td><td>Towers, backhaul, core network</td><td><b>None</b>, every node is a relay</td></tr>
+<tr><td>Central point of failure</td><td>Towers, backhaul, core network</td><td><b>None</b> if every street is covered by two high sites</td></tr>
 <tr><td>Across the PL–CZ border</td><td>Separate operators and alert systems</td><td><b>One shared channel</b> on both banks</td></tr>
 <tr><td>Capacity</td><td>Voice, data, video</td><td>Short text only, about 200 bytes per message, shared airtime</td></tr>
 <tr><td>Preparation</td><td>Already in every pocket</td><td>Nodes must be placed, charged and on the channel before the blackout: that is why every household gets one <a href="#/hardware#pins">delivered assembled</a></td></tr>
 </tbody></table></div>
-<p class="small">The mesh does not replace sirens, radio broadcasts or door-to-door teams. It adds a channel that survives when the others are down. Deaf and deafblind residents receive the same alert as vibration through the <a href="#/access">haptic band</a>. This simulation simplifies radio range and timing and ignores packet collisions; node locations are illustrative.</p>`,
+<p class="small">The mesh does not replace sirens, radio broadcasts or door-to-door teams. It adds a channel that survives when the others are down. Deaf and deafblind residents receive the same alert as vibration through the <a href="#/access">haptic band</a>. This simulation simplifies radio range and timing and ignores terrain and packet collisions; node locations are illustrative.</p>`,
     hardware: `
 <p class="eyebrow">open hardware</p>
 <h1>Delivered assembled. Open, so you can build it yourself.</h1>

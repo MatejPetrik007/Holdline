@@ -1,5 +1,6 @@
 // Blackout simulation: the same alert fails over the cell network, then floods a Meshtastic mesh.
-// Simplified model (range circles, managed flooding, SNR-based rebroadcast delay); no collisions.
+// Simplified model: high-site routers relay, household nodes are CLIENT_MUTE (receive, never relay);
+// range circles, no terrain, no collisions.
 // mountDemo(root, S) renders into root using the translated strings S and returns a cleanup function.
 
 const SVGNS = 'http://www.w3.org/2000/svg';
@@ -66,7 +67,7 @@ export function mountDemo(root, S) {
           <text class="town" x="250" y="410">ČESKÝ TĚŠÍN</text>
           <text class="town" x="560" y="410">CIESZYN</text>
           <text class="legend" x="474" y="608" transform="rotate(-62 474 608)">${S.riverLabel}</text>
-          <g data-g="back"></g><g data-g="links"></g><g data-g="towers"></g><g data-g="rings"></g><g data-g="pkts"></g><g data-g="nodes"></g>
+          <g data-g="cover"></g><g data-g="back"></g><g data-g="links"></g><g data-g="towers"></g><g data-g="rings"></g><g data-g="pkts"></g><g data-g="houses"></g><g data-g="nodes"></g>
           <text class="clock" x="24" y="44" data-k="clock">18:40</text>
           <text class="phase" x="24" y="66" data-k="phase"></text>
           <g transform="translate(24 96)" class="legend">
@@ -121,27 +122,49 @@ export function mountDemo(root, S) {
   };
   const setPill = (k, cls, text) => { const p = K(k); p.className = 'sim-pill ' + cls; p.textContent = text; };
 
-  const RANGE = { hq: 300, router: 300, client: 160 };
+  // Map units are roughly 10 m. Routers sit on high points (castle hill, a tall roof, a water tower) and
+  // see over the rooftops; household nodes are CLIENT_MUTE: they receive and show alerts but never relay.
+  const RANGE = { hq: 280, router: 400, home: 120 };
   const NODES = [
     { id: 'hq', name: N.hq, x: 600, y: 300, role: 'hq', c: 'PL' },
     { id: 'castle', name: 'Góra Zamkowa', x: 540, y: 250, role: 'router', c: 'PL' },
-    { id: 'bulwary', name: 'Bulwary', x: 522, y: 380, role: 'client', c: 'PL' },
-    { id: 'hospital', name: N.hospital, x: 660, y: 210, role: 'client', c: 'PL' },
-    { id: 'bobrek', name: 'Bobrek', x: 590, y: 80, role: 'client', c: 'PL' },
-    { id: 'pastwiska', name: 'Pastwiska', x: 720, y: 110, role: 'client', c: 'PL' },
-    { id: 'krasna', name: 'Krasna', x: 720, y: 330, role: 'client', c: 'PL' },
-    { id: 'bogus', name: 'Boguszowice', x: 820, y: 280, role: 'client', c: 'PL' },
-    { id: 'mniszt', name: 'Mnisztwo', x: 800, y: 430, role: 'client', c: 'PL' },
-    { id: 'markl', name: 'Marklowice', x: 660, y: 500, role: 'client', c: 'PL' },
     { id: 'ctr', name: N.roof, x: 370, y: 320, role: 'router', c: 'CZ' },
-    { id: 'nam', name: 'nám. ČSA', x: 400, y: 200, role: 'client', c: 'CZ' },
-    { id: 'chot', name: 'Chotěbuz', x: 340, y: 100, role: 'client', c: 'CZ' },
-    { id: 'svib', name: 'Svibice', x: 230, y: 160, role: 'client', c: 'CZ' },
-    { id: 'mosty', name: 'Mosty', x: 205, y: 420, role: 'client', c: 'CZ' },
-    { id: 'zukov', name: 'Dolní Žukov', x: 430, y: 440, role: 'client', c: 'CZ' },
-    { id: 'stan', name: 'Stanislavice', x: 300, y: 470, role: 'client', c: 'CZ' },
-    { id: 'konak', name: 'Koňákov', x: 170, y: 560, role: 'client', c: 'CZ' },
+    { id: 'mniszt', name: 'Wieża Mnisztwo', x: 800, y: 400, role: 'router', c: 'PL' },
+    { id: 'bulwary', name: 'Bulwary', x: 522, y: 380, role: 'home', c: 'PL' },
+    { id: 'hospital', name: N.hospital, x: 660, y: 210, role: 'home', c: 'PL' },
+    { id: 'bobrek', name: 'Bobrek', x: 590, y: 80, role: 'home', c: 'PL' },
+    { id: 'pastwiska', name: 'Pastwiska', x: 720, y: 110, role: 'home', c: 'PL' },
+    { id: 'krasna', name: 'Krasna', x: 720, y: 330, role: 'home', c: 'PL' },
+    { id: 'bogus', name: 'Boguszowice', x: 840, y: 270, role: 'home', c: 'PL' },
+    { id: 'markl', name: 'Marklowice', x: 660, y: 500, role: 'home', c: 'PL' },
+    { id: 'nam', name: 'nám. ČSA', x: 400, y: 200, role: 'home', c: 'CZ' },
+    { id: 'chot', name: 'Chotěbuz', x: 340, y: 100, role: 'home', c: 'CZ' },
+    { id: 'svib', name: 'Svibice', x: 230, y: 160, role: 'home', c: 'CZ' },
+    { id: 'mosty', name: 'Mosty', x: 205, y: 420, role: 'home', c: 'CZ' },
+    { id: 'zukov', name: 'Dolní Žukov', x: 430, y: 440, role: 'home', c: 'CZ' },
+    { id: 'stan', name: 'Stanislavice', x: 300, y: 470, role: 'home', c: 'CZ' },
+    { id: 'konak', name: 'Koňákov', x: 170, y: 560, role: 'home', c: 'CZ' },
   ];
+  // Hundreds of unnamed household nodes, scattered over the towns and villages (seeded, so every replay matches).
+  const HOUSES = [
+    { x: 625, y: 260, rx: 110, ry: 125, n: 95, c: 'PL' }, { x: 395, y: 285, rx: 95, ry: 115, n: 85, c: 'CZ' },
+    { x: 590, y: 88, rx: 40, ry: 26, n: 10, c: 'PL' }, { x: 720, y: 118, rx: 40, ry: 26, n: 10, c: 'PL' },
+    { x: 830, y: 285, rx: 40, ry: 28, n: 10, c: 'PL' }, { x: 800, y: 445, rx: 40, ry: 26, n: 10, c: 'PL' },
+    { x: 660, y: 510, rx: 40, ry: 26, n: 10, c: 'PL' }, { x: 870, y: 525, rx: 42, ry: 28, n: 10, c: 'PL' },
+    { x: 340, y: 110, rx: 40, ry: 26, n: 10, c: 'CZ' }, { x: 230, y: 170, rx: 40, ry: 26, n: 10, c: 'CZ' },
+    { x: 205, y: 430, rx: 42, ry: 30, n: 12, c: 'CZ' }, { x: 415, y: 460, rx: 36, ry: 26, n: 10, c: 'CZ' },
+    { x: 300, y: 480, rx: 40, ry: 26, n: 10, c: 'CZ' }, { x: 170, y: 565, rx: 34, ry: 22, n: 8, c: 'CZ' },
+  ];
+  {
+    const r = rng(1234);
+    let k = 0;
+    HOUSES.forEach((c) => {
+      for (let i = 0; i < c.n; i++) {
+        const a = r() * Math.PI * 2, d = Math.sqrt(r());
+        NODES.push({ id: 'h' + k++, name: '', x: +(c.x + Math.cos(a) * c.rx * d).toFixed(1), y: +(c.y + Math.sin(a) * c.ry * d).toFixed(1), role: 'home', c: c.c, gen: true });
+      }
+    });
+  }
   const byId = {};
   NODES.forEach((n) => { byId[n.id] = n; n.off = false; n.lang = n.c === 'CZ' ? 'cs' : 'pl'; });
   const TOWERS = [
@@ -151,16 +174,20 @@ export function mountDemo(root, S) {
   ];
   const HQ = byId.hq;
   const others = NODES.filter((n) => n.role !== 'hq');
+  const homes = NODES.filter((n) => n.role === 'home');
+  const routers = NODES.filter((n) => n.role === 'router');
+  const relays = NODES.filter((n) => n.role !== 'home');
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-  const thr = (a, b) => (RANGE[a.role] + RANGE[b.role]) / 2;
 
+  // Only the centre and the routers transmit. Everyone within a transmitter's range hears it directly.
   const adj = {};
+  relays.forEach((t) => (adj[t.id] = NODES.filter((n) => n !== t && dist(t, n) <= RANGE[t.role])));
+  // Backbone links between the centre and the high sites (both ends in each other's range).
   const links = [];
-  NODES.forEach((n) => (adj[n.id] = []));
-  for (let i = 0; i < NODES.length; i++)
-    for (let j = i + 1; j < NODES.length; j++) {
-      const a = NODES[i], b = NODES[j];
-      if (dist(a, b) <= thr(a, b)) { adj[a.id].push(b); adj[b.id].push(a); links.push({ a, b }); }
+  for (let i = 0; i < relays.length; i++)
+    for (let j = i + 1; j < relays.length; j++) {
+      const a = relays[i], b = relays[j];
+      if (dist(a, b) <= Math.min(RANGE[a.role], RANGE[b.role])) links.push({ a, b });
     }
 
   // ---------- static drawing ----------
@@ -175,7 +202,7 @@ export function mountDemo(root, S) {
       { x: 170, y: 560, rx: 35, ry: 25, n: 10 }, { x: 870, y: 520, rx: 45, ry: 30, n: 14 },
     ];
     clusters.forEach((c) => {
-      for (let i = 0; i < c.n; i++) {
+      for (let i = 0; i < Math.round(c.n * 0.6); i++) {
         const a = r() * Math.PI * 2, d = Math.sqrt(r());
         const e = mk('circle', {
           cx: (c.x + Math.cos(a) * c.rx * d).toFixed(1), cy: (c.y + Math.sin(a) * c.ry * d).toFixed(1),
@@ -187,6 +214,8 @@ export function mountDemo(root, S) {
     });
   }
   links.forEach((l) => { l.el = mk('line', { x1: l.a.x, y1: l.a.y, x2: l.b.x, y2: l.b.y, class: 'link' }, G('links')); });
+  // Coverage of each transmitter: every household inside a circle hears it directly, with no relay.
+  relays.forEach((n) => { n.cover = mk('circle', { cx: n.x, cy: n.y, r: RANGE[n.role], class: 'cover' }, G('cover')); });
 
   TOWERS.forEach((t) => {
     mk('path', { d: `M${HQ.x} ${HQ.y} L${t.x} ${t.y}`, class: 'backhaul' }, G('back'));
@@ -199,20 +228,31 @@ export function mountDemo(root, S) {
     t.g = g;
   });
 
-  function setState(n, s) { n.state = s; n.g.setAttribute('class', `node ${n.role} ${n.off ? 'off' : s}`); }
-  function refreshLinks() { links.forEach((l) => l.el.classList.toggle('dead', l.a.off || l.b.off)); }
+  function setState(n, s) { n.state = s; n.g.setAttribute('class', `node ${n.role}${n.gen ? ' gen' : ''} ${n.off ? 'off' : s}`); }
+  function refreshLinks() {
+    links.forEach((l) => l.el.classList.toggle('dead', l.a.off || l.b.off));
+    relays.forEach((n) => n.cover.classList.toggle('dead', n.off));
+  }
   function setTower(t, s) { t.g.setAttribute('class', 'tower ' + s); }
+  const roleName = (n) => (n.role === 'router' ? S.router : S.household);
 
   NODES.forEach((n) => {
+    if (n.gen) {
+      // unnamed household: a small dot, no label, not interactive
+      const g = mk('g', { class: 'node home gen', transform: `translate(${n.x} ${n.y})` }, G('houses'));
+      mk('circle', { class: 'core', r: 2.6 }, g);
+      n.g = g;
+      return;
+    }
     const isHq = n.role === 'hq';
     const g = mk('g', { class: 'node ' + n.role, transform: `translate(${n.x} ${n.y})`, tabindex: isHq ? -1 : 0, role: isHq ? 'img' : 'button' }, G('nodes'));
     mk('circle', { class: 'halo', r: 20 }, g);
     if (n.role === 'router') mk('rect', { class: 'core', x: -8, y: -8, width: 16, height: 16, transform: 'rotate(45)' }, g);
     else if (isHq) mk('rect', { class: 'core', x: -10, y: -10, width: 20, height: 20, rx: 3 }, g);
-    else mk('circle', { class: 'core', r: 7 }, g);
+    else mk('circle', { class: 'core', r: 6 }, g);
     mk('path', { class: 'x', d: 'M-6 -6 L6 6 M6 -6 L-6 6' }, g);
-    mk('text', { class: 'lbl' + (n.role !== 'client' ? ' strong' : ''), x: 0, y: n.role === 'client' ? 22 : 26, 'text-anchor': 'middle' }, g).textContent = n.name;
-    mk('title', {}, g).textContent = isHq ? S.tipHq : f(S.tipNode, { name: n.name, c: n.c, role: n.role === 'router' ? S.router : S.household });
+    mk('text', { class: 'lbl' + (n.role !== 'home' ? ' strong' : ''), x: 0, y: n.role === 'home' ? 20 : 26, 'text-anchor': 'middle' }, g).textContent = n.name;
+    mk('title', {}, g).textContent = isHq ? S.tipHq : f(S.tipNode, { name: n.name, c: n.c, role: roleName(n) });
     n.g = g;
     if (!isHq) {
       g.addEventListener('mouseenter', () => showNode(n));
@@ -271,7 +311,7 @@ export function mountDemo(root, S) {
 
   // ---------- managed flooding ----------
   const AIR = 700;
-  let H = 3, seen = {}, reached = 0, maxHop = 0, txCount = 0, quietCount = 0, implicitAck = false, meshT0 = null, meshDone = true, R;
+  let H = 3, seen = {}, reached = 0, maxHop = 0, txCount = 0, implicitAck = false, meshT0 = null, meshDone = true;
   let sentLangs = null, packets = 1, sel = byId.nam;
 
   // ---------- languages ----------
@@ -292,7 +332,7 @@ export function mountDemo(root, S) {
   function drawScreen() {
     const n = sel, d = DEV[n.lang], got = !!(seen[n.id] && sentLangs);
     K('nName').textContent = n.name;
-    K('nMeta').textContent = `${n.c} · ${n.role === 'router' ? S.router : S.household}`;
+    K('nMeta').textContent = `${n.c} · ${roleName(n)}`;
     B('nLang').value = n.lang;
     const e = K('eink');
     e.classList.toggle('off', n.off); e.classList.toggle('alert', got && !n.off);
@@ -305,15 +345,16 @@ export function mountDemo(root, S) {
   }
 
   function updateStats() {
-    K('s1').textContent = `${reached}/${others.length}`;
+    K('s1').textContent = `${reached}/${homes.length}`;
     K('s2').textContent = maxHop || '–';
     K('s3').textContent = txCount * packets;
   }
+  const snrOf = (n, from) => (10 - 24 * Math.min(1, dist(n, from) / RANGE[from.role])).toFixed(1);
   function startMesh(t) {
     mode = 'mesh'; meshDone = false;
-    H = Number(B('hop').value); R = rng(7 + H);
+    H = Number(B('hop').value);
     const out = renderOutgoing(); sentLangs = out.langs; packets = out.p;
-    seen = { hq: true }; reached = 0; maxHop = 0; txCount = 0; quietCount = 0; implicitAck = false; meshT0 = t;
+    seen = { hq: true }; reached = 0; maxHop = 0; txCount = 0; implicitAck = false; meshT0 = t;
     others.forEach((n) => setState(n, n.off ? 'off' : 'idle'));
     links.forEach((l) => l.el.classList.remove('hot'));
     setClock('21:31', S.phases.mesh); clockT0 = t;
@@ -325,17 +366,37 @@ export function mountDemo(root, S) {
     transmit(HQ, H, t);
     at(t + 1, function check(tt) { if (events.length === 0) finishMesh(); else at(tt + 200, check); });
   }
+  // One transmission: every live node inside the circle hears it at the same moment.
   function transmit(n, hl, t) {
     txCount++; updateStats();
     setState(n, n.role === 'hq' ? 'hqtx' : 'tx');
-    ring(n.x, n.y, RANGE[n.role] * 1.05, t, AIR);
-    adj[n.id].forEach((nb) => {
-      if (nb.off) return;
+    ring(n.x, n.y, RANGE[n.role], t, AIR * 1.4);
+    const near = adj[n.id].filter((nb) => !nb.off);
+    near.filter((nb) => nb.role !== 'home').forEach((nb) => {
       pkt(n, nb, t, AIR);
       at(t + AIR, (tt) => receive(nb, hl, n, tt));
     });
-    at(t + AIR, () => { if (n.state === 'tx') setState(n, n.lastHl === 0 ? 'limit' : 'got'); if (n.role === 'hq') setState(n, 'idle'); });
+    const hh = near.filter((nb) => nb.role === 'home');
+    if (hh.length) at(t + AIR, () => hear(hh, hl, n));
+    at(t + AIR, () => { if (n.state === 'tx') setState(n, 'got'); if (n.role === 'hq') setState(n, 'idle'); });
   }
+  // Households (CLIENT_MUTE) take the alert and show it. They never rebroadcast.
+  function hear(list, hl, from) {
+    const hop = H - hl + 1;
+    let k = 0;
+    list.forEach((n) => {
+      if (n.off || seen[n.id]) return;
+      seen[n.id] = true; k++; reached++;
+      n.rxHop = hop; n.rxSnr = snrOf(n, from);
+      setState(n, 'got');
+      if (n === sel) drawScreen();
+    });
+    if (!k) return;
+    maxHop = Math.max(maxHop, hop);
+    log('rx', f(S.log.rxHomes, { k, from: from.name, hop }));
+    updateStats();
+  }
+  // Routers (ROUTER role) relay the first copy they hear, quickly and always.
   function receive(n, hl, from, t) {
     if (n.off) return;
     const l = links.find((l) => (l.a === n && l.b === from) || (l.b === n && l.a === from));
@@ -344,22 +405,18 @@ export function mountDemo(root, S) {
       if (!implicitAck) { implicitAck = true; log('rx', f(S.log.ack, { from: from.name })); }
       return;
     }
-    if (seen[n.id]) {
-      if (n.state === 'waiting' && n.role !== 'router') { setState(n, 'quiet'); quietCount++; log('q', f(S.log.quiet, { n: n.name, from: from.name })); }
-      return;
-    }
-    seen[n.id] = true; reached++;
+    if (seen[n.id]) return;
+    seen[n.id] = true;
     const hop = H - hl + 1; maxHop = Math.max(maxHop, hop);
-    const d = dist(n, from), th = thr(n, from);
-    const snr = (10 - 24 * (d / th)).toFixed(1);
+    const snr = snrOf(n, from);
     n.rxHop = hop; n.rxSnr = snr;
     if (n === sel) drawScreen();
     updateStats();
     if (hl > 0) {
-      const delay = n.role === 'router' ? 120 : Math.round(380 + 1200 * (1 - d / th) + R() * 80);
+      const delay = 120 + Math.round(dist(n, from) / 4);
       setState(n, 'waiting');
       log('rx', f(S.log.rx, { n: n.name, c: n.c, hop, snr, ms: delay }));
-      at(t + delay, (tt) => { if (n.state !== 'waiting' || n.off) return; n.lastHl = hl - 1; transmit(n, hl - 1, tt); });
+      at(t + delay, (tt) => { if (n.state !== 'waiting' || n.off) return; transmit(n, hl - 1, tt); });
     } else {
       setState(n, 'limit');
       log('rx', f(S.log.rxLimit, { n: n.name, c: n.c, hop, snr }));
@@ -368,16 +425,16 @@ export function mountDemo(root, S) {
   function finishMesh() {
     if (meshDone) return;
     meshDone = true;
-    const total = others.length;
-    const missed = others.filter((n) => !seen[n.id]);
+    const missed = homes.filter((n) => !seen[n.id]);
     K('s4').textContent = ((simT - meshT0) / 1000).toFixed(1) + ' s';
-    if (missed.length === 0) log('sys', f(S.log.all, { t: total, tx: txCount, q: quietCount }));
+    if (missed.length === 0) log('sys', f(S.log.all, { t: homes.length, tx: txCount }));
     else {
       const off = missed.filter((n) => n.off).length;
-      log('bad', f(S.log.missed, { list: missed.map((n) => n.name).join(', ') }) + (off ? f(S.log.offCount, { n: off }) : ''));
+      const named = missed.filter((n) => !n.gen).map((n) => n.name).join(', ');
+      log('bad', f(S.log.missed, { n: missed.length, list: named || '–' }) + (off ? f(S.log.offCount, { n: off }) : ''));
       if (missed.some((n) => !n.off)) log('sys', S.log.tip);
     }
-    setPill('pMesh', 'ok', f(S.pills.delivered, { r: reached, t: total }));
+    setPill('pMesh', missed.length ? 'busy' : 'ok', f(S.pills.delivered, { r: reached, t: homes.length }));
     K('phase').textContent = S.phases.done;
   }
 
@@ -396,13 +453,13 @@ export function mountDemo(root, S) {
   function cellFailed() {
     TOWERS.forEach((t) => setTower(t, 'dead failed'));
     setPill('pCell', 'fail', S.pills.failed);
-    K('s0').textContent = '0/' + others.length;
+    K('s0').textContent = '0/' + homes.length;
   }
   function story() {
     mode = 'story'; resetVisual(); simT = 0; lightsOn(true);
     setClock('18:40', S.phases.normal);
     log('sys', S.log.grid);
-    log('sys', f(S.log.meshReady, { n: others.length }));
+    log('sys', f(S.log.meshReady, { r: routers.length, n: homes.length }));
     at(1600, () => {
       setClock('18:42', S.phases.blackout); lightsOn(false); TOWERS.forEach((t) => setTower(t, 'battery'));
       log('bad', S.log.lost); log('q', S.log.battery);

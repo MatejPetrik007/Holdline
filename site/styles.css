@@ -228,7 +228,7 @@ form.f .check input { margin-top: 4px; accent-color: var(--accent); width: 18px;
 .sim-lang { font: .64rem var(--mono); color: var(--s-signal); letter-spacing: .1em; }
 .sim-meta { font: .7rem var(--mono); color: var(--s-muted); display: flex; flex-direction: column; gap: 2px; }
 .sim-route { display: flex; flex-direction: column; gap: 8px; }
-.sim-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 6px; background: var(--s-panel-2); border: 1px solid var(--s-line); }
+.sim-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 6px; background: var(--s-panel-2); border: 1px solid var(--s-line); }
 .sim-pill { font: .68rem var(--mono); padding: 2px 8px; border-radius: 99px; border: 1px solid var(--s-line); color: var(--s-muted); white-space: nowrap; }
 .sim-pill.busy { color: var(--s-fg); border-color: var(--s-muted); }
 .sim-pill.fail { color: var(--s-fail); border-color: var(--s-fail); }
@@ -294,6 +294,10 @@ form.f .check input { margin-top: 4px; accent-color: var(--accent); width: 18px;
 .sim-map .node.off .lbl { fill: var(--s-fail); }
 .sim-map .node .x { stroke: var(--s-fail); stroke-width: 2; opacity: 0; } .sim-map .node.off .x { opacity: 1; }
 .sim-map .node.hq .core { stroke: var(--s-fg); }
+.sim-map .node.gen { cursor: default; }
+.sim-map .node.gen .core { stroke-width: 1; }
+.sim-map .cover { fill: var(--s-signal); fill-opacity: .03; stroke: var(--s-signal); stroke-opacity: .22; stroke-width: 1; stroke-dasharray: 2 6; transition: opacity .4s; }
+.sim-map .cover.dead { opacity: 0; }
 @keyframes simpulse { 0%, 100% { opacity: .08; } 50% { opacity: .35; } }
 .sim-map .tower .mast { fill: none; stroke: var(--s-cell); stroke-width: 2; transition: stroke .4s; }
 .sim-map .tower .wave { fill: none; stroke: var(--s-cell); stroke-width: 1.5; opacity: .7; }

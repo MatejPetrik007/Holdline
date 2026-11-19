@@ -37,18 +37,18 @@ export default {
       routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
       mapLabel: "Mapa Cieszyna i Czeskiego Cieszyna z węzłami mesh po obu stronach Olzy",
       riverLabel: "Olza · granica",
-      legend: ["węzeł · alert odebrany", "węzeł · jeszcze nie", "router na dachu", "stacja BTS"],
+      legend: ["dom · alert odebrany", "dom · czeka", "router na wzniesieniu", "stacja BTS"],
       replay: "Odtwórz ponownie", resend: "Wyślij ponownie przez mesh", hopLimit: "Hop limit", speed: "Prędkość", speeds: ["Wolno", "Normalnie", "Szybko"],
-      restore: "Przywróć wszystkie węzły", hint: "Kliknij węzeł, aby go wyłączyć, potem wyślij ponownie.", base: "stacja bazowa",
-      statsLabel: "Podsumowanie dostarczenia", stats: ["Sieć komórkowa", "Mesh dotarł", "Maks. skoków", "Transmisje", "Czas dostarczenia"],
+      restore: "Przywróć wszystkie węzły", hint: "Kliknij router lub nazwany dom, aby go wyłączyć, potem wyślij ponownie.", base: "stacja bazowa",
+      statsLabel: "Podsumowanie dostarczenia", stats: ["Sieć komórkowa", "Gospodarstwa", "Maks. skoków", "Transmisje", "Czas dostarczenia"],
       nodes: { hq: "Centrum kryzysowe", hospital: "Szpital", roof: "Dach Těšín" },
       tipHq: "Stacja bazowa centrum kryzysowego (Cieszyn)", tipNode: "{name} ({c}) · {role} · kliknij, aby wyłączyć / włączyć",
-      router: "router na dachu", household: "węzeł domowy",
+      router: "router na wzniesieniu (ROUTER)", household: "węzeł domowy (CLIENT_MUTE)",
       pills: { waiting: "czeka", sending: "wysyła", failed: "błąd", delivered: "dostarczono {r}/{t}" },
       phases: { normal: "SIEĆ DZIAŁA", blackout: "BLACKOUT · OBA BRZEGI", drained: "BATERIE BTS ROZŁADOWANE", cell: "ALERT PRZEZ SIEĆ KOMÓRKOWĄ", mesh: "MESHTASTIC · STEROWANY FLOODING", done: "ALERT DOSTARCZONY PRZEZ MESH" },
       log: {
         grid: "Sieć działa · 3 stacje BTS zasilane z sieci",
-        meshReady: "Mesh: {n} węzłów na baterii/solarze, kanał OLZA",
+        meshReady: "Mesh: {r} routery na wzniesieniach + {n} węzłów domowych na baterii/solarze, kanał OLZA",
         lost: "Brak prądu w Cieszynie i Czeskim Cieszynie",
         battery: "Stacje BTS przeszły na baterie zapasowe",
         depleted: "{t}: bateria rozładowana, stacja offline",
@@ -62,9 +62,10 @@ export default {
         quiet: "{n}: {from} przekazał go pierwszy, milczy",
         rx: "{n} ({c}) rx skok {hop} · SNR {snr} dB · przekazanie za {ms} ms",
         rxLimit: "{n} ({c}) rx skok {hop} · SNR {snr} dB · hop limit 0, nie przekazuje",
-        all: "Dostarczono do wszystkich {t} węzłów · {tx} transmisji · {q} milczało",
-        missed: "Nie dotarło do: {list}", offCount: " ({n} wyłączonych)",
-        tip: "Wskazówka: zwiększ hop limit lub przywróć router i wyślij ponownie.",
+        rxHomes: "{k} gospodarstw słyszy {from} bezpośrednio · skok {hop} · CLIENT_MUTE, bez przekazywania",
+        all: "Dostarczono do wszystkich {t} gospodarstw · transmisje łącznie: {tx} · żaden dom nie musiał przekazywać",
+        missed: "Nie dotarło: {n} gospodarstw · nazwane: {list}", offCount: " ({n} wyłączonych)",
+        tip: "Wskazówka: włącz router z powrotem albo dodaj drugie wzniesienie pokrywające te same ulice i wyślij ponownie.",
       },
     },
     verify: {
@@ -130,7 +131,7 @@ export default {
     demo: `
 <p class="eyebrow">symulacja · Cieszyn (PL) / Český Těšín (CZ)</p>
 <h1>Blackout nad Olzą</h1>
-<p class="lede">Na obu brzegach rzeki nie ma prądu. Stacje komórkowe wytrzymują na bateriach kilka godzin, potem milkną. Centrum kryzysowe w Cieszynie musi powiedzieć mieszkańcom obu krajów, gdzie jest woda i ładowanie. Zobacz, jak ten sam alert zawodzi w sieci komórkowej, a potem dociera do każdego domowego węzła przez mesh Meshtastic, skok po skoku.</p>
+<p class="lede">Na obu brzegach rzeki nie ma prądu. Stacje komórkowe wytrzymują na bateriach kilka godzin, potem milkną. Centrum kryzysowe w Cieszynie musi przekazać około 300 gospodarstwom w obu krajach, gdzie jest woda i ładowanie. Zobacz, jak ten sam alert zawodzi w sieci komórkowej, a potem dociera do każdego domu przez trzy radia na wzniesieniach: wzgórze, wysoki dach i wieżę ciśnień.</p>
 <div id="sim"></div>
 
 <div class="two">
@@ -144,24 +145,24 @@ export default {
 
 <h2>Jak rozchodzi się wiadomość</h2>
 <ol class="steps">
-  <li><h3>Centrum nadaje raz</h3><p>Jego węzeł na dachu nadaje zaszyfrowany pakiet z hop limitem, domyślnie 3. Odbiera go każdy węzeł w zasięgu, w mieście zwykle 1–5 km, ze wzgórza dużo dalej: przy bezpośredniej widoczności łącza Meshtastic sięgały ponad 300 km. Tutaj antena na dachu centrum sięga przez rzekę bezpośrednio do nám. ČSA, jednym hopem.</p></li>
-  <li><h3>Każdy węzeł przekazuje go raz</h3><p>To <i>sterowany flooding</i>. Węzeł, który odbierze nowy pakiet, czeka chwilę, a potem nadaje go dalej z hop limitem zmniejszonym o jeden. Na zerze się zatrzymuje.</p></li>
-  <li><h3>Dalekie węzły idą pierwsze</h3><p>Czas oczekiwania zależy od siły sygnału: słaby sygnał oznacza, że węzeł jest daleko od nadawcy, więc czeka krócej. Dzięki temu wiadomość najszybciej rozchodzi się na zewnątrz.</p></li>
-  <li><h3>Duplikaty są ignorowane</h3><p>Każdy pakiet ma ID. Węzeł, który już go widział, odrzuca kopie. Zwykły węzeł, który usłyszy sąsiada przekazującego pakiet przed swoją kolejką, milczy i oszczędza czas antenowy. Routery w wysokich punktach, tu Góra Zamkowa, przekazują zawsze.</p></li>
+  <li><h3>Centrum nadaje raz</h3><p>Jego węzeł na dachu nadaje zaszyfrowany pakiet z hop limitem, domyślnie 3. Wszystkie węzły w zasięgu słyszą go w tej samej chwili, w mieście zwykle 1–5 km, ze wzgórza znacznie dalej: przy bezpośredniej widoczności łącza Meshtastic przekraczały 300 km. Tutaj centrum dociera bezpośrednio do wszystkich trzech wzniesień i do domów wokół siebie.</p></li>
+  <li><h3>Wzniesienia przekazują, domy słuchają</h3><p>Routery na Górze Zamkowej, na dachu w Těšínie i na wieży ciśnień w Mnisztwie przekazują pakiet raz. Z góry jedna antena obejmuje całą dzielnicę, więc każde gospodarstwo słyszy go bezpośrednio. To najwyżej dwa skoki, niezależnie od tego, czy miasto ma 30 domów, czy 3000.</p></li>
+  <li><h3>Domy nie przekazują</h3><p>Węzły domowe działają w roli <code>CLIENT_MUTE</code>: odbierają i wyświetlają alert, ale nigdy go nie retransmitują. Gdyby setki domów powtarzały każdy pakiet, zapchałyby wspólny kanał i wiadomości by się zderzały. Przekazuje tylko kilka dobrze umieszczonych punktów, więc czas antenowy zostaje wolny na odpowiedzi.</p></li>
+  <li><h3>Duplikaty są ignorowane</h3><p>Każdy pakiet ma ID. Węzeł, który już go widział, odrzuca kopie, więc dom, który słyszy centrum i router, pokaże alert raz. Hop limit (maksymalnie 7) ogranicza, ile razy pakiet jest przekazywany; nie liczy domów.</p></li>
   <li><h3>Nadawca wie, że poszło</h3><p>Gdy centrum usłyszy swój pakiet przekazany dalej, traktuje to jako niejawne potwierdzenie.</p></li>
-  <li><h3>Tracisz węzeł, sieć zostaje</h3><p>Wyłącz na mapie router i wyślij ponownie. Nawet gdy padną Těšín roof i Góra Zamkowa, centrum i tak sięga bezpośrednio do nám. ČSA, a Dolní Žukov przekazuje alert dalej na południe. Węzły daleko od centrum zależą od sąsiadów, więc brak jednego węzła może kogoś odciąć: sprawdź to.</p></li>
+  <li><h3>Planuj utratę jednego punktu</h3><p>Wyłącz dach w Těšínie i wyślij ponownie: Koňákov i część Mostów zostaną bez alertu, bo nie obejmuje ich żadne inne wzniesienie. Jeśli zamiast tego wyłączysz Górę Zamkową, nikt nie wypadnie, bo pokrywają ją centrum i wieża ciśnień. W prawdziwej gminie każda ulica powinna leżeć w co najmniej dwóch kręgach.</p></li>
   <li><h3>Każdy ekran w języku właściciela</h3><p>Każdy węzeł ma własny język ekranu: czeski, polski lub angielski. W symulacji najedź na węzeł i zmień go. Centrum kryzysowe pisze alert raz i wybiera, jak zostanie przetłumaczony: tylko oryginał, automatycznie na języki używane przez odbiorców albo na wszystkie języki. Tłumaczenie odbywa się w centrum przed wysłaniem, bo podczas blackoutu węzły nie mają internetu. Jeśli język węzła nie został wysłany, węzeł pokazuje oryginał. Więcej języków to więcej bajtów: powyżej 233 B alert dzieli się na kilka pakietów.</p></li>
 </ol>
 
 <h2>Sieć komórkowa a mesh podczas blackoutu</h2>
 <div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Sieć komórkowa</th><th>Meshtastic mesh</th></tr></thead><tbody>
 <tr><td>Potrzebuje prądu z sieci</td><td>Tak, baterie na godziny</td><td><b>Nie</b>, bateria i solar na dni</td></tr>
-<tr><td>Centralny punkt awarii</td><td>Stacje, łącza szkieletowe, rdzeń sieci</td><td><b>Brak</b>, każdy węzeł przekazuje</td></tr>
+<tr><td>Centralny punkt awarii</td><td>Stacje, łącza szkieletowe, rdzeń sieci</td><td><b>Brak</b>, jeśli każdą ulicę pokrywają dwa wzniesienia</td></tr>
 <tr><td>Przez granicę PL–CZ</td><td>Osobni operatorzy i systemy ostrzegania</td><td><b>Jeden wspólny kanał</b> na obu brzegach</td></tr>
 <tr><td>Pojemność</td><td>Głos, dane, wideo</td><td>Tylko krótki tekst, ok. 200 bajtów na wiadomość, wspólny czas antenowy</td></tr>
 <tr><td>Przygotowanie</td><td>Już w każdej kieszeni</td><td>Węzły muszą być rozmieszczone, naładowane i w kanale przed blackoutem: dlatego każde gospodarstwo dostaje jeden <a href="#/hardware#pins">złożony</a></td></tr>
 </tbody></table></div>
-<p class="small">Mesh nie zastępuje syren, radia ani patroli od drzwi do drzwi. Dodaje kanał, który przetrwa, gdy inne padną. Osoby głuche i głuchoniewidome dostają ten sam alert jako wibrację przez <a href="#/access">opaskę haptyczną</a>. Symulacja upraszcza zasięg i czasy oraz pomija kolizje pakietów; położenie węzłów jest poglądowe.</p>`,
+<p class="small">Mesh nie zastępuje syren, radia ani patroli od drzwi do drzwi. Dodaje kanał, który przetrwa, gdy inne padną. Osoby głuche i głuchoniewidome dostają ten sam alert jako wibrację przez <a href="#/access">opaskę haptyczną</a>. Symulacja upraszcza zasięg i czasy oraz pomija teren i kolizje pakietów; położenie węzłów jest poglądowe.</p>`,
     hardware: `
 <p class="eyebrow">open hardware</p>
 <h1>Przychodzi złożony. Otwarty, więc możesz zbudować go sam.</h1>
