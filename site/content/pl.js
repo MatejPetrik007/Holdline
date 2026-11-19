@@ -42,7 +42,7 @@ export default {
       restore: "Przywróć wszystkie węzły", hint: "Kliknij router lub nazwany dom, aby go wyłączyć, potem wyślij ponownie.", base: "stacja bazowa",
       statsLabel: "Podsumowanie dostarczenia", stats: ["Sieć komórkowa", "Gospodarstwa", "Maks. skoków", "Transmisje", "Czas dostarczenia"],
       nodes: { hq: "Centrum kryzysowe", hospital: "Szpital", roof: "Dach Těšín" },
-      tipHq: "Stacja bazowa centrum kryzysowego (Cieszyn)", tipNode: "{name} ({c}) · {role} · kliknij, aby wyłączyć / włączyć",
+      tipHq: "Centrum kryzysowe: nadaje i trasuje (ROUTER, maszt na dachu)", tipNode: "{name} ({c}) · {role} · kliknij, aby wyłączyć / włączyć",
       router: "router na wzniesieniu (ROUTER)", household: "węzeł domowy (CLIENT_MUTE)",
       pills: { waiting: "czeka", sending: "wysyła", failed: "błąd", delivered: "dostarczono {r}/{t}" },
       phases: { normal: "SIEĆ DZIAŁA", blackout: "BLACKOUT · OBA BRZEGI", drained: "BATERIE BTS ROZŁADOWANE", cell: "ALERT PRZEZ SIEĆ KOMÓRKOWĄ", mesh: "MESHTASTIC · STEROWANY FLOODING", done: "ALERT DOSTARCZONY PRZEZ MESH" },
@@ -131,7 +131,7 @@ export default {
     demo: `
 <p class="eyebrow">symulacja · Cieszyn (PL) / Český Těšín (CZ)</p>
 <h1>Blackout nad Olzą</h1>
-<p class="lede">Na obu brzegach rzeki nie ma prądu. Stacje komórkowe wytrzymują na bateriach kilka godzin, potem milkną. Centrum kryzysowe w Cieszynie musi przekazać około 300 gospodarstwom w obu krajach, gdzie jest woda i ładowanie. Zobacz, jak ten sam alert zawodzi w sieci komórkowej, a potem dociera do każdego domu przez trzy radia na wzniesieniach: wzgórze, wysoki dach i wieżę ciśnień.</p>
+<p class="lede">Na obu brzegach rzeki nie ma prądu. Stacje komórkowe wytrzymują na bateriach kilka godzin, potem milkną. Centrum kryzysowe w Cieszynie musi przekazać około 300 gospodarstwom w obu krajach, gdzie jest woda i ładowanie. Zobacz, jak ten sam alert zawodzi w sieci komórkowej, a potem dociera do każdego domu z masztu na dachu centrum kryzysowego i z dwóch kolejnych wzniesień: wysokiego dachu w Czeskim Cieszynie i wieży ciśnień w Mnisztwie.</p>
 <div id="sim"></div>
 
 <div class="two">
@@ -145,12 +145,12 @@ export default {
 
 <h2>Jak rozchodzi się wiadomość</h2>
 <ol class="steps">
-  <li><h3>Centrum nadaje raz</h3><p>Jego węzeł na dachu nadaje zaszyfrowany pakiet z hop limitem, domyślnie 3. Wszystkie węzły w zasięgu słyszą go w tej samej chwili, w mieście zwykle 1–5 km, ze wzgórza znacznie dalej: przy bezpośredniej widoczności łącza Meshtastic przekraczały 300 km. Tutaj centrum dociera bezpośrednio do wszystkich trzech wzniesień i do domów wokół siebie.</p></li>
-  <li><h3>Wzniesienia przekazują, domy słuchają</h3><p>Routery na Górze Zamkowej, na dachu w Těšínie i na wieży ciśnień w Mnisztwie przekazują pakiet raz. Z góry jedna antena obejmuje całą dzielnicę, więc każde gospodarstwo słyszy go bezpośrednio. To najwyżej dwa skoki, niezależnie od tego, czy miasto ma 30 domów, czy 3000.</p></li>
+  <li><h3>Centrum nadaje i trasuje</h3><p>Węzeł centrum kryzysowego stoi na wysokim maszcie na dachu i działa jako router: pisze alert, nadaje go z hop limitem (domyślnie 3) i przekazuje ruch dla całej okolicy. Wszystkie węzły w zasięgu słyszą go w tej samej chwili, w mieście zwykle 1–5 km, z wysokiego punktu znacznie dalej: przy bezpośredniej widoczności łącza Meshtastic przekraczały 300 km. Tutaj samo centrum dociera bezpośrednio do 291 z 314 domów.</p></li>
+  <li><h3>Wzniesienia wypełniają luki, domy słuchają</h3><p>Dwa kolejne routery, na dachu w Těšínie i na wieży ciśnień w Mnisztwie, przekazują pakiet raz. Obejmują ulice, których antena centrum nie widzi, np. Mosty i Koňákov. To najwyżej dwa skoki, niezależnie od tego, czy miasto ma 30 domów, czy 3000.</p></li>
   <li><h3>Domy nie przekazują</h3><p>Węzły domowe działają w roli <code>CLIENT_MUTE</code>: odbierają i wyświetlają alert, ale nigdy go nie retransmitują. Gdyby setki domów powtarzały każdy pakiet, zapchałyby wspólny kanał i wiadomości by się zderzały. Przekazuje tylko kilka dobrze umieszczonych punktów, więc czas antenowy zostaje wolny na odpowiedzi.</p></li>
   <li><h3>Duplikaty są ignorowane</h3><p>Każdy pakiet ma ID. Węzeł, który już go widział, odrzuca kopie, więc dom, który słyszy centrum i router, pokaże alert raz. Hop limit (maksymalnie 7) ogranicza, ile razy pakiet jest przekazywany; nie liczy domów.</p></li>
   <li><h3>Nadawca wie, że poszło</h3><p>Gdy centrum usłyszy swój pakiet przekazany dalej, traktuje to jako niejawne potwierdzenie.</p></li>
-  <li><h3>Planuj utratę jednego punktu</h3><p>Wyłącz dach w Těšínie i wyślij ponownie: Koňákov i część Mostów zostaną bez alertu, bo nie obejmuje ich żadne inne wzniesienie. Jeśli zamiast tego wyłączysz Górę Zamkową, nikt nie wypadnie, bo pokrywają ją centrum i wieża ciśnień. W prawdziwej gminie każda ulica powinna leżeć w co najmniej dwóch kręgach.</p></li>
+  <li><h3>Planuj utratę jednego punktu</h3><p>Wyłącz dach w Těšínie i wyślij ponownie: Mosty i Koňákov (23 domy) zostaną bez alertu, bo obejmuje je tylko ten dach. Jeśli zamiast tego wyłączysz wieżę ciśnień w Mnisztwie, nikt nie wypadnie, bo pokrywa ją centrum. W prawdziwej gminie każda ulica powinna leżeć w co najmniej dwóch kręgach, a centrum potrzebuje własnego zasilania awaryjnego: jeśli padnie, nic nie zostanie wysłane.</p></li>
   <li><h3>Każdy ekran w języku właściciela</h3><p>Każdy węzeł ma własny język ekranu: czeski, polski lub angielski. W symulacji najedź na węzeł i zmień go. Centrum kryzysowe pisze alert raz i wybiera, jak zostanie przetłumaczony: tylko oryginał, automatycznie na języki używane przez odbiorców albo na wszystkie języki. Tłumaczenie odbywa się w centrum przed wysłaniem, bo podczas blackoutu węzły nie mają internetu. Jeśli język węzła nie został wysłany, węzeł pokazuje oryginał. Więcej języków to więcej bajtów: powyżej 233 B alert dzieli się na kilka pakietów.</p></li>
 </ol>
 

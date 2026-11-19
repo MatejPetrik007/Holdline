@@ -122,12 +122,12 @@ export function mountDemo(root, S) {
   };
   const setPill = (k, cls, text) => { const p = K(k); p.className = 'sim-pill ' + cls; p.textContent = text; };
 
-  // Map units are roughly 10 m. Routers sit on high points (castle hill, a tall roof, a water tower) and
-  // see over the rooftops; household nodes are CLIENT_MUTE: they receive and show alerts but never relay.
-  const RANGE = { hq: 280, router: 400, home: 120 };
+  // Map units are roughly 10 m. The crisis centre sends and routes from a tall mast on its roof; two more
+  // routers sit on high points (a tall roof, a water tower) and see over the rooftops. Household nodes are
+  // CLIENT_MUTE: they receive and show alerts but never relay.
+  const RANGE = { hq: 400, router: 400, home: 120 };
   const NODES = [
     { id: 'hq', name: N.hq, x: 600, y: 300, role: 'hq', c: 'PL' },
-    { id: 'castle', name: 'Góra Zamkowa', x: 540, y: 250, role: 'router', c: 'PL' },
     { id: 'ctr', name: N.roof, x: 370, y: 320, role: 'router', c: 'CZ' },
     { id: 'mniszt', name: 'Wieża Mnisztwo', x: 800, y: 400, role: 'router', c: 'PL' },
     { id: 'bulwary', name: 'Bulwary', x: 522, y: 380, role: 'home', c: 'PL' },

@@ -42,7 +42,7 @@ export default {
       restore: "Obnovit všechny uzly", hint: "Klikni na router nebo pojmenovaný dům, vypneš ho, pak odešli znovu.", base: "základnová stanice",
       statsLabel: "Souhrn doručení", stats: ["Mobilní síť", "Domácnosti", "Max. skoků", "Vysílání", "Doba doručení"],
       nodes: { hq: "Krizové centrum", hospital: "Nemocnice", roof: "Střecha Těšín" },
-      tipHq: "Základnová stanice krizového centra (Cieszyn)", tipNode: "{name} ({c}) · {role} · kliknutím vypneš / zapneš",
+      tipHq: "Krizové centrum: vysílá i routuje (ROUTER, stožár na střeše)", tipNode: "{name} ({c}) · {role} · kliknutím vypneš / zapneš",
       router: "router na vyvýšeném místě (ROUTER)", household: "domácí uzel (CLIENT_MUTE)",
       pills: { waiting: "čeká", sending: "odesílá", failed: "selhalo", delivered: "doručeno {r}/{t}" },
       phases: { normal: "SÍŤ V PROVOZU", blackout: "BLACKOUT · OBA BŘEHY", drained: "BATERIE VYSÍLAČŮ VYBITÉ", cell: "VAROVÁNÍ PŘES MOBILNÍ SÍŤ", mesh: "MESHTASTIC · ŘÍZENÝ FLOODING", done: "VAROVÁNÍ DORUČENO PŘES MESH" },
@@ -131,7 +131,7 @@ export default {
     demo: `
 <p class="eyebrow">simulace · Cieszyn (PL) / Český Těšín (CZ)</p>
 <h1>Blackout na Olši</h1>
-<p class="lede">Na obou březích řeky vypadl proud. Mobilní vysílače vydrží na baterie pár hodin a pak utichnou. Krizové centrum v Cieszyně potřebuje říct zhruba 300 domácnostem v obou zemích, kde najdou vodu a nabíjení. Podívej se, jak stejné varování selže v mobilní síti a pak se dostane do každého domu přes tři rádia na vyvýšených místech: kopec, vysokou střechu a vodojem.</p>
+<p class="lede">Na obou březích řeky vypadl proud. Mobilní vysílače vydrží na baterie pár hodin a pak utichnou. Krizové centrum v Cieszyně potřebuje říct zhruba 300 domácnostem v obou zemích, kde najdou vodu a nabíjení. Podívej se, jak stejné varování selže v mobilní síti a pak se dostane do každého domu ze střešního stožáru krizového centra a ze dvou dalších vyvýšených míst: vysoké střechy v Českém Těšíně a vodojemu v Mnisztwu.</p>
 <div id="sim"></div>
 
 <div class="two">
@@ -145,12 +145,12 @@ export default {
 
 <h2>Jak se zpráva šíří</h2>
 <ol class="steps">
-  <li><h3>Centrum vysílá jednou</h3><p>Jeho střešní uzel odvysílá šifrovaný paket s hop limitem, výchozí je 3. Všechny uzly v dosahu ho uslyší ve stejný okamžik, ve městě typicky 1–5 km, z kopce mnohem dál: při přímé viditelnosti zvládly spoje Meshtasticu přes 300 km. Tady centrum dosáhne přímo na všechna tři vyvýšená místa i na domy kolem sebe.</p></li>
-  <li><h3>Vyvýšená místa přeposílají, domy poslouchají</h3><p>Routery na Góře Zamkowé, na střeše v Těšíně a na vodojemu v Mnisztwu paket jednou přepošlou. Shora pokryje jedna anténa celou čtvrť, takže každá domácnost ho slyší přímo. To jsou nejvýš dva skoky, ať má město 30 domů, nebo 3 000.</p></li>
+  <li><h3>Centrum vysílá i routuje</h3><p>Uzel krizového centra je na vysokém stožáru na střeše a běží jako router: varování napíše, odvysílá s hop limitem (výchozí je 3) a přeposílá provoz pro celé okolí. Všechny uzly v dosahu ho uslyší ve stejný okamžik, ve městě typicky 1–5 km, z vyvýšeného místa mnohem dál: při přímé viditelnosti zvládly spoje Meshtasticu přes 300 km. Tady samotné centrum dosáhne přímo na 291 z 314 domů.</p></li>
+  <li><h3>Vyvýšená místa doplní mezery, domy poslouchají</h3><p>Dva další routery, na střeše v Těšíně a na vodojemu v Mnisztwu, paket jednou přepošlou. Pokryjí ulice, na které anténa centra nevidí, třeba Mosty a Koňákov. To jsou nejvýš dva skoky, ať má město 30 domů, nebo 3 000.</p></li>
   <li><h3>Domácnosti nepřeposílají</h3><p>Domácí uzly běží v roli <code>CLIENT_MUTE</code>: varování přijmou a zobrazí, ale nikdy ho nevysílají dál. Kdyby stovky domů opakovaly každý paket, zahltily by sdílený kanál a zprávy by se srážely. Přeposílá jen pár dobře umístěných bodů, takže vysílací čas zůstává volný pro odpovědi.</p></li>
   <li><h3>Duplikáty se zahazují</h3><p>Každý paket má ID. Uzel, který ho už viděl, kopie zahodí, takže dům, který slyší centrum i router, ukáže varování jednou. Hop limit (nejvýš 7) omezuje, kolikrát se paket přepošle; nepočítá domy.</p></li>
   <li><h3>Odesílatel ví, že zpráva odešla</h3><p>Když centrum uslyší svůj paket přeposlaný, bere to jako implicitní potvrzení.</p></li>
-  <li><h3>Počítej se ztrátou jednoho bodu</h3><p>Vypni střechu v Těšíně a odešli znovu: Koňákov a část Mostů zůstanou bez varování, protože je nepokrývá žádné jiné vyvýšené místo. Když místo toho vypneš Góru Zamkowou, nikdo nevypadne, protože ji překrývá centrum a vodojem. Ve skutečné obci by měla každá ulice ležet aspoň ve dvou kruzích.</p></li>
+  <li><h3>Počítej se ztrátou jednoho bodu</h3><p>Vypni střechu v Těšíně a odešli znovu: Mosty a Koňákov (23 domů) zůstanou bez varování, protože je pokrývá jen tahle střecha. Když místo toho vypneš vodojem v Mnisztwu, nikdo nevypadne, protože ho překrývá centrum. Ve skutečné obci by měla každá ulice ležet aspoň ve dvou kruzích a centrum potřebuje vlastní záložní napájení: když vypadne, neodejde nic.</p></li>
   <li><h3>Každý displej v jazyce svého majitele</h3><p>Každý uzel má vlastní jazyk displeje: češtinu, polštinu nebo angličtinu. V simulaci na uzel najeď a jazyk změň. Krizové centrum napíše varování jednou a zvolí, jak se přeloží: jen originál, automaticky do jazyků, které používají příjemci, nebo do všech jazyků. Překládá se v centru před odesláním, protože uzly při blackoutu nemají internet. Pokud jazyk uzlu odeslán nebyl, uzel ukáže originál. Víc jazyků znamená víc bajtů: nad 233 B se varování rozdělí do několika paketů.</p></li>
 </ol>
 

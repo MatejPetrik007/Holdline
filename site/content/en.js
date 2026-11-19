@@ -42,7 +42,7 @@ export default {
       restore: "Restore all nodes", hint: "Click a router or a named house to switch it off, then resend.", base: "base station",
       statsLabel: "Delivery summary", stats: ["Cell network", "Households reached", "Max hops", "Transmissions", "Time to deliver"],
       nodes: { hq: "Crisis centre", hospital: "Hospital", roof: "Těšín roof" },
-      tipHq: "Crisis centre base station (Cieszyn)", tipNode: "{name} ({c}) · {role} · click to switch off / on",
+      tipHq: "Crisis centre: sends and routes (ROUTER, rooftop mast)", tipNode: "{name} ({c}) · {role} · click to switch off / on",
       router: "high-site router (ROUTER)", household: "household node (CLIENT_MUTE)",
       pills: { waiting: "waiting", sending: "sending", failed: "failed", delivered: "{r}/{t} delivered" },
       phases: { normal: "GRID NORMAL", blackout: "BLACKOUT · BOTH BANKS", drained: "TOWER BATTERIES DRAINED", cell: "ALERT VIA CELL NETWORK", mesh: "MESHTASTIC · MANAGED FLOODING", done: "ALERT DELIVERED OVER MESH" },
@@ -131,7 +131,7 @@ export default {
     demo: `
 <p class="eyebrow">simulation · Cieszyn (PL) / Český Těšín (CZ)</p>
 <h1>Blackout on the Olza</h1>
-<p class="lede">The power is out on both banks of the river. Cell towers last a few hours on battery, then go silent. A crisis centre in Cieszyn needs to tell about 300 households in both countries where to find water and charging. Watch the same alert fail over the phone network, then reach every home through three radios on high points: a hill, a tall roof and a water tower.</p>
+<p class="lede">The power is out on both banks of the river. Cell towers last a few hours on battery, then go silent. A crisis centre in Cieszyn needs to tell about 300 households in both countries where to find water and charging. Watch the same alert fail over the phone network, then reach every home from the crisis centre's own rooftop mast, with two relays on high points: a tall roof in Český Těšín and a water tower in Mnisztwo.</p>
 <div id="sim"></div>
 
 <div class="two">
@@ -145,12 +145,12 @@ export default {
 
 <h2>How a message propagates</h2>
 <ol class="steps">
-  <li><h3>The centre transmits once</h3><p>Its rooftop node broadcasts the encrypted packet with a hop limit, 3 by default. Every node in radio range hears it at the same moment, typically 1–5 km in town and much further from a hill: with clear line of sight, Meshtastic links have spanned over 300 km. Here the centre reaches all three high sites, and the homes around it, directly.</p></li>
-  <li><h3>High sites relay, homes listen</h3><p>The routers on Góra Zamkowa, the Těšín roof and the Mnisztwo water tower rebroadcast the packet once. From up there one antenna covers a whole district, so every household hears it directly. That is two hops at most, whether the town has 30 homes or 3,000.</p></li>
+  <li><h3>The centre sends and routes</h3><p>The crisis centre's node sits on a tall mast on its roof and runs as a router: it writes the alert, transmits it with a hop limit (3 by default) and relays traffic for the area. Every node in range hears it at the same moment, typically 1–5 km in town and much further from a high point: with clear line of sight, Meshtastic links have spanned over 300 km. Here the centre alone reaches 291 of 314 homes directly.</p></li>
+  <li><h3>High sites fill the gaps, homes listen</h3><p>Two more routers, on the Těšín roof and the Mnisztwo water tower, rebroadcast the packet once. They cover the streets the centre's antenna can't see, such as Mosty and Koňákov. That is two hops at most, whether the town has 30 homes or 3,000.</p></li>
   <li><h3>Households don't relay</h3><p>Household nodes run in the <code>CLIENT_MUTE</code> role: they receive and show the alert but never rebroadcast it. If hundreds of homes repeated every packet, they would fill the shared channel and messages would collide. Only a few well-placed sites relay, so the airtime stays free for replies.</p></li>
   <li><h3>Duplicates are ignored</h3><p>Every packet has an ID. A node that has already seen it drops copies, so a home that hears both the centre and a router shows the alert once. The hop limit (7 at most) caps how many times a packet is relayed; it does not count houses.</p></li>
   <li><h3>The sender knows it got out</h3><p>When the centre hears its own packet relayed, it counts that as an implicit acknowledgement.</p></li>
-  <li><h3>Plan for losing a site</h3><p>Switch off the Těšín roof and resend: Koňákov and part of Mosty are cut off, because no other high site covers them. Switch off Góra Zamkowa instead and nobody is lost, because the centre and the water tower overlap it. In a real municipality every street should sit inside at least two circles.</p></li>
+  <li><h3>Plan for losing a site</h3><p>Switch off the Těšín roof and resend: Mosty and Koňákov (23 homes) are cut off, because only that roof covers them. Switch off the Mnisztwo water tower instead and nobody is lost, because the centre overlaps it. In a real municipality every street should sit inside at least two circles, and the centre needs backup power of its own: if it goes down, nothing is sent.</p></li>
   <li><h3>Every screen in its owner's language</h3><p>Each node has its own display language: Czech, Polish or English. Hover over a node in the simulation and change it. The crisis centre writes the alert once and chooses how it is translated: original only, automatically into the languages its recipients use, or into all languages. Translation happens at the centre before sending, because nodes have no internet in a blackout. If a language was not sent, the node shows the original. More languages mean more bytes: past 233 B the alert is split into several packets.</p></li>
 </ol>
 
