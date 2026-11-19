@@ -37,13 +37,13 @@ export default {
       routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
       mapLabel: "Mapa Cieszyna a Českého Těšína s mesh uzly na obou březích Olše",
       riverLabel: "Olše · hranice",
-      legend: ["domácnost · varování přijato", "domácnost · čeká", "router na vyvýšeném místě", "BTS vysílač"],
+      legend: ["domácnost · varování přijato", "domácnost · čeká", "router na vyvýšeném místě", "BTS vysílač", "obecní relé"],
       replay: "Přehrát znovu", resend: "Odeslat znovu přes mesh", hopLimit: "Hop limit", speed: "Rychlost", speeds: ["Pomalu", "Normálně", "Rychle"],
       restore: "Obnovit všechny uzly", hint: "Klikni na router nebo pojmenovaný dům, vypneš ho, pak odešli znovu.", base: "základnová stanice",
       statsLabel: "Souhrn doručení", stats: ["Mobilní síť", "Domácnosti", "Max. skoků", "Vysílání", "Doba doručení"],
       nodes: { hq: "Krizové centrum", hospital: "Nemocnice", roof: "Střecha Těšín" },
       tipHq: "Krizové centrum: vysílá i routuje (ROUTER, stožár na střeše)", tipNode: "{name} ({c}) · {role} · kliknutím vypneš / zapneš",
-      router: "router na vyvýšeném místě (ROUTER)", household: "domácí uzel (CLIENT_MUTE)",
+      router: "router na vyvýšeném místě (ROUTER)", household: "domácí uzel (CLIENT_MUTE)", local: "obecní relé (místní anténa, CLIENT)",
       pills: { waiting: "čeká", sending: "odesílá", failed: "selhalo", delivered: "doručeno {r}/{t}" },
       phases: { normal: "SÍŤ V PROVOZU", blackout: "BLACKOUT · OBA BŘEHY", drained: "BATERIE VYSÍLAČŮ VYBITÉ", cell: "VAROVÁNÍ PŘES MOBILNÍ SÍŤ", mesh: "MESHTASTIC · ŘÍZENÝ FLOODING", done: "VAROVÁNÍ DORUČENO PŘES MESH" },
       log: {
@@ -63,7 +63,7 @@ export default {
         rx: "{n} ({c}) rx skok {hop} · SNR {snr} dB · přeposlání za {ms} ms",
         rxLimit: "{n} ({c}) rx skok {hop} · SNR {snr} dB · hop limit 0, nepřeposílá",
         rxHomes: "{k} domácností slyší {from} přímo · skok {hop} · CLIENT_MUTE, nepřeposílá",
-        all: "Doručeno všem {t} domácnostem · jen {tx} vysílání · žádná domácnost nemusela přeposílat",
+        all: "Doručeno všem {t} domácnostem · {tx} vysílání · {q} obecních relé mlčelo",
         missed: "Nedoručeno: {n} domácností · pojmenované: {list}", offCount: " ({n} vypnuto)",
         tip: "Tip: zapni router zpět, nebo přidej druhé vyvýšené místo, které pokryje stejné ulice, a odešli znovu.",
       },
@@ -146,11 +146,11 @@ export default {
 <h2>Jak se zpráva šíří</h2>
 <ol class="steps">
   <li><h3>Centrum vysílá i routuje</h3><p>Uzel krizového centra je na vysokém stožáru na střeše a běží jako router: varování napíše, odvysílá s hop limitem (výchozí je 3) a přeposílá provoz pro celé okolí. Všechny uzly v dosahu ho uslyší ve stejný okamžik, ve městě typicky 1–5 km, z vyvýšeného místa mnohem dál: při přímé viditelnosti zvládly spoje Meshtasticu přes 300 km. Tady samotné centrum dosáhne přímo na 291 z 314 domů.</p></li>
-  <li><h3>Vyvýšená místa doplní mezery, domy poslouchají</h3><p>Dva další routery, na střeše v Těšíně a na vodojemu v Mnisztwu, paket jednou přepošlou. Pokryjí ulice, na které anténa centra nevidí, třeba Mosty a Koňákov. To jsou nejvýš dva skoky, ať má město 30 domů, nebo 3 000.</p></li>
-  <li><h3>Domácnosti nepřeposílají</h3><p>Domácí uzly běží v roli <code>CLIENT_MUTE</code>: varování přijmou a zobrazí, ale nikdy ho nevysílají dál. Kdyby stovky domů opakovaly každý paket, zahltily by sdílený kanál a zprávy by se srážely. Přeposílá jen pár dobře umístěných bodů, takže vysílací čas zůstává volný pro odpovědi.</p></li>
+  <li><h3>Vyvýšená místa doplní mezery, domy poslouchají</h3><p>Dva další routery, na střeše v Těšíně a na vodojemu v Mnisztwu, paket jednou přepošlou. Pokryjí ulice, na které anténa centra nevidí, třeba Mosty a Koňákov. Většina domů ho dostane na jeden nebo dva skoky, ať má město 30 domů, nebo 3 000.</p></li>
+  <li><h3>Domácnosti nepřeposílají, obecní relé ano</h3><p>Běžné domácí uzly běží v roli <code>CLIENT_MUTE</code>: varování přijmou a zobrazí, ale nikdy ho nevysílají dál. Kdyby stovky domů opakovaly každý paket, zahltily by sdílený kanál. Okrajové vesnice mají jeden dům s místní anténou v běžné roli <code>CLIENT</code> (trojúhelníky na mapě): chvíli počká a varování pošle dál, pokud předtím neuslyší, že ho už přeposlal router nebo soused.</p></li>
   <li><h3>Duplikáty se zahazují</h3><p>Každý paket má ID. Uzel, který ho už viděl, kopie zahodí, takže dům, který slyší centrum i router, ukáže varování jednou. Hop limit (nejvýš 7) omezuje, kolikrát se paket přepošle; nepočítá domy.</p></li>
   <li><h3>Odesílatel ví, že zpráva odešla</h3><p>Když centrum uslyší svůj paket přeposlaný, bere to jako implicitní potvrzení.</p></li>
-  <li><h3>Počítej se ztrátou jednoho bodu</h3><p>Vypni střechu v Těšíně a odešli znovu: Mosty a Koňákov (23 domů) zůstanou bez varování, protože je pokrývá jen tahle střecha. Když místo toho vypneš vodojem v Mnisztwu, nikdo nevypadne, protože ho překrývá centrum. Ve skutečné obci by měla každá ulice ležet aspoň ve dvou kruzích a centrum potřebuje vlastní záložní napájení: když vypadne, neodejde nic.</p></li>
+  <li><h3>Počítej se ztrátou jednoho bodu</h3><p>Vypni střechu v Těšíně a odešli znovu: varování do Mostů a Koňákova stejně dojde, skok po skoku přes obecní relé ve Stanislavicích a v Koňákově. Vypni k tomu i Stanislavice: řetěz se přeruší a 19 domů varování nedostane. S vypnutou střechou nastav hop limit na 1 a bez varování zůstanou i domy kolem Koňákova. Ve skutečné obci by měla každá ulice ležet aspoň ve dvou kruzích a centrum potřebuje vlastní záložní napájení: když vypadne, neodejde nic.</p></li>
   <li><h3>Každý displej v jazyce svého majitele</h3><p>Každý uzel má vlastní jazyk displeje: češtinu, polštinu nebo angličtinu. V simulaci na uzel najeď a jazyk změň. Krizové centrum napíše varování jednou a zvolí, jak se přeloží: jen originál, automaticky do jazyků, které používají příjemci, nebo do všech jazyků. Překládá se v centru před odesláním, protože uzly při blackoutu nemají internet. Pokud jazyk uzlu odeslán nebyl, uzel ukáže originál. Víc jazyků znamená víc bajtů: nad 233 B se varování rozdělí do několika paketů.</p></li>
 </ol>
 

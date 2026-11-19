@@ -37,13 +37,13 @@ export default {
       routeCell: "SMS / cell broadcast", routeMesh: "Meshtastic mesh",
       mapLabel: "Mapa Cieszyna i Czeskiego Cieszyna z węzłami mesh po obu stronach Olzy",
       riverLabel: "Olza · granica",
-      legend: ["dom · alert odebrany", "dom · czeka", "router na wzniesieniu", "stacja BTS"],
+      legend: ["dom · alert odebrany", "dom · czeka", "router na wzniesieniu", "stacja BTS", "przekaźnik wiejski"],
       replay: "Odtwórz ponownie", resend: "Wyślij ponownie przez mesh", hopLimit: "Hop limit", speed: "Prędkość", speeds: ["Wolno", "Normalnie", "Szybko"],
       restore: "Przywróć wszystkie węzły", hint: "Kliknij router lub nazwany dom, aby go wyłączyć, potem wyślij ponownie.", base: "stacja bazowa",
       statsLabel: "Podsumowanie dostarczenia", stats: ["Sieć komórkowa", "Gospodarstwa", "Maks. skoków", "Transmisje", "Czas dostarczenia"],
       nodes: { hq: "Centrum kryzysowe", hospital: "Szpital", roof: "Dach Těšín" },
       tipHq: "Centrum kryzysowe: nadaje i trasuje (ROUTER, maszt na dachu)", tipNode: "{name} ({c}) · {role} · kliknij, aby wyłączyć / włączyć",
-      router: "router na wzniesieniu (ROUTER)", household: "węzeł domowy (CLIENT_MUTE)",
+      router: "router na wzniesieniu (ROUTER)", household: "węzeł domowy (CLIENT_MUTE)", local: "przekaźnik wiejski (lokalna antena, CLIENT)",
       pills: { waiting: "czeka", sending: "wysyła", failed: "błąd", delivered: "dostarczono {r}/{t}" },
       phases: { normal: "SIEĆ DZIAŁA", blackout: "BLACKOUT · OBA BRZEGI", drained: "BATERIE BTS ROZŁADOWANE", cell: "ALERT PRZEZ SIEĆ KOMÓRKOWĄ", mesh: "MESHTASTIC · STEROWANY FLOODING", done: "ALERT DOSTARCZONY PRZEZ MESH" },
       log: {
@@ -63,7 +63,7 @@ export default {
         rx: "{n} ({c}) rx skok {hop} · SNR {snr} dB · przekazanie za {ms} ms",
         rxLimit: "{n} ({c}) rx skok {hop} · SNR {snr} dB · hop limit 0, nie przekazuje",
         rxHomes: "{k} gospodarstw słyszy {from} bezpośrednio · skok {hop} · CLIENT_MUTE, bez przekazywania",
-        all: "Dostarczono do wszystkich {t} gospodarstw · transmisje łącznie: {tx} · żaden dom nie musiał przekazywać",
+        all: "Dostarczono do wszystkich {t} gospodarstw · transmisje łącznie: {tx} · przekaźniki, które milczały: {q}",
         missed: "Nie dotarło: {n} gospodarstw · nazwane: {list}", offCount: " ({n} wyłączonych)",
         tip: "Wskazówka: włącz router z powrotem albo dodaj drugie wzniesienie pokrywające te same ulice i wyślij ponownie.",
       },
@@ -146,11 +146,11 @@ export default {
 <h2>Jak rozchodzi się wiadomość</h2>
 <ol class="steps">
   <li><h3>Centrum nadaje i trasuje</h3><p>Węzeł centrum kryzysowego stoi na wysokim maszcie na dachu i działa jako router: pisze alert, nadaje go z hop limitem (domyślnie 3) i przekazuje ruch dla całej okolicy. Wszystkie węzły w zasięgu słyszą go w tej samej chwili, w mieście zwykle 1–5 km, z wysokiego punktu znacznie dalej: przy bezpośredniej widoczności łącza Meshtastic przekraczały 300 km. Tutaj samo centrum dociera bezpośrednio do 291 z 314 domów.</p></li>
-  <li><h3>Wzniesienia wypełniają luki, domy słuchają</h3><p>Dwa kolejne routery, na dachu w Těšínie i na wieży ciśnień w Mnisztwie, przekazują pakiet raz. Obejmują ulice, których antena centrum nie widzi, np. Mosty i Koňákov. To najwyżej dwa skoki, niezależnie od tego, czy miasto ma 30 domów, czy 3000.</p></li>
-  <li><h3>Domy nie przekazują</h3><p>Węzły domowe działają w roli <code>CLIENT_MUTE</code>: odbierają i wyświetlają alert, ale nigdy go nie retransmitują. Gdyby setki domów powtarzały każdy pakiet, zapchałyby wspólny kanał i wiadomości by się zderzały. Przekazuje tylko kilka dobrze umieszczonych punktów, więc czas antenowy zostaje wolny na odpowiedzi.</p></li>
+  <li><h3>Wzniesienia wypełniają luki, domy słuchają</h3><p>Dwa kolejne routery, na dachu w Těšínie i na wieży ciśnień w Mnisztwie, przekazują pakiet raz. Obejmują ulice, których antena centrum nie widzi, np. Mosty i Koňákov. Większość domów dostaje go w jednym lub dwóch skokach, niezależnie od tego, czy miasto ma 30 domów, czy 3000.</p></li>
+  <li><h3>Domy nie przekazują, przekaźniki wiejskie tak</h3><p>Zwykłe węzły domowe działają w roli <code>CLIENT_MUTE</code>: odbierają i wyświetlają alert, ale nigdy go nie retransmitują. Gdyby setki domów powtarzały każdy pakiet, zapchałyby wspólny kanał. Wsie na skraju mają jeden dom z lokalną anteną w zwykłej roli <code>CLIENT</code> (trójkąty na mapie): czeka chwilę i przekazuje alert dalej, chyba że wcześniej usłyszy, że zrobił to już router lub sąsiad.</p></li>
   <li><h3>Duplikaty są ignorowane</h3><p>Każdy pakiet ma ID. Węzeł, który już go widział, odrzuca kopie, więc dom, który słyszy centrum i router, pokaże alert raz. Hop limit (maksymalnie 7) ogranicza, ile razy pakiet jest przekazywany; nie liczy domów.</p></li>
   <li><h3>Nadawca wie, że poszło</h3><p>Gdy centrum usłyszy swój pakiet przekazany dalej, traktuje to jako niejawne potwierdzenie.</p></li>
-  <li><h3>Planuj utratę jednego punktu</h3><p>Wyłącz dach w Těšínie i wyślij ponownie: Mosty i Koňákov (23 domy) zostaną bez alertu, bo obejmuje je tylko ten dach. Jeśli zamiast tego wyłączysz wieżę ciśnień w Mnisztwie, nikt nie wypadnie, bo pokrywa ją centrum. W prawdziwej gminie każda ulica powinna leżeć w co najmniej dwóch kręgach, a centrum potrzebuje własnego zasilania awaryjnego: jeśli padnie, nic nie zostanie wysłane.</p></li>
+  <li><h3>Planuj utratę jednego punktu</h3><p>Wyłącz dach w Těšínie i wyślij ponownie: alert i tak dotrze do Mostów i Koňákova, skok po skoku przez przekaźniki w Stanislavicach i Koňákovie. Wyłącz dodatkowo Stanislavice: łańcuch się zrywa i 19 domów nie dostaje alertu. Przy wyłączonym dachu ustaw hop limit na 1, a bez alertu zostaną też domy wokół Koňákova. W prawdziwej gminie każda ulica powinna leżeć w co najmniej dwóch kręgach, a centrum potrzebuje własnego zasilania awaryjnego: jeśli padnie, nic nie zostanie wysłane.</p></li>
   <li><h3>Każdy ekran w języku właściciela</h3><p>Każdy węzeł ma własny język ekranu: czeski, polski lub angielski. W symulacji najedź na węzeł i zmień go. Centrum kryzysowe pisze alert raz i wybiera, jak zostanie przetłumaczony: tylko oryginał, automatycznie na języki używane przez odbiorców albo na wszystkie języki. Tłumaczenie odbywa się w centrum przed wysłaniem, bo podczas blackoutu węzły nie mają internetu. Jeśli język węzła nie został wysłany, węzeł pokazuje oryginał. Więcej języków to więcej bajtów: powyżej 233 B alert dzieli się na kilka pakietów.</p></li>
 </ol>
 

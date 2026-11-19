@@ -74,7 +74,8 @@ export function mountDemo(root, S) {
             <circle cx="5" cy="-4" r="5" fill="var(--s-signal)"/><text x="16" y="0">${S.legend[0]}</text>
             <circle cx="5" cy="14" r="5" fill="var(--s-panel-2)" stroke="var(--s-muted)" stroke-width="1.5"/><text x="16" y="18">${S.legend[1]}</text>
             <rect x="0" y="27" width="10" height="10" fill="var(--s-panel-2)" stroke="var(--s-muted)" stroke-width="1.5" transform="rotate(45 5 32)"/><text x="16" y="36">${S.legend[2]}</text>
-            <path d="M5 44 L0 56 M5 44 L10 56 M2 52 L8 52" stroke="var(--s-cell)" stroke-width="2" fill="none"/><text x="16" y="54">${S.legend[3]}</text>
+            <path d="M5 40 L10 49 L0 49 Z" fill="var(--s-panel-2)" stroke="var(--s-muted)" stroke-width="1.5"/><text x="16" y="54">${S.legend[4]}</text>
+            <path d="M5 62 L0 74 M5 62 L10 74 M2 70 L8 70" stroke="var(--s-cell)" stroke-width="2" fill="none"/><text x="16" y="72">${S.legend[3]}</text>
           </g>
         </svg>
       </div>
@@ -125,25 +126,27 @@ export function mountDemo(root, S) {
   // Map units are roughly 10 m. The crisis centre sends and routes from a tall mast on its roof; two more
   // routers sit on high points (a tall roof, a water tower) and see over the rooftops. Household nodes are
   // CLIENT_MUTE: they receive and show alerts but never relay.
-  const RANGE = { hq: 400, router: 400, home: 120 };
+  // Villages outside the high sites' reach have a local antenna on one house (role CLIENT): it relays the
+  // alert onward, hop by hop, unless it hears someone nearby relay it first.
+  const RANGE = { hq: 400, router: 400, local: 160, home: 120 };
   const NODES = [
     { id: 'hq', name: N.hq, x: 600, y: 300, role: 'hq', c: 'PL' },
     { id: 'ctr', name: N.roof, x: 370, y: 320, role: 'router', c: 'CZ' },
     { id: 'mniszt', name: 'Wieża Mnisztwo', x: 800, y: 400, role: 'router', c: 'PL' },
     { id: 'bulwary', name: 'Bulwary', x: 522, y: 380, role: 'home', c: 'PL' },
     { id: 'hospital', name: N.hospital, x: 660, y: 210, role: 'home', c: 'PL' },
-    { id: 'bobrek', name: 'Bobrek', x: 590, y: 80, role: 'home', c: 'PL' },
-    { id: 'pastwiska', name: 'Pastwiska', x: 720, y: 110, role: 'home', c: 'PL' },
+    { id: 'bobrek', name: 'Bobrek', x: 590, y: 80, role: 'local', c: 'PL' },
+    { id: 'pastwiska', name: 'Pastwiska', x: 720, y: 110, role: 'local', c: 'PL' },
     { id: 'krasna', name: 'Krasna', x: 720, y: 330, role: 'home', c: 'PL' },
-    { id: 'bogus', name: 'Boguszowice', x: 840, y: 270, role: 'home', c: 'PL' },
-    { id: 'markl', name: 'Marklowice', x: 660, y: 500, role: 'home', c: 'PL' },
+    { id: 'bogus', name: 'Boguszowice', x: 840, y: 270, role: 'local', c: 'PL' },
+    { id: 'markl', name: 'Marklowice', x: 660, y: 500, role: 'local', c: 'PL' },
     { id: 'nam', name: 'nám. ČSA', x: 400, y: 200, role: 'home', c: 'CZ' },
-    { id: 'chot', name: 'Chotěbuz', x: 340, y: 100, role: 'home', c: 'CZ' },
-    { id: 'svib', name: 'Svibice', x: 230, y: 160, role: 'home', c: 'CZ' },
-    { id: 'mosty', name: 'Mosty', x: 205, y: 420, role: 'home', c: 'CZ' },
-    { id: 'zukov', name: 'Dolní Žukov', x: 430, y: 440, role: 'home', c: 'CZ' },
-    { id: 'stan', name: 'Stanislavice', x: 300, y: 470, role: 'home', c: 'CZ' },
-    { id: 'konak', name: 'Koňákov', x: 170, y: 560, role: 'home', c: 'CZ' },
+    { id: 'chot', name: 'Chotěbuz', x: 340, y: 100, role: 'local', c: 'CZ' },
+    { id: 'svib', name: 'Svibice', x: 230, y: 160, role: 'local', c: 'CZ' },
+    { id: 'mosty', name: 'Mosty', x: 205, y: 420, role: 'local', c: 'CZ' },
+    { id: 'zukov', name: 'Dolní Žukov', x: 430, y: 440, role: 'local', c: 'CZ' },
+    { id: 'stan', name: 'Stanislavice', x: 300, y: 470, role: 'local', c: 'CZ' },
+    { id: 'konak', name: 'Koňákov', x: 170, y: 560, role: 'local', c: 'CZ' },
   ];
   // Hundreds of unnamed household nodes, scattered over the towns and villages (seeded, so every replay matches).
   const HOUSES = [
@@ -174,7 +177,7 @@ export function mountDemo(root, S) {
   ];
   const HQ = byId.hq;
   const others = NODES.filter((n) => n.role !== 'hq');
-  const homes = NODES.filter((n) => n.role === 'home');
+  const homes = NODES.filter((n) => n.role === 'home' || n.role === 'local');
   const routers = NODES.filter((n) => n.role === 'router');
   const relays = NODES.filter((n) => n.role !== 'home');
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -215,7 +218,7 @@ export function mountDemo(root, S) {
   }
   links.forEach((l) => { l.el = mk('line', { x1: l.a.x, y1: l.a.y, x2: l.b.x, y2: l.b.y, class: 'link' }, G('links')); });
   // Coverage of each transmitter: every household inside a circle hears it directly, with no relay.
-  relays.forEach((n) => { n.cover = mk('circle', { cx: n.x, cy: n.y, r: RANGE[n.role], class: 'cover' }, G('cover')); });
+  relays.forEach((n) => { n.cover = mk('circle', { cx: n.x, cy: n.y, r: RANGE[n.role], class: 'cover' + (n.role === 'local' ? ' local' : '') }, G('cover')); });
 
   TOWERS.forEach((t) => {
     mk('path', { d: `M${HQ.x} ${HQ.y} L${t.x} ${t.y}`, class: 'backhaul' }, G('back'));
@@ -234,7 +237,7 @@ export function mountDemo(root, S) {
     relays.forEach((n) => n.cover.classList.toggle('dead', n.off));
   }
   function setTower(t, s) { t.g.setAttribute('class', 'tower ' + s); }
-  const roleName = (n) => (n.role === 'router' ? S.router : S.household);
+  const roleName = (n) => (n.role === 'router' ? S.router : n.role === 'local' ? S.local : S.household);
 
   NODES.forEach((n) => {
     if (n.gen) {
@@ -249,9 +252,10 @@ export function mountDemo(root, S) {
     mk('circle', { class: 'halo', r: 20 }, g);
     if (n.role === 'router') mk('rect', { class: 'core', x: -8, y: -8, width: 16, height: 16, transform: 'rotate(45)' }, g);
     else if (isHq) mk('rect', { class: 'core', x: -10, y: -10, width: 20, height: 20, rx: 3 }, g);
+    else if (n.role === 'local') mk('path', { class: 'core', d: 'M0 -8 L7.5 5.5 L-7.5 5.5 Z' }, g);
     else mk('circle', { class: 'core', r: 6 }, g);
     mk('path', { class: 'x', d: 'M-6 -6 L6 6 M6 -6 L-6 6' }, g);
-    mk('text', { class: 'lbl' + (n.role !== 'home' ? ' strong' : ''), x: 0, y: n.role === 'home' ? 20 : 26, 'text-anchor': 'middle' }, g).textContent = n.name;
+    mk('text', { class: 'lbl' + (n.role === 'hq' || n.role === 'router' ? ' strong' : ''), x: 0, y: n.role === 'home' || n.role === 'local' ? 20 : 26, 'text-anchor': 'middle' }, g).textContent = n.name;
     mk('title', {}, g).textContent = isHq ? S.tipHq : f(S.tipNode, { name: n.name, c: n.c, role: roleName(n) });
     n.g = g;
     if (!isHq) {
@@ -311,7 +315,7 @@ export function mountDemo(root, S) {
 
   // ---------- managed flooding ----------
   const AIR = 700;
-  let H = 3, seen = {}, reached = 0, maxHop = 0, txCount = 0, implicitAck = false, meshT0 = null, meshDone = true;
+  let H = 3, seen = {}, reached = 0, maxHop = 0, txCount = 0, quietCount = 0, implicitAck = false, meshT0 = null, meshDone = true, R = rng(7);
   let sentLangs = null, packets = 1, sel = byId.nam;
 
   // ---------- languages ----------
@@ -352,7 +356,7 @@ export function mountDemo(root, S) {
   const snrOf = (n, from) => (10 - 24 * Math.min(1, dist(n, from) / RANGE[from.role])).toFixed(1);
   function startMesh(t) {
     mode = 'mesh'; meshDone = false;
-    H = Number(B('hop').value);
+    H = Number(B('hop').value); R = rng(7 + H); quietCount = 0;
     const out = renderOutgoing(); sentLangs = out.langs; packets = out.p;
     seen = { hq: true }; reached = 0; maxHop = 0; txCount = 0; implicitAck = false; meshT0 = t;
     others.forEach((n) => setState(n, n.off ? 'off' : 'idle'));
@@ -396,7 +400,9 @@ export function mountDemo(root, S) {
     log('rx', f(S.log.rxHomes, { k, from: from.name, hop }));
     updateStats();
   }
-  // Routers (ROUTER role) relay the first copy they hear, quickly and always.
+  // Routers (ROUTER role) relay the first copy they hear, quickly and always. Village relays (CLIENT role)
+  // wait first: weaker signal means farther away, so a shorter wait. If they hear anyone else relay the
+  // packet while waiting, they stay quiet.
   function receive(n, hl, from, t) {
     if (n.off) return;
     const l = links.find((l) => (l.a === n && l.b === from) || (l.b === n && l.a === from));
@@ -405,15 +411,20 @@ export function mountDemo(root, S) {
       if (!implicitAck) { implicitAck = true; log('rx', f(S.log.ack, { from: from.name })); }
       return;
     }
-    if (seen[n.id]) return;
+    if (seen[n.id]) {
+      if (n.role === 'local' && n.state === 'waiting') { setState(n, 'quiet'); quietCount++; log('q', f(S.log.quiet, { n: n.name, from: from.name })); }
+      return;
+    }
     seen[n.id] = true;
+    if (n.role === 'local') reached++;
     const hop = H - hl + 1; maxHop = Math.max(maxHop, hop);
     const snr = snrOf(n, from);
     n.rxHop = hop; n.rxSnr = snr;
     if (n === sel) drawScreen();
     updateStats();
     if (hl > 0) {
-      const delay = 120 + Math.round(dist(n, from) / 4);
+      const ratio = Math.min(1, dist(n, from) / RANGE[from.role]);
+      const delay = n.role === 'router' ? 120 + Math.round(dist(n, from) / 4) : Math.round(AIR + 300 + 1200 * (1 - ratio) + R() * 80);
       setState(n, 'waiting');
       log('rx', f(S.log.rx, { n: n.name, c: n.c, hop, snr, ms: delay }));
       at(t + delay, (tt) => { if (n.state !== 'waiting' || n.off) return; transmit(n, hl - 1, tt); });
@@ -427,7 +438,7 @@ export function mountDemo(root, S) {
     meshDone = true;
     const missed = homes.filter((n) => !seen[n.id]);
     K('s4').textContent = ((simT - meshT0) / 1000).toFixed(1) + ' s';
-    if (missed.length === 0) log('sys', f(S.log.all, { t: homes.length, tx: txCount }));
+    if (missed.length === 0) log('sys', f(S.log.all, { t: homes.length, tx: txCount, q: quietCount }));
     else {
       const off = missed.filter((n) => n.off).length;
       const named = missed.filter((n) => !n.gen).map((n) => n.name).join(', ');
